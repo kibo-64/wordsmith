@@ -11,8 +11,8 @@
 <meta name="description" content="A word-puzzle smithy. Drop letters, forge words, beat bosses.">
 <!-- PWA manifest + Apple touch icon so iOS "Add to Home Screen" and Android "Install app" both produce a fullscreen experience with our branding. -->
 <link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./ASSETS/Smithy.png">
-<link rel="icon" type="image/png" href="./ASSETS/Smithy.png">
+<link rel="apple-touch-icon" href="./Wordsmith%20LOGO.png">
+<link rel="icon" type="image/png" href="./Wordsmith%20LOGO.png">
 <title>Wordsmith</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -137,7 +137,11 @@ html, body {
 /* ─── HUD ─── */
 
 .hud {
-  padding: 50px 14px 4px;
+  /* Use env(safe-area-inset-top) so iOS standalone mode and Android both
+     reserve exactly the right amount for the device's status bar / notch
+     area, without leaving dead space on phones with no notch. Plus a 10px
+     base so the HUD never butts straight up against the system bar. */
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 14px 4px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -709,25 +713,28 @@ html, body {
 }
 
 .cube-face {
+  /* Matched to .tile-inner so falling letters share the same forged-metal
+     look as placed tiles — no more two visual languages. */
   position: absolute;
   inset: 3px;
-  border-radius: 10px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-weight: 800;
   font-size: calc(var(--cell) * 0.5);
-  color: var(--tile-text);
-  background: linear-gradient(155deg,
-    hsl(var(--letter-hue, 40), 70%, 95%) 0%,
-    hsl(var(--letter-hue, 40), 55%, 80%) 60%,
-    hsl(var(--letter-hue, 40), 50%, 65%) 100%);
-  border: 1px solid rgba(255, 245, 220, 0.55);
+  color: var(--tile-locked-text);
+  background: linear-gradient(180deg,
+    hsl(var(--letter-hue, 40), 60%, 92%) 0%,
+    hsl(var(--letter-hue, 40), 55%, 78%) 45%,
+    hsl(var(--letter-hue, 40), 50%, 60%) 100%);
   box-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.32),
-    0 0 0 1px rgba(0, 0, 0, 0.20) inset,
-    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    inset 0 2px 0 rgba(255, 255, 255, 0.78),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.20),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.10),
+    0 3px 6px rgba(0, 0, 0, 0.42),
+    0 1px 0 rgba(0, 0, 0, 0.5);
   backface-visibility: hidden;
 }
 .cube-face span {
@@ -751,9 +758,11 @@ html, body {
 .dice-wrap.cube.dragging .cube-face.front,
 .extra-tile.cube.dragging .cube-face.front {
   box-shadow:
-    0 12px 24px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(0, 0, 0, 0.20) inset,
-    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    inset 0 2px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 12px 24px rgba(0, 0, 0, 0.50),
+    0 2px 0 rgba(0, 0, 0, 0.5);
   transform: translateZ(25px) scale(1.04);
 }
 
@@ -1649,58 +1658,46 @@ html, body {
   transition: top 0.32s cubic-bezier(0.55, 0, 0.78, 1.0), left 0.10s, opacity 0.4s, transform 0.4s !important;
 }
 
-/* Time-freeze full-screen indicator — restored stronger frosted look per
-   user request. Three layers stacked: an icy gradient wash, frost crystals
-   crawling in from each edge, and a slow blue pulse around everything. */
+/* Time-freeze full-screen indicator — toned-down version. Subtle icy wash +
+   soft corner frost only. No more diagonal crosshatch grid, no more heavy
+   backdrop-blur — the gameplay underneath should still read clearly. */
 .freeze-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 28;
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(220, 240, 255, 0.22), transparent 55%),
-    radial-gradient(ellipse at 70% 80%, rgba(184, 216, 255, 0.22), transparent 55%),
-    linear-gradient(180deg, rgba(110, 180, 255, 0.18), rgba(50, 110, 200, 0.12) 50%, rgba(184, 216, 255, 0.22));
-  animation: freeze-pulse 1.8s ease-in-out infinite;
-  border: 3px solid rgba(220, 240, 255, 0.55);
+    radial-gradient(ellipse at 30% 20%, rgba(220, 240, 255, 0.08), transparent 55%),
+    radial-gradient(ellipse at 70% 80%, rgba(184, 216, 255, 0.08), transparent 55%),
+    linear-gradient(180deg, rgba(110, 180, 255, 0.05), rgba(184, 216, 255, 0.08));
+  animation: freeze-pulse 2.4s ease-in-out infinite;
+  border: 2px solid rgba(184, 216, 255, 0.30);
   box-shadow:
-    inset 0 0 80px rgba(184, 216, 255, 0.45),
-    inset 0 0 30px rgba(255, 255, 255, 0.25),
-    0 0 30px rgba(184, 216, 255, 0.3);
-  backdrop-filter: blur(1.5px) saturate(0.85) hue-rotate(-10deg);
-  -webkit-backdrop-filter: blur(1.5px) saturate(0.85) hue-rotate(-10deg);
+    inset 0 0 50px rgba(184, 216, 255, 0.20),
+    0 0 16px rgba(184, 216, 255, 0.18);
 }
 
-/* Frost-crystal corner fronds — drawn with radial gradients on ::before/::after
-   so they fade in from the four corners like ice creeping across glass. */
-.freeze-overlay::before,
-.freeze-overlay::after {
+/* Soft frost corners only — no cross-hatch grid. */
+.freeze-overlay::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 0% 0%,   rgba(255,255,255,0.55) 0px, transparent 90px),
-    radial-gradient(circle at 100% 0%, rgba(255,255,255,0.55) 0px, transparent 90px),
-    radial-gradient(circle at 0% 100%, rgba(255,255,255,0.55) 0px, transparent 90px),
-    radial-gradient(circle at 100% 100%, rgba(255,255,255,0.55) 0px, transparent 90px);
-  animation: freeze-crystal 2.6s ease-in-out infinite alternate;
-}
-.freeze-overlay::after {
-  background:
-    repeating-linear-gradient( 45deg, transparent 0 22px, rgba(220,240,255,0.10) 22px 24px),
-    repeating-linear-gradient(-45deg, transparent 0 22px, rgba(220,240,255,0.10) 22px 24px);
-  mix-blend-mode: screen;
-  animation: freeze-crystal 3.4s ease-in-out infinite alternate-reverse;
+    radial-gradient(circle at 0% 0%,   rgba(255,255,255,0.22) 0px, transparent 70px),
+    radial-gradient(circle at 100% 0%, rgba(255,255,255,0.22) 0px, transparent 70px),
+    radial-gradient(circle at 0% 100%, rgba(255,255,255,0.22) 0px, transparent 70px),
+    radial-gradient(circle at 100% 100%, rgba(255,255,255,0.22) 0px, transparent 70px);
+  animation: freeze-crystal 3s ease-in-out infinite alternate;
 }
 
 @keyframes freeze-pulse {
-  0%, 100% { opacity: 0.85; }
-  50%      { opacity: 1; }
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 0.95; }
 }
 @keyframes freeze-crystal {
-  0%   { opacity: 0.5; transform: scale(1); }
-  100% { opacity: 1;   transform: scale(1.04); }
+  0%   { opacity: 0.4; }
+  100% { opacity: 0.8; }
 }
 
 .freeze-label {
