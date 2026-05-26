@@ -1,0 +1,6 @@
+{
+  "name": "wordsmith",
+  "private": true,
+  "type": "module",
+  "description": "Wordsmith — a word-tetris puzzle game. Static HTML + Vercel serverless functions in /api for AI-generated gazette content."
+}
