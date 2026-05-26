@@ -1087,7 +1087,8 @@ html, body {
   color: rgba(0, 0, 0, 0.55);
   font-style: italic;
 }
-.gazette-forge-btn {
+.gazette-forge-btn,
+.gazette-share-btn {
   background: rgba(26, 18, 8, 0.92);
   color: #f5ebd0;
   border: 1px solid rgba(0, 0, 0, 0.4);
@@ -1100,13 +1101,49 @@ html, body {
   cursor: pointer;
   transition: transform 0.1s ease, background 0.15s ease;
 }
-.gazette-forge-btn:hover:not(:disabled) {
+.gazette-forge-btn:hover:not(:disabled),
+.gazette-share-btn:hover:not(:disabled) {
   background: #1a1208;
   transform: translateY(-1px);
 }
-.gazette-forge-btn:disabled {
+.gazette-forge-btn:disabled,
+.gazette-share-btn:disabled {
   opacity: 0.55;
   cursor: default;
+}
+.gazette-share-note {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: #2a1a0a;
+  opacity: 0.85;
+}
+/* Larger gazette image — taller frame so the engraving is the centrepiece. */
+.gazette-image.gazette-image-large {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 320px;
+  margin: 10px 0 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  background: rgba(245, 235, 215, 0.55);
+}
+.gazette-image.gazette-image-large .gazette-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Bold word chips in the gazette body — these are the player's actual
+   forged words that the AI woven into the story. */
+.gazette-word {
+  font-weight: 800;
+  color: #1a1208;
+  background: linear-gradient(180deg, rgba(255, 215, 130, 0.55), rgba(220, 175, 90, 0.45));
+  padding: 0 3px;
+  border-radius: 3px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.01em;
 }
 .gazette-err {
   color: #8a1a1a;
@@ -1173,6 +1210,78 @@ html, body {
 .records-grid.records-grid-endless {
   grid-template-columns: repeat(3, 1fr);
 }
+
+/* Endless boss banner — pronounced "!" pulse + flash overlay that re-plays
+   every time a new boss starts. Right-side circular timer counts the
+   remaining seconds (turns red under 10s). */
+.level-banner.endless-boss-banner {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 110, 110, 0.45);
+  box-shadow: 0 0 18px rgba(255, 110, 110, 0.25);
+}
+.banner-icon.banner-icon-pulse {
+  animation: banner-icon-pulse 1.1s ease-in-out infinite;
+}
+@keyframes banner-icon-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.18); filter: drop-shadow(0 0 6px rgba(255, 110, 110, 0.7)); }
+}
+/* White-flash overlay slides across the banner once when a new boss starts. */
+.endless-boss-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 240, 200, 0.0) 30%,
+    rgba(255, 255, 240, 0.55) 50%,
+    rgba(255, 240, 200, 0.0) 70%,
+    transparent 100%);
+  animation: endless-boss-flash 0.7s ease-out 1;
+}
+@keyframes endless-boss-flash {
+  0%   { transform: translateX(-100%); opacity: 1; }
+  100% { transform: translateX(100%);  opacity: 0; }
+}
+/* Circular countdown badge on the right side of the banner. */
+.endless-boss-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 8px;
+  border-radius: 50%;
+  background: rgba(20, 14, 8, 0.55);
+  border: 1.5px solid rgba(255, 200, 120, 0.6);
+  margin-left: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.endless-boss-timer.danger {
+  border-color: #ff4d6d;
+  background: rgba(80, 18, 28, 0.55);
+  animation: endless-boss-timer-pulse 0.9s ease-in-out infinite;
+}
+@keyframes endless-boss-timer-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.55); }
+  50%      { box-shadow: 0 0 0 6px rgba(255, 77, 109, 0); }
+}
+.endless-boss-timer-num {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+  color: #ffd9a8;
+}
+.endless-boss-timer.danger .endless-boss-timer-num { color: #ffb5b8; }
+.endless-boss-timer-lbl {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 217, 168, 0.7);
+  margin-top: 2px;
+}
+.endless-boss-timer.danger .endless-boss-timer-lbl { color: rgba(255, 181, 184, 0.7); }
 
 .run-stat.new-words .run-stat-num { color: #6ee7a5; }
 
@@ -1768,14 +1877,17 @@ html, body {
    or hammer) triggers the effect automatically. */
 .tile.boon .tile-inner {
   position: relative;
+  /* Inset the colored aura INSIDE the tile-inner (via inset box-shadow) so
+     the tile silhouette stays a clean square — the aura no longer adds a
+     2px outer ring that made the tile look like a different shape. */
   box-shadow:
+    inset 0 0 0 2px var(--boon-aura, rgba(255, 255, 255, 0.5)),
     inset 0 1px 0 rgba(255, 255, 255, 0.85),
     inset 0 -2px 0 rgba(0, 0, 0, 0.22),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.10),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.10),
     0 3px 6px rgba(0, 0, 0, 0.42),
     0 1px 0 rgba(0, 0, 0, 0.5),
-    0 0 0 2px var(--boon-aura, rgba(255, 255, 255, 0.5)),
-    0 0 14px var(--boon-glow, rgba(255, 255, 255, 0.35));
+    0 0 12px var(--boon-glow, rgba(255, 255, 255, 0.35));
   animation: boon-aura-pulse 2s ease-in-out infinite;
 }
 .tile.boon-stasis    { --boon-aura: rgba(140, 200, 255, 0.78); --boon-glow: rgba(140, 200, 255, 0.55); }
@@ -1790,12 +1902,12 @@ html, body {
    visible faces are inside .dice-cube; we paint the aura on the .cube-face. */
 .extra-tile.boon .cube-face {
   box-shadow:
+    inset 0 0 0 2px var(--boon-aura, rgba(255, 255, 255, 0.5)),
     inset 0 1px 0 rgba(255, 255, 255, 0.85),
     inset 0 -2px 0 rgba(0, 0, 0, 0.22),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.10),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.10),
     0 3px 6px rgba(0, 0, 0, 0.42),
-    0 0 0 2px var(--boon-aura, rgba(255, 255, 255, 0.5)),
-    0 0 14px var(--boon-glow, rgba(255, 255, 255, 0.35));
+    0 0 12px var(--boon-glow, rgba(255, 255, 255, 0.35));
   animation: boon-aura-pulse 2s ease-in-out infinite;
 }
 .extra-tile.boon-stasis    { --boon-aura: rgba(140, 200, 255, 0.78); --boon-glow: rgba(140, 200, 255, 0.55); }
@@ -1812,13 +1924,20 @@ html, body {
 
 .tile-boon-badge {
   position: absolute;
-  top: 2px;
-  right: 3px;
-  font-size: 11px;
+  top: 5px;
+  right: 5px;
+  font-size: 9px;
   line-height: 1;
   pointer-events: none;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65));
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
   z-index: 3;
+  /* Tuck the badge INSIDE the tile bounds so it doesn't pop out the corner
+     and make the tile read as a weird shape. A subtle dark capsule keeps it
+     legible against bright tile colors. */
+  padding: 2px 4px;
+  background: rgba(20, 14, 8, 0.55);
+  border-radius: 6px;
+  backdrop-filter: blur(2px);
 }
 .boon-badge-wild  { color: #ffeaff; }
 .boon-badge-life  { color: #ffd7e0; }
@@ -6600,30 +6719,37 @@ function App() {
   // boundaries. Schedule: 60s warm-up (no boss) → 60s boss → 30s break →
   // 60s boss → 30s break → ... The break gives the player a chance to
   // recover the board between rotations.
+  const [endlessBossSecsLeft, setEndlessBossSecsLeft] = useState(0);
+  const [endlessBossFlashKey, setEndlessBossFlashKey] = useState(0);
   useEffect(() => {
     if (phase !== "playing") return;
     if (modeRef.current !== "endless") return;
     const tick = setInterval(() => {
       if (frozenRef.current && Date.now() < frozenRef.current) return;
       const elapsedSec = Math.floor(endlessElapsedRef.current / 1000);
-      const phaseMarker = endlessBossPhaseRef.current;
       // First boss at 60s, then alternating 60s on / 30s off forever.
       // Phase cycle length is 90s after the warm-up.
-      if (elapsedSec < 60) return;            // still in warm-up
-      const cyclePos = (elapsedSec - 60) % 90; // 0..89
-      const shouldHaveBoss = cyclePos < 60;    // boss active for first 60s of each 90s cycle
+      if (elapsedSec < 60) { setEndlessBossSecsLeft(0); return; } // still in warm-up
+      const cyclePos = (elapsedSec - 60) % 90;     // 0..89
+      const shouldHaveBoss = cyclePos < 60;         // boss active for first 60s of each 90s cycle
+      const secsLeft = shouldHaveBoss ? (60 - cyclePos) : 0;
+      setEndlessBossSecsLeft(secsLeft);
       if (shouldHaveBoss && !bossChallengeRef.current) {
         const c = window.pickBossChallenge();
         bossChallengeRef.current = c;
         setBossChallenge(c);
-        // Audio cue so the player knows a boss just started.
-        if (window.Sound && Sound.boom) { /* leave silent — we don't want a startle */ }
+        // Flash + sound when the boss starts so the player notices the
+        // sudden change in rules. New key bumps a CSS animation that re-
+        // plays a brief overlay over the banner.
+        setEndlessBossFlashKey(k => k + 1);
+        if (window.Sound && Sound.boom) Sound.boom();
       } else if (!shouldHaveBoss && bossChallengeRef.current) {
         // Boss break — clear the challenge.
         bossChallengeRef.current = null;
         setBossChallenge(null);
         mustMakeMetRef.current = false;
         setMustMakeMet(false);
+        if (window.Sound && Sound.thaw) Sound.thaw();
       }
     }, 1000);
     return () => clearInterval(tick);
@@ -8296,11 +8422,21 @@ function App() {
               the elapsed time. Story mode keeps the original level banner. */}
           {mode === "endless" ? (
             bossChallenge ? (
-              <div className={`level-banner boss`}>
-                <div className="banner-icon">!</div>
+              <div className={`level-banner boss endless-boss-banner`} key={`bossflash-${endlessBossFlashKey}`}>
+                {/* Flash overlay re-plays each time a new boss starts (the
+                    key is bumped on every transition). */}
+                <div className="endless-boss-flash" />
+                <div className="banner-icon banner-icon-pulse">!</div>
                 <div style={{ flex: 1 }}>
                   <div className="banner-text">{bossChallenge.label}</div>
                   <div className="banner-subtext">{bossChallenge.desc}</div>
+                </div>
+                {/* Countdown for how much longer this boss lasts. Tints red
+                    when there's less than 10s left so the player feels the
+                    rule about to expire. */}
+                <div className={`endless-boss-timer ${endlessBossSecsLeft <= 10 ? "danger" : ""}`}>
+                  <div className="endless-boss-timer-num">{endlessBossSecsLeft}</div>
+                  <div className="endless-boss-timer-lbl">s</div>
                 </div>
               </div>
             ) : (
@@ -9803,15 +9939,20 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
   const [aiGazette, setAiGazette] = React.useState(null);     // { headline, dateline, body } | null
   const [aiBusy,    setAiBusy]    = React.useState(true);     // text still in flight on first paint
   const [aiImage,   setAiImage]   = React.useState(null);     // data: URL when generated
-  const [imgBusy,   setImgBusy]   = React.useState(false);
+  const [imgBusy,   setImgBusy]   = React.useState(true);     // image fires automatically now
   const [imgError,  setImgError]  = React.useState("");
+  const [shareNote, setShareNote] = React.useState("");
   // Gazette is now a second page behind a button — keeps the Retry / New Run
   // / Back to Title buttons reachable without scrolling past the newspaper.
   const [showGazette, setShowGazette] = React.useState(false);
   React.useEffect(() => {
-    if (uniqueWords.length < 3) { setAiBusy(false); return; }
+    if (uniqueWords.length < 3) { setAiBusy(false); setImgBusy(false); return; }
     let cancelled = false;
     const lang = (window.Lang && window.Lang.get()) || "en";
+    // ─── Text first ───────────────────────────────────────────
+    // We need the AI-written headline to feed into the image prompt, so the
+    // text request goes first. Once it resolves we kick off the image with
+    // that headline as the prompt anchor.
     fetch("/api/gazette", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
@@ -9824,39 +9965,77 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
       }),
     })
       .then(r => r.ok ? r.json() : Promise.reject(new Error("gazette HTTP " + r.status)))
-      .then(j => { if (!cancelled && j && j.headline && j.body) setAiGazette(j); })
-      .catch(() => { /* silent — procedural fallback is already rendered */ })
+      .then(j => {
+        if (cancelled) return;
+        if (j && j.headline && j.body) {
+          setAiGazette(j);
+          // Image follows. We use the AI-generated headline (or procedural
+          // fallback if the AI didn't return one) as the visual anchor.
+          fetch("/api/gazette-image", {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              words:    uniqueWords.slice(0, 20),
+              headline: j.headline,
+              lang,
+              quality:  "medium",  // bigger image in layout → bump to medium
+            }),
+          })
+            .then(r => r.json().then(jj => ({ ok: r.ok, j: jj })))
+            .then(({ ok, j: img }) => {
+              if (cancelled) return;
+              if (ok && img && img.image) setAiImage(img.image);
+              else setImgError(img?.error || "Image generation failed");
+            })
+            .catch(e => { if (!cancelled) setImgError(e?.message || "Network error"); })
+            .finally(() => { if (!cancelled) setImgBusy(false); });
+        } else {
+          // No AI text → don't try the image either; procedural gazette stays.
+          if (!cancelled) setImgBusy(false);
+        }
+      })
+      .catch(() => { if (!cancelled) setImgBusy(false); /* silent — procedural fallback */ })
       .finally(() => { if (!cancelled) setAiBusy(false); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // Effective gazette: AI version if loaded, otherwise procedural.
   const effectiveGazette = aiGazette || gazette;
-  // Image-generation handler — fires only on user tap so we never burn $0.01+
-  // automatically. Disabled while in flight or if already generated.
-  const handleForgeImage = React.useCallback(() => {
-    if (imgBusy || aiImage) return;
-    setImgBusy(true);
-    setImgError("");
-    const lang = (window.Lang && window.Lang.get()) || "en";
-    fetch("/api/gazette-image", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        words:    uniqueWords.slice(0, 20),
-        headline: effectiveGazette.headline,
-        lang,
-        quality:  "low",   // grayscale newspaper engraving — low is plenty
-      }),
-    })
-      .then(r => r.json().then(j => ({ ok: r.ok, j })))
-      .then(({ ok, j }) => {
-        if (ok && j && j.image) setAiImage(j.image);
-        else setImgError(j?.error || "Image generation failed");
-      })
-      .catch(e => setImgError(e?.message || "Network error"))
-      .finally(() => setImgBusy(false));
-  }, [imgBusy, aiImage, effectiveGazette.headline, uniqueWords]);
+  // Render the body — AI version uses **double asterisks** to flag the
+  // player's forged words; we split on those and render each match as a
+  // bolded chip. Procedural body just renders as plain text.
+  const renderGazetteBody = (text) => {
+    if (typeof text !== "string" || !text.includes("**")) return text;
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((p, i) => {
+      if (p.startsWith("**") && p.endsWith("**")) {
+        return <strong key={i} className="gazette-word">{p.slice(2, -2)}</strong>;
+      }
+      return <React.Fragment key={i}>{p}</React.Fragment>;
+    });
+  };
+  // Share handler. Uses navigator.share on mobile (iOS/Android), falls back
+  // to clipboard copy on desktop. Sharing the gazette text + a link to the
+  // game.
+  const handleShareGazette = React.useCallback(async () => {
+    const T2 = window.Lang ? window.Lang.t : ((en) => en);
+    const cleanBody = (effectiveGazette.body || "").replace(/\*\*/g, "");
+    const shareText = `📰 ${effectiveGazette.headline}\n\n${cleanBody}\n\n— ${T2("The Gnomes' Gazette", "La Gaceta de los Gnomos")} · playwordsmith.com`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: effectiveGazette.headline, text: shareText, url: "https://playwordsmith.com" });
+      } catch (e) { /* user cancelled or no permission — silent */ }
+    } else if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        setShareNote(T2("Copied to clipboard!", "¡Copiado al portapapeles!"));
+        setTimeout(() => setShareNote(""), 2200);
+      } catch (e) {
+        setShareNote(T2("Couldn't copy — try selecting the text.", "No se pudo copiar."));
+        setTimeout(() => setShareNote(""), 2500);
+      }
+    }
+  }, [effectiveGazette.headline, effectiveGazette.body]);
 
   // ─── Gazette-page view ──────────────────────────────────────
   // Second page of the game-over flow. Shown only when the player explicitly
@@ -9872,30 +10051,31 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
               <div className="gazette-title">{T("The Gnomes' Gazette", "La Gaceta de los Gnomos")}</div>
               <div className="gazette-issue">{T("PRESS RUN", "TIRADA")} · {uniqueWords.length} {T("WORDS", "PALABRAS")}</div>
             </div>
-            <div className="gazette-image">
+            {/* The engraving now auto-generates in parallel with the text and
+                renders larger (taller) so it reads as the centrepiece of the
+                newspaper rather than a small inset thumbnail. */}
+            <div className="gazette-image gazette-image-large">
               {aiImage
                 ? <img src={aiImage} alt="" className="gazette-img gazette-img-ai" />
                 : <img src="./ASSETS/Smithy.png" alt="" className="gazette-img" />}
-              {imgBusy && <div className="gazette-img-overlay">{T("Forging engraving…", "Forjando grabado…")}</div>}
+              {imgBusy && !aiImage && <div className="gazette-img-overlay">{T("Engraving the press plate…", "Grabando la plancha…")}</div>}
             </div>
             <h2 className="gazette-headline">{effectiveGazette.headline}</h2>
             <div className="gazette-dateline">{effectiveGazette.dateline} — {T("Special to the Gazette", "Especial para la Gaceta")}</div>
-            <p className="gazette-body">{effectiveGazette.body}</p>
+            <p className="gazette-body">{renderGazetteBody(effectiveGazette.body)}</p>
             <div className="gazette-actions">
               {aiBusy && <span className="gazette-busy">{T("✒ The gnomes are typing…", "✒ Los gnomos están escribiendo…")}</span>}
-              {!aiImage && (
+              {!aiBusy && (
                 <button
-                  className="gazette-forge-btn"
-                  onClick={() => { window.Sound && Sound.tap(); handleForgeImage(); }}
-                  disabled={imgBusy}>
-                  {imgBusy
-                    ? T("Forging engraving…", "Forjando grabado…")
-                    : T("⚒ Forge an engraving", "⚒ Forjar un grabado")}
+                  className="gazette-share-btn"
+                  onClick={() => { window.Sound && Sound.tap(); handleShareGazette(); }}>
+                  ↗ {T("Share gazette", "Compartir gaceta")}
                 </button>
               )}
+              {shareNote && <span className="gazette-share-note">{shareNote}</span>}
               {imgError && <span className="gazette-err">{imgError}</span>}
             </div>
-            <div className="gazette-footer">{T("— more on page 2 —", "— continúa en página 2 —")}</div>
+            <div className="gazette-footer">{T("— Wordsmith Press —", "— Prensa Wordsmith —")}</div>
           </div>
           <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); setShowGazette(false); }}>
             {T("← Back", "← Volver")}

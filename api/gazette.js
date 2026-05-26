@@ -60,13 +60,29 @@ export default async function handler(req, res) {
   // Build the prompt. Haiku is fast + cheap so we lean into a richly-flavored
   // system message + a single user turn that hands over the word inventory.
   const system = lang === "es"
-    ? `Eres el editor de "La Gaceta de los Gnomos", un periódico medieval de un pueblo de gnomos herreros. Escribes en español con un tono absurdo, gracioso y caprichoso — mezcla de noticias rurales y mitología de taller. Tu trabajo: a partir de una lista de palabras que un jugador forjó en una partida, escribir UNA noticia corta como si las palabras fueran personajes, lugares o eventos reales del mundo gnómico. Responde SOLO en JSON válido (sin markdown, sin explicación), con la forma exacta: {"headline":"...","dateline":"...","body":"..."}. El headline en MAYÚSCULAS, máximo 8 palabras. El dateline corto, 2-4 palabras, como "Distrito del Yunque" o "Detrás de la Fragua". El body es 2-3 oraciones, máximo 60 palabras, debe incorporar al menos 4 de las palabras de la lista (úsalas como nombres propios, lugares, o conceptos del mundo). Sé ingenioso, no genérico.`
-    : `You are the editor of "The Gnomes' Gazette", a medieval newspaper from a village of gnome blacksmiths. You write in English with an absurd, witty, whimsical tone — equal parts village news and workshop folklore. Your job: given a list of words a player forged during a game run, write ONE short news story as if the words were real characters, places, or events from the gnome world. Respond ONLY in valid JSON (no markdown, no preamble), exactly: {"headline":"...","dateline":"...","body":"..."}. headline in ALL CAPS, max 8 words. dateline is short — 2-4 words like "Anvil District" or "Behind the Forge". body is 2-3 sentences, max 60 words, must work in at least 4 of the words from the list (use them as proper nouns, places, or world-concepts). Be inventive, not generic.`;
+    ? `Eres el editor de "La Gaceta de los Gnomos", un periódico medieval de un pueblo de gnomos herreros. Escribes en español con un tono absurdo, gracioso y caprichoso — mezcla de noticias rurales y mitología de taller. Tu trabajo: a partir de una lista de palabras que un jugador forjó en una partida, escribir UNA noticia corta como si las palabras fueran personajes, lugares o eventos reales del mundo gnómico.
+
+REGLAS:
+- Responde SOLO en JSON válido (sin markdown, sin explicación), exacto: {"headline":"...","dateline":"...","body":"..."}.
+- headline en MAYÚSCULAS, máximo 10 palabras. Puede incorporar palabras de la lista.
+- dateline corto, 2-4 palabras (ej. "Distrito del Yunque", "Detrás de la Fragua").
+- body es 3-5 oraciones, hasta 120 palabras. DEBES incorporar TANTAS palabras de la lista como sea posible (mínimo el 80%) de forma natural, usándolas como nombres propios, lugares, criaturas, verbos, o conceptos del mundo gnómico.
+- Cada palabra de la lista que uses en el body debe estar envuelta en **dobles asteriscos** así: **PALABRA**. Esto resaltará las palabras forjadas por el jugador.
+- Sé ingenioso, narrativo, no genérico. Construye una historia coherente con tantas palabras del jugador como sea posible.`
+    : `You are the editor of "The Gnomes' Gazette", a medieval newspaper from a village of gnome blacksmiths. You write in English with an absurd, witty, whimsical tone — equal parts village news and workshop folklore. Your job: given a list of words a player forged during a game run, write ONE short news story as if the words were real characters, places, or events from the gnome world.
+
+RULES:
+- Respond ONLY in valid JSON (no markdown, no preamble), exactly: {"headline":"...","dateline":"...","body":"..."}.
+- headline in ALL CAPS, max 10 words. May include words from the list.
+- dateline is short — 2-4 words like "Anvil District" or "Behind the Forge".
+- body is 3-5 sentences, up to 120 words. You MUST incorporate AS MANY words from the list AS POSSIBLE (at least 80%) naturally as proper nouns, places, creatures, verbs, or world-concepts.
+- Every word from the list that you use in the body MUST be wrapped in **double asterisks** like this: **WORD**. This highlights the words the player forged.
+- Be inventive, narrative, not generic. Build a coherent story that weaves in as many of the player's words as possible.`;
 
   const wordsList = words.join(", ");
   const userPrompt = lang === "es"
-    ? `Palabras forjadas (en orden): ${wordsList}\n\nNivel: ${level}. Puntos: ${score}.${longest ? ` Palabra más larga: ${longest}.` : ""}\n\nEscribe el JSON ahora.`
-    : `Forged words (in order): ${wordsList}\n\nLevel: ${level}. Score: ${score}.${longest ? ` Longest: ${longest}.` : ""}\n\nWrite the JSON now.`;
+    ? `Palabras forjadas (${words.length} en total): ${wordsList}\n\nNivel: ${level}. Puntos: ${score}.${longest ? ` Palabra más larga: ${longest}.` : ""}\n\nIntegra el máximo posible de estas palabras en el cuerpo, envueltas en **dobles asteriscos**. Escribe el JSON ahora.`
+    : `Forged words (${words.length} total): ${wordsList}\n\nLevel: ${level}. Score: ${score}.${longest ? ` Longest: ${longest}.` : ""}\n\nWeave as many of these words as possible into the body, wrapped in **double asterisks**. Write the JSON now.`;
 
   try {
     const aiRes = await fetch(ANTHROPIC_URL, {
@@ -78,7 +94,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 400,
+        max_tokens: 800,    // longer body now that we ask for 3-5 sentences w/ most words inlined
         system,
         messages: [{ role: "user", content: userPrompt }],
       }),
@@ -105,9 +121,9 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: "AI returned malformed JSON", fallback: true });
     }
 
-    const headline = String(parsed.headline || "").slice(0, 100);
+    const headline = String(parsed.headline || "").slice(0, 120);
     const dateline = String(parsed.dateline || "").slice(0,  60);
-    const bodyText = String(parsed.body     || "").slice(0, 600);
+    const bodyText = String(parsed.body     || "").slice(0, 1500);
     if (!headline || !bodyText) {
       return res.status(502).json({ error: "AI response missing headline/body", fallback: true });
     }

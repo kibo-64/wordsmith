@@ -49,7 +49,9 @@ export default async function handler(req, res) {
   const words    = Array.isArray(body.words) ? body.words.filter(Boolean).slice(0, 30) : [];
   const headline = String(body.headline || "").slice(0, 100);
   const lang     = body.lang === "es" ? "es" : "en";
-  const quality  = ["low", "medium", "high"].includes(body.quality) ? body.quality : "low";
+  // Auto-gen now fires on game-over (not behind a button), so we default to
+  // medium quality for a more detailed engraving. Caller can still override.
+  const quality  = ["low", "medium", "high"].includes(body.quality) ? body.quality : "medium";
 
   if (words.length < 1 || !headline) {
     return res.status(400).json({ error: "Need words[] and headline" });
