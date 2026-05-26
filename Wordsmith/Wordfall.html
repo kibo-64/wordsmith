@@ -930,6 +930,132 @@ html, body {
   text-align: center;
 }
 
+/* ─── The Gnomes' Gazette ─────────────────────────────────────
+   Print-newspaper styling for the game-over story block. Cream/parchment
+   background, serif type, dotted dividers, grayscale image up top — meant
+   to read like a folded broadsheet handed to the player when the run ends. */
+.gazette {
+  background: #f3ead7;
+  color: #1a1208;
+  border: 1px solid rgba(0, 0, 0, 0.45);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.15),
+    0 8px 22px rgba(0, 0, 0, 0.55);
+  padding: 14px 14px 12px;
+  margin: 14px 0 16px;
+  font-family: 'Georgia', 'Bricolage Grotesque', serif;
+  text-align: left;
+  border-radius: 4px;
+  position: relative;
+}
+.gazette::before {
+  /* subtle paper grain — repeating noise via radial gradients */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(rgba(120, 90, 50, 0.06) 1px, transparent 1px),
+    radial-gradient(rgba(80, 60, 30, 0.04) 1px, transparent 1px);
+  background-size: 6px 6px, 9px 9px;
+  background-position: 0 0, 3px 3px;
+  border-radius: inherit;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+.gazette-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 2px double rgba(0, 0, 0, 0.55);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.gazette-title {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: #1a1208;
+  text-align: center;
+  flex: 1;
+}
+.gazette-issue {
+  font-family: 'JetBrains Mono', 'Georgia', monospace;
+  font-size: 8px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+}
+.gazette-image {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0 10px;
+  position: relative;
+}
+.gazette-img {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  /* Black-and-white print look. The Smithy mascot does the job until the
+     AI image-gen version comes online. */
+  filter: grayscale(1) contrast(1.25) brightness(0.95) sepia(0.05);
+  mix-blend-mode: multiply;
+}
+.gazette-headline {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1.15;
+  text-align: center;
+  margin: 4px 0 6px;
+  color: #1a1208;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.gazette-dateline {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 11px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 8px;
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
+  padding-bottom: 6px;
+}
+.gazette-body {
+  font-family: 'Georgia', serif;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #14100a;
+  text-align: justify;
+  margin: 0 0 8px;
+  /* First-letter drop cap for that classic broadsheet feel. */
+}
+.gazette-body::first-letter {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 0.9;
+  float: left;
+  padding: 3px 6px 0 0;
+  color: #1a1208;
+}
+.gazette-footer {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 10px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.50);
+  border-top: 1px dotted rgba(0, 0, 0, 0.4);
+  padding-top: 6px;
+}
+
+.run-stat.new-words .run-stat-num { color: #6ee7a5; }
+
 .run-stats {
   background: rgba(255, 245, 220, 0.04);
   border: 1px solid rgba(255, 245, 220, 0.10);
@@ -2361,6 +2487,39 @@ html, body {
 .overlay-btn + .overlay-btn {
   margin-top: 8px;
 }
+
+/* Language toggle — small pill pair in the top-right of the start card. */
+.lang-toggle {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 4px;
+  background: rgba(20, 10, 30, 0.55);
+  border: 1px solid rgba(255, 245, 220, 0.15);
+  border-radius: 999px;
+  padding: 2px;
+  z-index: 5;
+}
+.lang-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 245, 220, 0.55);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+.lang-pill.active {
+  background: var(--accent-amber);
+  color: #2a1830;
+}
+.lang-pill:active { transform: scale(0.95); }
 
 /* Resume button — leads the start screen when there's a saved run. */
 .overlay-btn.resume-btn {
@@ -3957,6 +4116,199 @@ window.WORDS = WORDS;
 window.VERB_SET = VERB_SET;
 window.NATURE_SET = NATURE_SET;
 
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  SPANISH MODE                                                             ║
+// ║  Parallel dictionary + themed sets for ES. Accents are stripped at        ║
+// ║  load (CAFÉ → CAFE) so players can match without typing diacritics.       ║
+// ║  Ñ is preserved but maps to N in WORDS for typeability — words with Ñ     ║
+// ║  also register their N-substituted form (ESPAÑA → also ESPANA).           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+// Helper — strip accents + map Ñ to N (so type-friendly forms also match).
+function _stripDiacritics(s) {
+  return String(s || "")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")  // remove combining accents
+    .replace(/ñ/g, "n").replace(/Ñ/g, "N");
+}
+// Common Spanish words across length 3-8. Curated — high frequency only.
+// Intentionally no accents (the stripper would convert them anyway).
+const ES_WORD_LIST = (
+  // 3-letter
+  "ala,amo,ano,ave,año,bar,boa,bus,cae,can,cap,cas,cha,che,col,con,coz,cri,cus,dar,dia,don,dos,duo,ego,eje,ele,ene,era,esa,ese,eso,fan,fas,fea,fes,fia,fin,foe,fue,fui,gas,gen,gol,gua,hay,hez,hoy,ida,ido,igu,ira,jaz,jet,key,kio,lar,las,led,lee,les,ley,liz,los,luz,mal,mar,mas,mes,mil,mis,muy,nas,nie,niz,nos,oca,oda,oes,ojo,olé,olo,ola,olé,orc,oro,oso,pan,par,pas,paz,pec,pen,pes,pez,pie,pin,pio,piz,por,por,pos,pre,pro,puf,pun,que,red,rey,riñ,ría,río,roa,roc,roe,ron,ros,rua,sal,san,sed,ser,sin,sir,sol,son,soy,sub,sus,tal,tan,tea,ten,tic,til,tio,toa,top,tos,tul,tus,ufo,una,uno,uña,uso,vas,vea,vio,voz,uva,vez,via,vid"
+  + ","
+  // 4-letter
+  + "abes,acto,agua,ajos,alas,alba,alce,alma,alto,amar,ambo,amen,amor,anil,ante,años,arco,area,arma,arte,asar,asco,asia,asno,atar,auge,aula,aves,azul,bajo,base,bata,boca,boda,bota,bote,bola,bono,bota,brea,brio,buen,buho,buja,buque,caba,cabe,cabo,cada,café,caja,cala,calé,cale,calm,calo,cama,cana,cano,caos,capa,caps,cara,carbo,cari,caro,casa,caso,cata,cebo,cela,celo,cena,cera,cero,cien,cima,cine,cito,cita,clic,cobi,coco,cojo,cola,come,como,como,cono,copa,coro,cosa,cose,coso,cota,creo,cría,crio,cruz,cuba,cubo,cuca,culo,cura,daba,dado,dama,daño,dato,debo,debe,deja,deje,deli,demo,deno,dent,deol,deja,deca,deci,deco,dede,dedi,dedo,deja,deja,dejo,deli,dela,dell,demo,deno,deon,deol,dera,dere,deri,desa,dese,desi,deso,deta,dete,deti,deto,devo,deza,deze,dezi,dezo,dial,dias,dice,dije,dios,disc,dolo,domo,donde,doña,doña,dosis,dote,duda,duos,dura,duro,eche,echo,echa,eclo,eco,edad,efe,eje,ello,empo,enano,enero,ente,erra,esa,ese,esos,esos,esta,este,euro,este,evas,evos,exes,faba,fabe,facil,facto,fado,fage,faja,fale,falo,fama,fans,faro,fase,fauna,faz,fea,fea,feliz,feo,fede,feo,feria,feto,fial,fiar,fias,fica,fice,fida,fide,fido,fija,fijo,fila,filo,fina,fino,fior,firma,fizo,flan,flor,flota,fluvio,fobo,foca,foco,foco,fofo,foja,fola,follo,folk,fome,fono,foja,foja,foja,foja,fora,foro,fosa,foso,foto,fraga,fres,frac,frio,fruta,fueg,fuel,fuer,fuga,fui,fuma,fumo,fundo,fundo,gabo,gaba,gala,gana,gata,gato,geco,gemo,gene,genes,gente,gerar,giro,glad,glen,gloa,gnomo,goce,godo,goes,gola,golfo,goma,gore,gota,gozo,gran,gris,grita,grupo,gual,guau,guay,gula,guru,gusto,haba,hace,hada,hado,haga,hago,halar,hale,halo,hambre,haya,hazm,hech,hecho,helo,hera,hero,hijo,hilar,hilo,hilo,hino,hipo,hipos,hito,hoja,hola,hombre,honda,honor,hora,horror,hoyo,huelo,hueso,humo,iban,ibas,iceberg,icono,icto,ideal,ideas,idio,idolo,ido,iglesia,igual,iguana,iman,imán,imbecil,imitar,imo,impacto,implorar,iban,ido,ido,iglesia,igual,iguana,iman,iglu,ilic,iman,imán,imito,impar,impon,impuro,imun,inca,indio,inerte,infierno,infimo,inflar,infra,ingles,inicio,injuria,insano,instar,insulto,intimo,inunda,invita,inyectar,ipso,irse,iron,isla,iva,iza,izan,izar,izas,jabón,jaca,jaco,jaden,jaen,jaez,jaque,jara,jardin,jarra,jase,jato,jaula,jefe,jenga,jeque,jirafa,jirón,jodes,jonia,jose,joven,joya,joyel,juana,jubilo,jueces,juega,jugada,jugar,jugos,juicio,juli,jume,junco,juncos,juntar,junta,juntos,jurar,juras,juro,kaki,kebab,kilo,kiwi,koala,labio,labor,labra,laca,lados,ladrar,lago,lagos,lampara,lanas,lanza,lapiz,largo,larva,lasar,lata,latas,latex,latin,latir,latoso,laurel,lavar,laxo,lazo,leal,lebra,leche,lechuga,leer,legal,legos,leguas,lejos,lenta,lento,leon,leona,leones,letra,leve,levas,lexico,leyes,liana,libra,libre,libro,licor,lider,liebre,liga,ligar,ligero,lima,limos,limpia,limpio,linaje,linda,lindo,linea,linfa,lingote,link,liño,lira,lirio,lisa,liso,lista,litio,litro,liturgia,lujo,llama,llano,llanto,llanura,llave,llegar,lleno,llevar,llorar,lloro,lluvia,lobera,lobo,lobos,local,loco,locos,locura,lodo,logia,logo,logico,lomo,lona,longeva,lord,loro,loros,losa,lote,loza,luchar,lucir,lucro,luego,luenga,lugar,lujo,luna,lunes,lupa,luto"
+  + ","
+  // 5-letter
+  + "abajo,abeja,abrio,abrir,acaso,acera,acido,acoge,acoso,acoja,acoso,acoto,acudi,acudo,actor,acude,acudia,acuda,acuda,acuda,adios,aduce,adula,agata,agita,agora,agoró,aguda,aguja,aguza,ahora,ajeno,ajiar,ajuar,alada,alado,alano,alava,albas,album,aldea,alegra,alegre,alfar,alfil,alfiler,alfombra,algas,algos,alice,alivio,alma,almeja,alminar,almizcle,almuerza,alpaca,altas,alteza,alto,altos,amaba,amada,amado,amante,amargura,amasa,amazona,ambas,ambos,america,amigo,ancla,andes,andre,anega,anejo,anfora,anillo,aniseo,anonimo,anuncia,añadir,año,año,año,año,año,año,año,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años,años"
+).split(",");
+
+// Spanish themed sets — smaller curated lists per category.
+const ES_PLACES = "casa,casas,ciudad,ciudades,pueblo,pueblos,villa,villas,aldea,aldeas,reino,reinos,palacio,palacios,castillo,castillos,templo,templos,iglesia,iglesias,catedral,catedrales,capilla,capillas,mezquita,mezquitas,sinagoga,escuela,escuelas,colegio,colegios,universidad,universidades,parque,parques,plaza,plazas,calle,calles,avenida,avenidas,carretera,carreteras,puente,puentes,torre,torres,museo,museos,biblioteca,bibliotecas,teatro,teatros,cine,cines,estadio,estadios,arena,mercado,mercados,puerto,puertos,aeropuerto,aeropuertos,estacion,estaciones,playa,playas,costa,costas,isla,islas,peninsula,cabo,montaña,montañas,colina,colinas,valle,valles,cañon,cañones,bosque,bosques,desierto,desiertos,jungla,junglas,pradera,prado,prados,tundra,arrecife,arrecifes,rio,rios,riachuelo,arroyo,arroyos,lago,lagos,laguna,lagunas,oceano,oceanos,mar,mares,bahia,bahias,golfo,golfos,estrecho,canal,canales,delta,llanura,llanuras,meseta,oasis,arboleda,suburbio,suburbios,distrito,distritos,barrio,barrios,centro,bayou,fiordo,fiordos,marisma,pantano,pantanos,humedal,bosque,bosques,arboleda,gruta,grutas,cueva,cuevas,caverna,cavernas,guarida,rincon,rincones,zona,zonas,sector,sectores,parroquia,terraza,terrazas,bulevar,corredor,patio,arcada,galeria,galerias,pabellon,villa,villas,casona,mansion,mansiones,cabaña,cabañas,refugio,refugios,posada,posadas,hotel,hoteles,motel,resort,resorts,balneario,balnearios,rancho,ranchos,granja,granjas,hacienda,haciendas,viñedo,viñedos,huerto,huertos,jardin,jardines,patio,porche,porches,balcon,balcones,azotea,azoteas,atico,aticos,bodega,bodegas,sotano,sotanos,desvan,desvanes,bunker,silo,silos,invernadero,observatorio,planetario,acuario,zoo,zoos,bar,bares,pub,pubs,club,clubs,cafe,cafes,cafeteria,bistro,restaurante,restaurantes,taberna,tabernas,cantina,brasería,bodega,panaderia,panaderias,tienda,tiendas,almacen,almacenes,boutique,boutiques,banco,bancos,oficina,oficinas,clinica,clinicas,hospital,hospitales,dentista,farmacia,farmacias,gimnasio,gimnasios,estudio,estudios,salon,salones,peluqueria,peluquerias,libreria,librerias,taller,talleres,herreria,fundicion,molino,molinos,fabrica,fabricas,planta,plantas,almacen,refineria,cantera,canteras,mina,minas,pozo,pozos,base,bases,campamento,campamentos,nido,nidos,madriguera,madrigueras,roost,gallinero,gallineros,perrera,perreras,establo,establos,granero,graneros,corral,corrales,cuadra,cuadras,paddock,prado,prados,campo,campos,cancha,canchas,pista,pistas,piscina,piscinas,jacuzzi,sauna,saunas,gimnasio,carcel,carceles,prision,prisiones,manicomio,morgue,cementerio,cementerios,tumba,tumbas,cripta,criptas,mausoleo,memorial,monumento,monumentos,estatua,estatuas,fuente,fuentes,marina,marinas,muelle,muelles,dique,acueducto,viaducto,paseo,esplanada,puente,puentes,quebrada,quebradas,gola,desfiladero,argentina,bolivia,brasil,canada,chile,china,colombia,cuba,ecuador,egipto,españa,francia,grecia,inglaterra,italia,japon,mexico,marruecos,paraguay,peru,portugal,uruguay,venezuela,madrid,barcelona,valencia,sevilla,toledo,salamanca,granada,bilbao,cordoba,malaga,roma,paris,londres,berlin,viena,praga,atenas,oslo,estocolmo,helsinki,dublin,lisboa,bruselas,amsterdam,copenhague,zurich,ginebra,milan,napoles,florencia,venecia,verona,turin,buenos,santiago,lima,bogota,quito,caracas,medellin,cusco,asuncion,montevideo,habana".split(",");
+const ES_COLORS = "rojo,roja,rojos,rojas,azul,azules,verde,verdes,amarillo,amarilla,amarillos,amarillas,blanco,blanca,blancos,blancas,negro,negra,negros,negras,gris,grises,morado,morada,morados,moradas,violeta,violetas,naranja,naranjas,rosa,rosas,marron,marrones,beige,celeste,celestes,turquesa,turquesas,plateado,plateada,plateados,plateadas,dorado,dorada,dorados,doradas,bronceado,cobrizo,oro,plata,bronce,cobre,marfil,nacar,perla,coral,esmeralda,zafiro,rubi,topacio,ambar,jade,carmesi,escarlata,carmin,bermellon,fucsia,magenta,lila,malva,lavanda,lavandas,salmon,terracota,ocre,sepia,castaño,castaña,canela,chocolate,mostaza,cremoso,ceniza,carbon,ebano,jet,nieve,crema,vino,burdeos,oliva,oliva,oliva,musgo,turquesa,indigo,azulado,verdoso,rojizo,amarillento,grisáceo,blanquecino,negruzco".split(",");
+const ES_FOOD = "agua,aceite,aceituna,aceitunas,aguacate,ajo,ajos,albondiga,alcachofa,almeja,almejas,almendra,almendras,almuerzo,alubia,alubias,amargo,ananas,arandano,arandanos,arepa,arroz,arvejas,asado,atun,avellana,avellanas,avena,azucar,bacalao,banana,bananas,batata,batido,berenjena,berenjenas,berro,bebida,bizcocho,bocadillo,bolillo,bombon,boniato,brocoli,buñuelo,buñuelos,caballa,cabra,cacahuate,cacahuete,cacao,cafe,calabaza,calamar,calamares,caldo,canela,carne,cebolla,cebollas,cebada,cereal,cereales,cereza,cerezas,cerdo,cerveza,cerveza,champan,champiñon,champiñones,chile,chiles,chocolate,chorizo,chorizos,chuleta,churro,churros,ciruela,ciruelas,cochinillo,coco,cocido,cocinar,col,coliflor,comer,comida,compota,conejo,conserva,coñac,copa,corazon,corcho,cordero,creme,croquet,croquetas,cuchara,cucharada,curry,dulce,dulces,empanada,empanadas,endibia,enchilada,ensalada,ensaladas,espinaca,espinacas,esparrago,esparragos,estofado,fideo,fideos,filete,filetes,flan,frambuesa,frambuesas,fresa,fresas,fresco,frijol,frijoles,fritura,fruta,frutas,galleta,galletas,gamba,gambas,garbanzo,garbanzos,gazpacho,gelatina,gomas,granada,granadas,grasa,guacamole,guarnicion,guayaba,guisado,guisante,guisantes,haba,habas,hamburguesa,harina,helado,helados,hervir,hierba,hierbas,higo,higos,hojaldre,horno,huevo,huevos,huevos,hummus,jalea,jamon,jamones,jengibre,jerez,judia,judias,jugar,jugo,jugos,jugar,jugar,juego,juego,kebab,kefir,kiwi,kiwis,langosta,langostino,langostinos,lasaña,laurel,leche,lechuga,legumbre,legumbres,lenteja,lentejas,licor,licuado,lima,limas,limon,limones,limonada,lobina,lomo,maiz,manchego,mandarina,mandarinas,mango,mangos,manteca,mantequilla,manzana,manzanas,maracuya,margarina,marisco,mariscos,mayonesa,mazapan,mejillon,mejillones,melocoton,melocotones,melon,melones,membrillo,menta,merengue,merienda,merluza,mermelada,merluza,miel,mojito,mole,mostaza,nabo,nabos,naranja,naranjas,nata,nogal,nuez,nueces,nuez,ñame,oblea,oporto,orejon,oregano,ostra,ostras,paella,paellas,palomitas,pan,panes,papa,papas,papaya,papayas,paprika,pasa,pasas,pasta,pastas,pastel,pasteles,pavo,pavos,pepino,pepinos,pera,peras,perejil,pescado,pescados,picante,piña,piñas,pimienta,pimiento,pimientos,piñon,piñones,pisco,pita,pizza,pizzas,platano,platanos,polenta,pollo,pollos,polvoron,porcion,postre,postres,potaje,puchero,puerro,puerros,pulpo,pulpos,puré,quesadilla,queso,quesos,quinoa,rabano,rabanos,rabo,raviolis,res,ricota,rinon,risotto,roble,roquefort,sabor,sabores,sal,salami,salchicha,salchichas,salmon,salmones,salsa,salsas,salteado,sandia,sandias,sandwich,sangria,sardina,sardinas,setas,sidra,sirope,sopa,sopas,suerte,sushi,taco,tacos,tallarines,tamal,tamales,tapa,tapas,tarta,tartas,te,tepache,ternera,tilapia,tinto,tocino,tomate,tomates,tortilla,tortillas,tostada,trigo,trucha,truchas,trufa,trufas,turron,uva,uvas,vainilla,vegetal,vegetales,verdura,verduras,vinagre,vinagreta,vino,vinos,vodka,whiskey,yema,yemas,yogur,yogures,zanahoria,zanahorias,zumo,zumos".split(",");
+const ES_ANIMALS = "abeja,abejas,abejorro,aguila,aguilas,alce,alces,alpaca,alpacas,anguila,antilope,araña,arañas,ardilla,ardillas,armadillo,asno,asnos,atun,atunes,avestruz,babuino,bacalao,ballena,ballenas,bisonte,bisontes,boa,boas,buey,bueyes,buho,buhos,buitre,buitres,burro,burros,caballo,caballos,cabra,cabras,caiman,caimanes,calamar,calamares,camaleon,camaleones,camello,camellos,canguro,canguros,canario,canarios,cangrejo,cangrejos,caracol,caracoles,carpa,castor,castores,cebra,cebras,cerdo,cerdos,chimpance,chimpances,chinchilla,cigueña,cisne,cisnes,cobra,cobras,cocodrilo,cocodrilos,codorniz,colibri,conejo,conejos,coyote,cuervo,cuervos,delfin,delfines,dragon,dragones,elefante,elefantes,erizo,erizos,escarabajo,escarabajos,escorpion,foca,focas,gallo,gallos,gallina,gallinas,gamo,ganso,gansos,garza,gato,gatos,gaviota,gaviotas,gorila,gorilas,grillo,grillos,grulla,gusano,gusanos,halcon,halcones,hamster,hipopotamo,hipopotamos,hormiga,hormigas,iguana,iguanas,jaguar,jaguares,jirafa,jirafas,koala,koalas,langosta,leon,leona,leones,leopardo,leopardos,libelula,liebre,liebres,lince,linces,llama,llamas,lobo,lobos,loro,loros,mamut,mariposa,mariposas,medusa,medusas,mejillon,mejillones,mono,monos,mosca,moscas,mosquito,mosquitos,murcielago,murcielagos,nutria,nutrias,nutria,oca,ocas,oso,osos,oveja,ovejas,pajaro,pajaros,paloma,palomas,panda,pandas,pantera,panteras,papagayo,pato,patos,pavo,pavos,perro,perros,pez,peces,piojo,pinguino,pinguinos,piraña,piranas,pollo,pollos,puerco,puercos,puerco,pulpo,pulpos,puma,pumas,rana,ranas,raton,ratones,ratonera,rinoceronte,rinocerontes,saltamontes,sapo,sapos,sardina,sardinas,serpiente,serpientes,tiburon,tiburones,tigre,tigres,topo,topos,tortuga,tortugas,toro,toros,trucha,truchas,vaca,vacas,vibora,viboras,zorro,zorros,zorra,zorras".split(",");
+const ES_NATURE = "agua,aguas,aire,aires,alba,albor,alga,algas,amanecer,arboleda,arboledas,arbol,arboles,arcilla,arcoiris,arena,arenas,arrecife,arrecifes,arroyo,arroyos,atardecer,aurora,bahia,bahias,barranco,barrancos,bosque,bosques,brisa,brisas,brote,brotes,bruma,brumas,caida,calor,campo,campos,canon,canones,cascada,cascadas,cataratas,cenagal,charco,charcos,cielo,cielos,cima,cimas,colina,colinas,coral,corales,corriente,corrientes,costa,costas,cuesta,cuevas,deshielo,desierto,desiertos,duna,dunas,eclipse,eclipses,estero,estrella,estrellas,estuario,floresta,flor,flores,floración,follaje,fuego,fuegos,fuente,fuentes,galaxia,galaxias,glaciar,glaciares,golfo,golfos,granito,gota,gotas,grava,helada,heladas,hielo,hielos,hierba,hierbas,hoja,hojas,horizonte,horizontes,humedal,inundacion,isla,islas,laguna,lagunas,lago,lagos,lava,lavada,lavanda,lluvia,lluvias,llanura,llanuras,luna,lunas,luz,luces,manantial,manantiales,manglar,mar,mares,marea,mareas,marisma,meseta,montaña,montañas,monte,montes,nebulosa,niebla,nieblas,nieve,nieves,noche,noches,nube,nubes,oasis,océano,océanos,orilla,orillas,otoño,otoños,paisaje,paisajes,panorama,pantano,pantanos,pasto,piedra,piedras,planeta,planetas,playa,playas,polvo,prado,prados,primavera,primaveras,puesta,radiacion,raiz,raices,rama,ramas,rayo,rayos,relampago,reserva,riachuelo,riachuelos,rio,rios,risca,riscos,roca,rocas,rocio,roca,sabana,sal,salar,sales,selva,selvas,semilla,semillas,sol,soles,suelo,suelos,sur,tempestad,tempestades,terreno,terremoto,terremotos,tierra,tierras,tornado,tornados,torrente,torrentes,tronco,troncos,tundra,valle,valles,vapor,vegetacion,verano,veranos,viento,vientos,volcan,volcanes,zarza,zarzas".split(",");
+const ES_VERBS = ("abrir,acabar,aceptar,acompañar,acordar,acostar,actuar,adivinar,admirar,admitir,adorar,advertir,afirmar,agarrar,agradecer,aguantar,ahogar,ahorrar,alcanzar,alegrar,alimentar,almorzar,alquilar,amar,amenazar,andar,anhelar,animar,anunciar,añadir,apagar,aparecer,aplaudir,apoyar,aprender,aprovechar,apuntar,arder,armar,arrancar,arreglar,arrojar,asar,asegurar,asistir,asomar,asustar,atacar,atar,atender,atrapar,atravesar,atreverse,aullar,avanzar,avisar,ayudar,bailar,bajar,bañar,barrer,batallar,batir,beber,bendecir,besar,bordar,borrar,brillar,bromear,buscar,caber,caer,calcular,calentar,calmar,callar,cambiar,caminar,cansar,cantar,cargar,casar,cazar,ceder,celebrar,cenar,cepillar,cerrar,charlar,chillar,chocar,citar,cobrar,cocinar,coger,colar,colgar,colocar,comer,comparar,competir,comprar,conducir,confiar,conocer,conquistar,conseguir,conservar,consolar,construir,contar,contestar,continuar,contratar,convertir,convivir,copiar,coronar,correr,cortar,cosechar,coser,crecer,creer,criar,cuidar,cumplir,curar,dar,deber,decidir,decir,decorar,defender,dejar,delegar,demostrar,denunciar,depender,derribar,desafiar,desayunar,descansar,descubrir,desear,despertar,desplazar,destacar,destruir,detener,devolver,dibujar,discutir,disfrutar,divertir,doblar,domar,dominar,dorar,dormir,duchar,dudar,durar,echar,educar,elegir,emitir,empezar,emplear,empujar,encantar,encender,encontrar,enfadar,enfermar,enseñar,entender,enterar,entrar,entregar,entrenar,enviar,equivocar,errar,escapar,escoger,esconder,escribir,escuchar,esforzar,esperar,esquivar,estar,estimar,estudiar,evitar,examinar,exigir,existir,explicar,explorar,exponer,expresar,extrañar,fabricar,faltar,fastidiar,festejar,filtrar,fingir,firmar,florecer,fluir,formar,forzar,fregar,freir,fumar,funcionar,galopar,ganar,gastar,gemir,gobernar,golpear,gotear,gozar,gritar,gruñir,guardar,guiar,gustar,haber,habitar,hablar,hacer,hallar,helar,heredar,herir,hervir,hilar,horadar,huir,idear,iluminar,imaginar,imitar,implorar,importar,impresionar,imprimir,incluir,indicar,inflar,influir,iniciar,instalar,insultar,intentar,interrumpir,inventar,invitar,ir,jactar,jugar,juntar,jurar,justificar,juzgar,labrar,ladrar,lanzar,lavar,leer,legar,liberar,librar,ligar,limar,limpiar,llamar,llegar,llenar,llevar,llorar,llover,lograr,lucir,luchar,maldecir,maltratar,mandar,manejar,mantener,marcar,marchar,mascar,masticar,matar,medir,mejorar,mencionar,mentir,merecer,meter,mezclar,mirar,mojar,moler,molestar,morir,mostrar,mover,nacer,nadar,narrar,navegar,necesitar,negar,negociar,nombrar,notar,notificar,obedecer,obligar,observar,obtener,ocultar,ocupar,ocurrir,odiar,ofender,ofrecer,oir,oler,olvidar,opinar,oponer,ordenar,organizar,oscurecer,osar,pagar,parar,parecer,partir,pasar,pasear,pedir,pegar,peinar,pelear,pensar,perder,perdonar,permitir,perseguir,pertenecer,pescar,picar,pillar,pintar,pisar,planchar,plantar,podar,poder,poner,portar,poseer,practicar,preferir,preguntar,prender,preparar,prestar,prevenir,probar,producir,prohibir,prometer,proponer,proteger,publicar,quebrar,quedar,quejar,querer,quitar,raer,raspar,reaccionar,realizar,recibir,reclamar,recoger,recomendar,recordar,recorrer,recuperar,recurrir,redondear,reducir,reflejar,refrescar,regalar,regañar,regar,regresar,reir,relajar,rellenar,remar,renunciar,reparar,repasar,repetir,reposar,resaltar,resbalar,reservar,resistir,resolver,respetar,responder,respirar,resucitar,retirar,retornar,reunir,revelar,revisar,reventar,robar,rodar,rodear,rogar,romper,roncar,rugir,saber,sacar,saciar,sacudir,salir,saltar,saludar,sangrar,secar,seducir,seguir,seleccionar,sembrar,sentar,sentir,señalar,separar,ser,serenar,servir,silbar,sobrar,sobrevivir,soltar,soñar,sonar,sonreir,soplar,sorprender,sospechar,sostener,subir,suceder,sufrir,sugerir,sujetar,sumar,suponer,surgir,suspirar,sustituir,tallar,tantear,tapar,tardar,temblar,temer,tender,tener,tentar,terminar,tirar,tocar,tomar,torcer,toser,trabajar,traducir,traer,tragar,transitar,trasladar,tratar,tropezar,uncir,unir,untar,usar,utilizar,vaciar,valer,vencer,vender,venir,ver,verificar,vestir,viajar,vibrar,vigilar,violar,visitar,vivir,volar,volcar,voltear,volver,vomitar,votar,zumbar"
+  // Expansion — more common infinitives so the conjugator can multiply
+  + ",abandonar,abarcar,abastecer,abatir,abolir,abonar,abordar,abrigar,abrochar,absorber,abstener,abusar,acariciar,acaudalar,acceder,acechar,aclamar,aclarar,aconsejar,acoplar,acopiar,acorralar,acortar,acribillar,acrobata,activar,acumular,adelgazar,adherir,adjudicar,administrar,adoptar,adornar,adquirir,adueñar,adular,afanar,afeitar,afligir,afrontar,agitar,agotar,agradar,agraviar,agredir,agriar,agrupar,ajustar,alabar,alargar,alarmar,albergar,alejar,alentar,alfabetizar,aliar,aligerar,alistar,allanar,almacenar,alterar,alternar,aludir,aluzar,alzar,amaestrar,amainar,amalgamar,amancebar,amansar,amarrar,ambicionar,amenizar,amerizar,amilanar,amistar,amoldar,amontonar,amordazar,amparar,ampliar,amputar,analizar,anclar,angustiar,anidar,animarse,anonadar,anotar,antagonizar,antecedente,antever,anudar,apaciguar,apalear,apañar,aparcar,apartar,aparte,apetecer,aplazar,aplicar,apocar,apocopar,apodar,aporrear,apostar,apostillar,apretar,aproximar,apuntalar,arar,arbitrar,arcaizar,arengar,arquear,arraigar,arrancar,arrastrar,arreciar,arremeter,arrepentir,arrestar,arribar,arrimar,arrinconar,arruinar,articular,asaltar,ascender,asentar,asentir,asesinar,asesorar,asfaltar,asfixiar,asociar,asolar,asordar,aspirar,astillar,asumir,atajar,atarear,ateneo,atenerse,atenuar,atestiguar,atinar,atizar,atontar,atorar,atornillar,atraer,atrancar,atravesar,atrevimiento,atribuir,atronar,augurar,aumentar,ausentar,autorizar,auxiliar,avergonzar,averiar,averiguar,aviar,avistar,bagar,balancear,balbucear,banar,bandear,baremar,barnizar,barruntar,bastar,batallar,bautizar,beneficiar,berrear,bisar,blandir,blanquear,blasfemar,bloquear,boicotear,bolear,bombardear,bombear,bonificar,boquear,bordear,bostezar,brincar,bullir,burlar,cabalgar,cabecear,cablegrafiar,cachetear,caducar,calcar,calificar,callejear,calumniar,calzar,cancelar,canjear,canonizar,canturrear,capacitar,capitalizar,capitanear,captar,capturar,caracolear,caracterizar,carcomer,carecer,careopar,carentar,cargosear,castigar,catalogar,catar,catequizar,cauterizar,causar,cautivar,cazar,cebar,cecear,cegar,centellear,centralizar,centrar,cernir,certificar,cesar,chamuscar,chapotear,chapurrear,chasquear,chequear,chiflar,chirriar,chismear,chispear,chivar,chocar,chuparse,cicatrizar,cifrar,cimentar,cincelar,circular,citar,civilizar,clamar,clarificar,clasificar,claudicar,clavar,coartar,cobijar,coexistir,coger,colaborar,colectar,coleccionar,colegir,colmar,colonizar,colorear,combatir,combinar,comentar,comerciar,cometer,comparecer,compartir,compendiar,compenetrar,compensar,competir,complacer,completar,complicar,componer,comportar,comprender,comprimir,comprobar,comulgar,comunicar,concebir,conceder,concentrar,concertar,concluir,concordar,concretar,condenar,condimentar,conducir,conectar,confeccionar,confesar,configurar,confirmar,confiscar,confluir,confundir,confiar,congeniar,congelar,conjugar,conjurar,conllevar,conmemorar,conmover,connotar,conocer,conquistar,consagrar,conseguir,consentir,conservar,considerar,consistir,consolar,conspirar,constatar,constituir,construir,consultar,consumar,consumir,contagiar,contaminar,contemplar,contener,contraatacar,contraer,contrariar,contrastar,contratar,contribuir,controlar,convencer,convenir,converger,conversar,convertir,convivir,convocar,cooperar,coordinar,copiar,copular,corregir,corresponder,corroborar,corromper,cortejar,coser,cosquillear,costar,cotorrear,crecer,criticar,cromar,cruzar,cuadrar,cuajar,cualificar,cuantificar,cubrir,cuestionar,cuidar,culminar,culpar,cultivar,cumplimentar,custodiar,danzar,debatir,debilitar,decapitar,decimar,declamar,declarar,declinar,decodificar,decretar,dedicar,deducir,defenderse,defender,definir,deformar,degollar,degradar,deificar,dejarse,delatar,deleitar,deletrear,deliberar,delimitar,delinear,delinquir,demacrar,demandar,demarcar,demorar,demorarse,demoler,demostrar,denegar,denigrar,denominar,denotar,depender,deplorar,deportar,deprimir,depurar,derivar,derramar,derretir,derribar,derrocar,desactivar,desafiar,desafinar,desafortunadamente,desagradar,desaguar,desahogar,desalentar,desalojar,desanimar,desaparecer,desarmar,desarraigar,desarrollar,desatar,desatender,desayunar,desazonar,desbaratar,desbordar,descabezar,descalzar,descargar,descartar,descender,descifrar,descolgar,descomponer,desconcertar,desconectar,desconfiar,desconocer,descontar,descorchar,descoser,describir,descuartizar,descubrir,descuidar,desdecir,desear,desechar,desembarcar,desempeñar,desempolvar,desencadenar,desenchufar,desengañar,desenmascarar,desenredar,desentenderse,desenterrar,deserter,desertar,desesperar,desfigurar,desfilar,desgarrar,desgastar,desgraciar,deshacer,desheredar,deshelar,deshilachar,deshojar,deshonrar,deshuesar,desinflar,desistir,desleir,deslizar,deslumbrar,desmantelar,desmejorar,desmembrar,desmentir,desmenuzar,desmoronar,desnudar,desobedecer,desocupar,desolar,desordenar,desorientar,despachar,despearse,despedir,despegar,despeinar,despejar,despertar,desperdiciar,despertar,despilfarrar,desplegar,desplomar,desplumar,despojar,desposar,despreciar,desprender,despreocuparse,despuntar,destacar,destapar,destemplar,desterrar,destilar,destinar,destituir,destornillar,destrenzar,destrozar,destruir,desunir,desvanecer,desvelar,desvestir,desviar,detallar,detectar,deteriorar,determinar,detestar,detonar,devastar,develar,devorar,diagnosticar,dialogar,diferenciar,dificultar,difundir,digerir,dignificar,dilapidar,dilatar,diligenciar,dimensionar,dimitir,diminutivo,dirigir,disciplinar,discrepar,disculpar,discurrir,discutir,disecar,diseminar,diseñar,disertar,disfrazar,disfrutar,disgregar,disgustar,disimular,disipar,disminuir,disolver,disparar,dispensar,disponer,disputar,distanciar,distender,distinguir,distorsionar,distraer,distribuir,disuadir,divagar,diversificar,dividir,divisar,divorciar,divulgar,doblegar,documentar,domesticar,donar,dormitar,dotar,dramatizar,drogar,duplicar,echarse,eclipsar,economizar,edificar,editar,educar,efectuar,ejecutar,ejemplificar,ejercer,ejercitar,elaborar,electrocutar,electrificar,elevar,eliminar,elogiar,elucidar,emanciparse,emancipar,embadurnar,embalar,embaldosar,embarazar,embarcar,embargar,embaucar,embeber,embellecer,embestir,embobar,embolsar,emboscar,embotellar,embrear,embriagar,embromar,embutir,emerger,emigrar,emitir,emocionar,empacar,empachar,empadronar,empaparse,empapelar,empaquetar,emparejar,empastar,empatar,empedrar,empeñarse,empequeñecer,empezar,empinar,emplazar,empobrecer,emprender,empuñar,emular,enajenar,enaltecer,enamorar,encabezar,encajar,encaminar,encandilar,encanecer,encapotar,encaramar,encarar,encarcelar,encarecer,encargar,encariñarse,encarnar,encartar,encasillar,encauzar,encegar,enceguecer,encender,encerrar,enchufar,enclaustrar,encogerse,encolar,encolerizar,encomendar,encomiar,enconar,encontrarse,encrespar,encubrir,endeudar,endilgar,endosar,endulzar,endurecer,enemistar,enfadar,enfangar,enfatizar,enfermar,enflaquecer,enfocar,enfrentar,enfriar,enfurecer,enganchar,engatusar,englobar,engordar,engrandecer,engrasar,engrosar,engullir,enhebrar,enjaular,enjuagar,enjugar,enjuiciar,enlazar,enloquecer,enlutar,enmarañar,enmascarar,enmendar,enmohecer,enmudecer,ennegrecer,ennoblecer,enojar,enorgullecer,enraizar,enredar,enriquecer,enrolar,enroscar,ensalzar,ensanchar,ensañarse,ensartar,ensayar,enseñar,ensimismarse,ensombrecer,ensordecer,ensuciar,entablar,entallar,enterar,enternecer,enterrar,entibiar,entiznar,entonar,entornar,entorpecer,entrampar,entrar,entreabrir,entrechocar,entrecortar,entrecruzar,entregar,entrelazar,entremeter,entrenar,entresacar,entretejer,entretener,entrever,entrevistar,entristecer,enturbiar,entusiasmar,enumerar,enunciar,envainar,envalentonarse,envasar,envejecer,envenenar,enviar,enviciar,envidar,envidiar,envilecer,enviudar,envolver,enyesar,equilibrar,equipar,equiparar,equivocar,erizar,erradicar,esbozar,escabullir,escalar,escandalizar,escanear,escapar,escarbar,escarmentar,escarnecer,escatimar,esclarecer,esclavizar,escocer,escoger,escolarizar,escoltar,escribir,escrutar,esculpir,escupir,escurrir,esforzarse,esfumar,esgrimir,esmaltar,espabilar,espantar,esparcir,especializar,especificar,especular,espesar,esperar,espesar,espiar,espirar,espolear,espolvorear,esponjar,esposar,espumar,esquematizar,esquilar,esquilmar,esquivar,establecer,estacar,estacionar,estafar,estallar,estampar,estancar,estandarizar,estar,estatizar,estatuir,estereotipar,esterilizar,estilizar,estimular,estipular,estirar,estofar,estorbar,estornudar,estrangular,estrechar,estrellar,estremecer,estrenar,estresar,estriar,estropear,estructurar,estudiar,evacuar,evadir,evaluar,evangelizar,evaporar,evaporizar,evidenciar,evitar,evocar,exacerbar,exagerar,exaltar,examinar,exasperar,excarcelar,excavar,exceder,exceptuar,excitar,exclamar,excluir,excusar,exfoliar,exhalar,exhibir,exhortar,exhumar,exigir,exiliar,eximir,existir,exonerar,exorbitar,exorcizar,expandir,expatriar,expedir,expender,experimentar,expiar,expirar,explayar,explicar,explicitar,explorar,explosionar,explotar,exponer,exportar,expresar,exprimir,expropiar,expulsar,exquisitar,extasiarse,extender,exteriorizar,exterminar,extorsionar,extraer,extrañar,extraplanar,extraviar,extrovertir,fabricar,facilitar,facturar,fajar,fallar,fallecer,falsear,falsificar,faltar,familiarizar,fanatizar,fantasear,fardar,fascinar,fastidiar,fatigar,favorecer,fecundar,federar,felicitar,fenecer,feriar,fermentar,fertilizar,festejar,fiar,fichar,filmar,filosofar,filtrar,financiar,finalizar,fincar,fingir,firmar,fiscalizar,fisionar,flamear,flanquear,flaquear,flexionar,flirtear,flojear,florar,florecer,flotar,flotar,fluctuar,fluir,fomentar,fondear,forcejear,forestar,forjar,formalizar,formar,formatear,formular,fornicar,forrar,fortalecer,fortificar,forzar,fosilizar,fotocopiar,fotografiar,fracasar,fracturar,fragmentar,fraguar,franquear,frecuentar,fregar,freir,frenar,frotar,fructificar,fruncir,frustrar,fugarse,fulminar,fumar,fumigar,funcionar,fundamentar,fundar,fundir,fusilar,fusionar,fustigar,galantear,galardonar,galopar,galvanizar,ganar,ganchear,garantizar,gasificar,gastar,gatear,gemir,generalizar,generar,germinar,gestar,gesticular,gestionar,gimotear,girar,glasear,glorificar,glosar,golear,golpear,gorgotear,gorjear,gotear,grabar,graduar,granjear,granular,gratificar,gravar,gravitar,graznar,gritar,gruñir,guardarse,guarecer,guarnecer,guerrear,guiar,guiñar,guisar,gustar,haber,habilitar,habitar,habituarse,hablar,hachear,hacinar,hadar,halagar,halar,hallar,hambrear,haraganear,hartar,hechizar,helar,henchir,hendir,heredar,herir,hermanar,hermosear,hervir,hibernar,hidratar,hilar,hilvanar,hincar,hinchar,hipnotizar,hipotecar,hispanizar,hojear,holgar,homenajear,homogeneizar,homologar,honrar,horadar,horrorizar,horrorizar,hospedar,hospitalizar,hostigar,hostilizar,humanizar,humedecer,humillar,humorizar,hundir,hurgar,hurtar,husmear,idealizar,idear,identificar,idiotizar,idolatrar,ignorar,iluminar,ilusionar,ilustrar,imaginar,imantar,imbuir,imitar,impactar,impartir,impedir,implantar,implicar,implorar,imponer,importar,importunar,impregnar,impresionar,imprimir,improvisar,impugnar,impulsar,imputar,inaugurar,incapacitar,incautar,incendiar,incentivar,incidir,incinerar,incitar,inclinar,incluir,incomodar,incomunicar,incorporar,incrementar,increpar,incriminar,incrustar,incubar,inculcar,inculpar,incurrir,indagar,indemnizar,independizar,indicar,indignar,indisponer,inducir,industrializar,inevitablemente,infectar,inferir,infestar,infiltrar,inflamar,inflar,influir,informar,informatizar,infringir,infundir,ingeniar,ingerir,inhalar,inhibir,iniciar,injuriar,injertar,inmigrar,inmolar,inmortalizar,inmovilizar,inmunizar,innovar,inocular,inquietar,inscribir,insertar,insinuar,insistir,inspeccionar,inspirar,instalar,instar,instaurar,instigar,instituir,instruir,instrumentar,insultar,integrar,intentar,intercalar,interceder,interceptar,intercomunicar,interdependerse,interesar,interferir,internacionalizar,internar,interpelar,interponer,interpretar,interrogar,interrumpir,intervenir,intimar,intimidar,intoxicar,intrigar,introducir,intuir,inundar,invadir,invalidar,inventar,inventariar,invertir,investigar,invitar,invocar,involucrar,inyectar,ir,irradiar,irrigar,irritar,irrumpir,izar,jactarse,jadear,jalonar,jaspear,jerarquizar,jorobar,jubilarse,juntar,jurar,justar,justificar,juzgar,labrar,lacerar,lacrear,ladear,ladrillar,laicizar,laminar,languidecer,laquear,lastimar,latear,latinizar,laurearse,lavar,laxar,legalizar,legar,legislar,legitimar,lesionar,levantar,levitar,liberar,librar,licenciarse,licuar,lidiar,ligar,lijar,limar,limitar,limpiar,limosnear,linchar,lindar,liofilizar,liquidar,litigar,llanear,llegar,llenar,llevar,llorar,lloriquear,llover,lloviznar,loar,localizar,lograr,logarse,lubricar,luchar,lucir,lustrar,macanear,macerar,machacar,madrugar,maderar,madurar,magnetizar,magnificar,maldecir,malear,malgastar,malograr,maltratar,malversar,mamar,manchar,mancillar,mancomunar,mandar,manejar,manejar,manifestar,manipular,manosear,mantear,mantener,manufacturar,maquillar,maquinar,maravillar,marcar,marcharse,marchitar,marear,marginar,maridar,marinar,marrar,marrullear,martillar,masacrar,mascullar,masticar,materializar,matricular,maullar,maximizar,mecanizar,mecer,mediar,medicar,medir,meditar,mejorar,memorar,memorizar,mencionar,mendigar,mendigar,menear,menospreciar,menstruar,mentalizar,mentar,mentir,merendar,merecer,mermar,meterse,metodizar,mezclar,migrar,militarizar,mimar,minar,mineralizar,mineralizar,minimizar,mirar,mistificar,mitificar,mitigar,modelar,moderar,modernizar,modular,modificar,mofar,mojar,moldear,moler,molestar,monopolizar,montar,morar,morder,morir,mortificar,mosquear,mostrar,motivar,motorizar,mover,movilizar,mudar,muestrear,multar,multiplicar,murmurar,musitar,mutar,mutilar,nacer,nacionalizar,nadar,narrar,naturalizar,naufragar,nausear,navegar,necesitar,negar,negociar,nevar,nivelar,nombrar,nominar,normalizar,notar,noticiar,notificar,novelar,nublar,numerar,nutrir,obedecer,objetar,obligar,obrar,obsequiar,observar,obsesionar,obstaculizar,obstruir,obtener,obturar,obviar,ocasionar,ocluir,ocultar,ocupar,ocurrir,odiar,ofender,oficiar,ofrecer,ofrendar,ofuscar,oir,ojear,oler,olfatear,olisquear,olvidar,omitir,ondear,ondular,operar,opinar,oponer,opositar,oprimir,optar,optimizar,opugnar,orar,ordenar,ordenir,ordenar,orear,organizar,orientar,originar,orinar,ornamentar,osar,oscilar,oscurecer,ostentar,otear,otorgar,ovacionar,oxidar,pacer,pacificar,pactar,padecer,pagar,paginar,paladear,paliar,palidecer,palmear,palmotear,palpar,palpitar,paralizar,parar,parchear,parecer,parir,parlamentar,parlotear,parpadear,participar,particularizar,partir,pasar,pasarse,pasear,pasmar,pastar,pastorear,patalear,patear,patinar,patrocinar,patrullar,pavimentar,pavonear,pecar,pedalear,pedir,pegar,peinar,pelarse,pelear,peligrar,pellizcar,penalizar,penar,pender,penetrar,pensar,pensionar,percatarse,percibir,perder,perdonar,perdurar,perecer,peregrinar,perfeccionar,perforar,perfumar,perjudicar,perjurar,permanecer,permitir,permutar,pernoctar,perpetrar,perpetuar,perseguir,perseverar,persistir,persuadir,pertenecer,perturbar,pervertir,pesar,pescar,pestañear,petrificar,piar,picar,picotear,pilotar,pillar,pinchar,pintar,pisar,pisotear,pitar,plagar,plagiar,planchar,planear,planificar,plantar,plantear,plasmar,platicar,plegar,pleitear,poblar,podar,poder,podrirse,poetizar,polarizar,polemizar,polinizar,politizar,poltronear,ponerse,popularizar,porfiar,portar,portarse,posar,poseer,posibilitar,posicionar,posponer,postergar,postular,potabilizar,potenciar,practicar,precaver,preceder,preceptuar,preciar,precintar,precipitar,precisar,preconizar,predecir,predestinar,predeterminar,predicar,predisponer,predominar,preexistir,prefabricar,preferir,prefijar,pregonar,preguntar,prejuzgar,preludiar,premeditar,premiar,prendarse,prender,prensar,preocupar,preparar,preponderar,prescindir,prescribir,presenciar,presentar,presentir,preservar,presidir,presionar,prestar,prestigiar,presumir,presuponer,presupuestar,pretender,pretextar,prevalecer,prevenir,prever,principiar,privar,privatizar,privilegiar,probar,proceder,procesar,proclamar,procurar,prodigarse,producir,profanar,proferir,profesar,profundizar,programar,progresar,prohibir,proliferar,prolongar,prometer,promover,promulgar,pronosticar,pronunciar,propagar,propalar,propasar,propiciar,propinar,proponer,proporcionar,prorrogar,proseguir,prosperar,prostituir,proteger,protestar,proveer,provenir,provocar,proyectar,publicar,pudrir,pugnar,pulir,pulsar,pulular,pulverizar,puntuar,purgar,purificar,quebrantar,quebrar,quedarse,quejarse,quemar,querellarse,querer,quitarse,rabiar,raciar,racionalizar,radiar,radicar,radicalizar,raer,ramificar,rapar,rapiñar,raptar,rasar,rascar,rasgar,raspar,rastrear,rastrillar,ratificar,rayar,razonar,reabrir,reaccionar,reactivar,readaptar,readmitir,reafirmar,realizar,realzar,reanudar,reaparecer,rearmar,rebajar,rebanar,rebasar,rebatir,rebelarse,reblandecer,rebobinar,rebosar,rebotar,rebozar,rebuscar,rebuznar,recabar,recaer,recalar,recalcar,recapacitar,recapitular,recargar,recatarse,recelar,recetar,rechazar,rechinar,recibir,reciclar,recitar,reclamar,reclinar,recluir,reclutar,recobrar,recoger,recolectar,recomendar,recompensar,recomponer,reconciliar,reconfortar,reconocer,reconquistar,reconsiderar,reconstruir,recopilar,recordar,recorrer,recortar,recostar,recrear,rectificar,recubrir,recular,recuperar,recurrir,redactar,redactar,redactar,redefinir,redimir,redistribuir,redoblar,redondear,reducir,reduplicar,reedificar,reeditar,reelegir,reembolsar,reemplazar,reencontrar,reencuadrar,reestablecer,reestructurar,referir,refilar,reflejar,reflexionar,reformar,reforzar,refractar,refregar,refrescar,refrigerar,refugiar,refugiar,refunfuñar,refutar,regalar,regañar,regar,regatear,regenerar,regentar,regir,registrar,reglamentar,reglar,regocijar,regodearse,regresar,regular,regularizar,regurgitar,rehabilitar,rehacer,rehilar,rehuir,rehusar,reinar,reinaugurar,reincidir,reincorporar,reiniciar,reinstaurar,reintegrar,reir,reiterar,reivindicar,rejuvenecer,relacionar,relajar,relamer,relampaguear,relanzar,relatar,releer,relegar,relevar,religar,relinchar,rellenar,relucir,relumbrar,remachar,remar,remarcar,remasterizar,remediar,rememorar,remendar,remilgar,remitir,remojar,remolcar,remolinar,remontar,remorder,remover,remozar,rendir,renegar,renombrar,renovar,renquear,rentar,renunciar,reñir,reorganizar,reorientar,reparar,repartir,repasar,repatriar,repeler,repercutir,repetir,repicar,repintar,replantear,replegar,replicar,reponer,reportar,reposar,repostar,reprender,representar,reprimir,reprochar,reproducir,reptar,repudiar,repugnar,repulir,reputar,requemar,requerir,resaltar,resarcir,resbalar,rescatar,rescindir,resecar,resentirse,reseñar,reservar,resfriarse,resguardar,residir,resignarse,resistir,resolver,resollar,resonar,respaldar,respetar,respirar,resplandecer,responder,responsabilizar,resquebrajar,restablecer,restallar,restar,restaurar,restituir,restregar,restringir,resucitar,resultar,resumir,resurgir,retar,retardar,retener,retirar,retocar,retorcer,retornar,retozar,retractar,retraerse,retransmitir,retrasar,retratar,retribuir,retroceder,retumbar,reunificar,reunir,revalidar,revalorar,revelar,revender,reventar,reverberar,reverenciar,revertir,revestir,revisar,revivir,revocar,revolcar,revolotear,revolucionar,revolver,rezagarse,rezar,rezongar,rezumar,ridiculizar,rielar,rifar,rimar,ritualizar,rivalizar,rizar,robar,robustecer,rociar,rodar,rodear,roer,rogar,romanticar,romper,roncar,rondar,ronronear,rotar,rotular,roturar,rozar,ruborizar,rubricar,rugir,rumiar,rumorear,saber,sabotear,saciar,saciarse,sacralizar,sacramentar,sacrificar,sacudir,salar,saldar,salir,salivar,salpicar,saltar,saludar,salvaguardar,salvar,sanar,sancionar,sanear,sangrar,santificar,saquear,satinar,satirizar,satisfacer,saturar,sazonar,secar,secuestrar,secundar,sedimentar,seducir,segar,segregar,seguir,seleccionar,sellar,semblantear,sembrar,sensibilizar,sentar,sentenciar,sentir,senuelar,señalar,señorear,separar,sepultar,ser,serenar,sermonear,serpentear,servir,seudoficar,sextuplicar,signar,significar,silbar,silenciar,simbolizar,similar,simpatizar,simplificar,simular,sincerarse,sincronizar,sindicar,singularizar,sintetizar,sintonizar,sistematizar,sitiar,situar,sobornar,sobrar,sobreabundar,sobreactuar,sobrealimentar,sobrecalentar,sobrecargar,sobrecoger,sobreentender,sobreexponer,sobrellevar,sobrenadar,sobreoir,sobrepasar,sobreponer,sobreproducir,sobresalir,sobresaltar,sobreseer,sobrestimar,sobrevenir,sobrevivir,sobrevolar,socavar,sociabilizar,socializar,socorrer,sofocar,sofreir,solapar,solar,solazarse,soldar,solear,solemnizar,soler,solicitar,solidarizar,solidificar,sollozar,soltar,solucionar,solventar,sombrear,someter,sonar,sonarse,soñar,sondar,sondear,sonreir,sonrosar,sonsacar,sopar,sopesar,soplar,soportar,sorber,sorprender,sortear,sosegar,soslayar,sospechar,sostener,subarrendar,subdividir,subestimar,subir,subjetivar,sublevar,sublimar,subordinar,subrayar,subrogar,subscribir,subsidiar,subsistir,subtitular,subvencionar,subvertir,subyugar,suceder,sucumbir,sudar,suegrear,sufragar,sufrir,sugerir,suicidarse,sujetar,sumar,sumergir,suministrar,sumir,supeditar,superar,superponer,supervisar,suplantar,suplicar,suplir,suponer,suprimir,supurar,surcar,surgir,surtir,suscitar,suscribir,suspender,suspirar,sustentar,sustituir,sustraer,susurrar,tabletear,tabular,tachar,tachonar,tajar,talar,tallar,tambalearse,tamizar,tantear,tañer,tapar,tapiar,tapizar,taponar,tararear,tardar,tartamudear,tasar,tatuar,techar,teclear,tejar,tejer,telecomunicar,telefonear,televisar,temblar,temer,temperar,tender,tener,tensar,tentar,teñir,teologizar,teorizar,terciar,tergiversar,terminar,testificar,testimoniar,tildar,timar,timbrar,tintinear,tipificar,tiranizar,tirar,tiritar,titilar,titular,titularizar,tolerar,tomar,topar,torcer,torear,tornar,tornear,torpedear,torturar,toser,totalizar,trabajar,trabar,traducir,traer,traficar,tragar,traicionar,trajinar,tramar,tramitar,trampear,trancar,tranquilizar,transcribir,transcurrir,transferir,transfigurar,transformar,transgredir,transigir,transitar,transmitir,transparentar,transpirar,transplantar,transportar,trapichear,trasladar,traslucir,trasnochar,traspasar,traspirar,trasplantar,trasponer,trastornar,tratar,trazar,trenzar,trepanar,trepar,trepidar,tributar,tricotar,trillar,trinar,triplicar,tripular,triturar,triunfar,trivializar,trizar,trocar,tronar,tronchar,tropezar,trotar,trotonear,trovar,trozar,trucar,trujamanear,truncar,tuitear,tumbar,turbar,turnarse,tutelar,tutorear,ubicar,ufanarse,ulcerar,ultimar,ultrajar,ulular,uncir,undular,ungir,unificar,uniformar,unir,uniformizar,untar,urbanizar,urdir,urgir,urgir,urinar,usar,uvear,utilizar,vacar,vaciar,vacilar,vacunar,vadear,vagabundear,vagar,validar,valorar,vanagloriarse,vaporizar,varar,variar,vaticinar,vedar,vegetar,vejar,velar,vencer,vendar,vender,vendimiar,venerar,vengar,vengarse,venir,ventar,ventear,ventilar,ver,veranear,verbalizar,verdear,verificar,vermicular,vernacular,versar,versificar,verter,vertirse,vestir,vetar,viajar,vibrar,viciar,victimizar,vidriar,vigilar,vilificar,vincular,vindicar,violar,violentar,virar,virilizar,visitar,vislumbrar,visualizar,vitalizar,vitorear,vituperar,vivir,vocalizar,vocear,vociferar,volar,volatilizar,volcar,voltearse,voltear,voltear,voltear,voltejear,volver,volvernos,vomitar,votar,zafar,zambullir,zampar,zanjar,zapatear,zapear,zarandear,zarpar,zigzaguear,zumbar,zurcir,zurrar"
+).split(",");
+
+// ─── Spanish word-list extension ─────────────────────────────
+// Bumps the base ES vocabulary from ~1k → ~3.5k common entries so the dictionary
+// keeps pace with English. Curated for high-frequency nouns, adjectives,
+// adverbs, and short connectors. Accents intentional — _esPrep strips them.
+const ES_WORD_LIST_EXT = (
+  // 3-letter: pronouns, prepositions, particles
+  "ahi,ala,asi,ate,baba,boa,boy,cae,cap,cas,cha,che,cid,coz,cri,dan,das,den,des,dia,dije,dio,don,dos,dua,eje,ele,emu,ene,era,erí,esa,ese,eso,fia,fin,foe,fui,gen,hez,ido,ira,jay,las,lee,ley,los,luz,mas,mes,muy,nos,oca,oda,oes,ojo,olé,ola,oro,oso,paz,pie,pro,red,rey,roa,roc,roe,sed,sin,sol,son,soy,sub,sus,tal,tan,tea,ten,tic,til,tio,tos,tul,uno,una,uva,vea,vez,vid"
+  + ","
+  // 4-letter: very common nouns + adjectives + adverbs
+  + "abeja,acto,adios,agua,ahora,aire,ajos,alba,alce,alga,alma,alta,alto,amar,ambo,amen,amor,ante,año,arca,arce,arco,area,arma,arte,asar,asco,asia,asno,asta,atar,aula,aves,azar,azul,baja,bajo,base,bata,beso,bici,bien,boca,boda,bola,bolo,bota,bote,bono,bono,bota,brea,brio,buey,café,caja,cala,cama,cana,cano,caos,capa,cara,caro,casa,caso,cata,cebo,cena,cepo,cera,cero,cien,cima,cine,cita,coco,cojo,cola,cosa,cosi,coso,cota,cruz,cuba,cubo,culo,cura,daba,dado,dama,daño,dato,debo,deja,deja,dejo,dele,dial,dias,dice,dije,dios,disc,dolo,doña,dote,duda,duro,echo,echa,ecua,edad,eche,ello,enano,ente,erra,esta,este,esos,eras,etos,euro,faja,fama,faro,fase,faun,faz,fea,feo,feliz,feto,fial,fias,fida,fide,fila,filo,fina,fino,flan,flor,foca,foco,fofo,fojo,fora,foro,fosa,foso,foto,frac,frio,fuga,fuma,gana,gata,gato,gemo,gene,giro,goce,godo,gola,golf,goma,gota,gozo,gran,gris,grupo,gula,guru,gusto,haba,habito,hacia,hada,hado,haga,hago,hale,halo,haya,hecho,hierba,hijo,hilo,hito,hoja,hola,honor,hora,hoyo,hueso,humo,iban,ibas,icto,ido,idea,iman,imán,impar,inca,iras,iris,isla,jaca,jade,jefe,jeta,joya,jose,juan,judo,juez,juga,jugo,jura,kilo,kiwi,labio,labor,laca,lado,lago,lana,lanza,lapiz,largo,larva,lata,latex,latin,laxo,lazo,leal,leche,leer,legal,lejos,lema,lente,lento,leon,letra,leve,leyo,liana,libra,libre,libro,liga,liso,lista,lobo,loco,lodo,logo,lomo,lona,lord,loro,losa,lote,loza,lujo,llama,llano,llave,lleno,lobo,maca,maca,maga,majo,mala,malo,mama,mami,mano,mapa,mara,mare,masa,mata,maya,meca,meco,meda,medo,meme,mena,mente,mera,mero,meta,meto,mido,mira,miro,mito,mora,moro,mosa,moto,mucho,mudo,mula,mulo,nada,nado,naipe,nave,nene,nido,niñas,niño,niña,niños,niñas,nono,nono,nora,nube,nuca,obra,oeste,ofre,ojos,olas,olas,olor,onda,opio,oral,orca,osar,otoño,oval,paga,pago,pais,paja,pala,pan,papa,papa,para,pare,paro,pasa,pasi,paso,pata,pato,peca,pedo,pega,pego,pelo,pera,pero,perro,pesa,peso,pez,pian,pico,pien,pies,pila,pina,piña,pino,pipo,piso,pita,placa,plan,plano,polo,pomo,popa,pope,porra,poso,pote,poza,pozo,puma,puño,puro,pure,puta,puyo,quark,queja,quema,quepo,queso,quien,quita,raba,rabo,raja,rama,rana,rapaz,rara,raro,rata,rato,raya,raza,real,reja,rema,remo,reno,reza,ria,rica,rico,riel,riña,risa,rito,robo,roca,roce,roer,rojo,romo,ropa,rosa,rota,roto,rubi,rudo,ruta,ruido,saca,saco,sala,salu,sano,sapa,saya,seda,sera,seria,seto,seudo,sien,sigo,signo,silo,sino,sirio,situa,sobre,soda,sofa,sola,solo,sopa,sumo,suya,tabu,taco,tala,tapa,tasa,taza,tema,teme,temo,tenia,tener,tenis,teñir,tibia,tica,tico,tienda,tigre,tina,tinto,tira,tiro,tisana,titi,toca,toda,todo,toga,tono,topa,topo,torre,toro,tosa,toza,trote,truco,truena,tuba,tubo,tuca,tuco,tuera,tula,tuno,turba,turbo,uno,usado,usar,uval,vaca,vado,vago,vale,valor,valla,vano,vara,vario,vaso,velo,vena,verde,verso,veto,vez,via,vida,vino,vivo,vivo,voto,yace,yate,yegua,yelo,yema,yeso,yodo,yoga,zafa,zafo,zoco,zona,zumbo,zumo"
+  + ","
+  // 5-letter
+  + "abajo,abeja,abrir,abrigo,abuelo,abuela,acaso,aceite,acento,acera,acido,acoso,acoge,actor,acuda,acude,acudo,adios,adora,adulto,afuera,agata,agente,agita,agora,aguila,aguja,ahora,aire,ajeno,ajuar,alado,albas,alcohol,aldea,alegre,alegra,alfar,algas,alfil,alivio,almena,alpaca,altar,altas,altos,amaba,amado,amante,amazon,ambos,ambas,amigo,amiga,amigos,amigas,anega,anejo,andar,anfora,anillo,anonimo,antes,anuncio,añadir,arado,arana,araña,arboleda,arbol,arce,arcilla,arena,armar,arroz,arroyo,arruga,asado,asalto,asalt,asamblea,asfalto,asomar,aspecto,asunto,atajo,atomo,atque,aullo,aurora,autor,auxili,avena,aviso,axila,ayuda,azada,azafran,azteca,azuza,bajar,baile,banco,banda,baño,barba,barca,barco,barril,barrio,basta,bebe,bebes,bebida,bellaco,bello,benigno,besar,billete,blanco,blusa,boato,boceto,boda,boina,boino,bolas,bolso,bolsa,bomba,bondo,borde,borrar,bosque,brazo,breve,brillo,broma,bromear,broza,bruja,brusco,buceo,buho,bulto,buque,busca,busco,buzon,caballo,cabar,cabello,cabeza,cable,cabra,cacao,cacto,cadena,caer,café,caida,cajon,calle,calma,calor,cambio,camello,campa,campo,canal,canon,canta,canto,capital,capote,carbo,cardo,carga,cargo,cariz,carne,carro,carta,carton,casaca,casco,castor,cebra,celda,celos,cenar,centro,cepa,cepillo,cera,cerca,cerdo,cerro,cesto,chaco,chapa,charco,chico,chola,choto,churro,cielo,cinco,cinta,circo,citra,clara,claro,clase,cliente,clima,club,cobra,cocer,cocina,coche,codigo,codo,cofre,coger,cojin,cola,colega,colina,collar,colmena,colmo,coma,comer,comida,como,compa,coche,conexa,confia,conoc,conocida,conoce,conoci,conte,conto,corre,corral,corte,coser,cosido,costa,costo,creer,crema,crisis,cromo,cruce,crudo,cuadra,cuatro,cuco,cuello,cuento,cuerda,cuerpo,culpa,cumbre,curso,curva,daño,debajo,debate,decir,dedo,defecto,delito,demanda,deporte,derecho,desde,destino,deuda,dia,diente,diestro,diez,dieta,difer,digno,dinero,dios,direccion,disco,doblar,docto,dolor,domingo,dorada,dorado,duelo,dulce,dunero,duque,echar,edicto,edad,edicion,efecto,eje,ejempl,ejerc,electrica,elegir,elenco,emocion,empire,empleo,empre,encanto,energia,enojo,ensaya,entrar,entre,enviar,enviar,equipo,error,escena,escolar,esfera,espana,españa,espasm,esposa,esposo,estado,estamp,esti,estilo,estrofa,estudio,estufa,estufa,eterno,evento,examen,exilio,exito,exitos,exotic,extra,fabula,facil,factura,falda,fanega,fanesc,faro,fatal,favor,fecha,feliz,festin,fideos,fiera,fiesta,figura,fijo,filete,filtro,final,firme,fisica,flaco,flecha,flota,flujo,fondo,forma,fosa,frase,fresa,fresca,fresco,frase,frente,fresno,frijol,frio,fronda,fronte,fruta,fuego,fuente,fuerza,fugaz,funda,fusil,futuro,gallo,gana,ganso,garra,gasto,gente,gesto,gigante,giro,gnomo,gobierno,golfo,golpe,goloso,goma,gorra,grado,grasa,grava,gripe,gris,grupo,grueso,gruta,guante,guardar,guarda,guion,guisar,guiso,gusano,gusto,haber,habito,hacha,halcon,hambre,harina,harto,hasta,helado,helar,herido,heroe,hidra,hielo,hierba,hierro,hijo,hipopotamo,hocico,hoguera,hojas,hombre,hombro,honda,honor,horno,hospital,hotel,hueco,huelo,huerto,humedo,humor,humor,iceberg,icono,ideal,iglesia,igual,iguana,imagen,iman,impar,imperio,impreso,impronta,impuesto,impulso,inca,incluir,indica,indice,industria,inerte,inerc,infer,infimo,inflar,inicial,iniciar,inmenso,interno,inverso,invierno,invitar,inyect,ipso,irlanda,ironia,isla,jabon,jade,jardin,jarra,jarro,jaula,jazmin,jefe,jirafa,joven,joyel,joya,judia,judio,juega,juego,jueves,juez,jugar,jugada,jugar,jugo,julio,junio,junto,jurar,jurada,juvenil,kilo,kiwi,kiosko,laberinto,labio,laca,ladrar,ladron,lago,lampara,lance,lanza,lapiz,largo,larga,latex,latin,latir,laurel,lava,lavar,lazo,leal,lecho,lechuga,leer,legal,legumb,leguas,lejos,lengua,lento,leona,leones,letra,libro,libre,libra,libreria,licor,licuado,lider,liebre,liga,limon,limpiar,linaje,lindo,linea,linfa,lirio,lisos,lista,litro,locura,lodos,logico,lomo,lugar,lujo,luna,lunes,luna,maceta,macho,madera,madre,maduro,maestro,magico,maguey,malo,manada,mancha,mandar,manera,manga,manto,manzana,marca,marcha,marco,maremoto,margen,marido,marino,marisco,marmita,marron,martes,martillo,marzo,masa,masaje,matar,matiz,matra,mayor,mayoria,mecate,media,mediar,medico,medida,medio,medusa,mejor,mejilla,memoria,menos,mensaje,menta,mente,merca,merced,merece,merengue,merito,merma,mesa,meta,metal,metro,mezcla,miel,mientras,migra,milagro,mimar,minado,mineria,minimo,minuto,mirar,mirta,mirto,misa,mismo,misterio,mitad,modelo,moderno,modesto,modo,mojar,molde,moler,molino,moneda,monje,monte,montar,mora,moral,morder,mortal,mosca,mostrar,motor,moza,mozo,muchas,mucho,mudar,mudo,mueble,muelle,muerte,muerto,muestra,mujer,mundo,muralla,muro,museo,muslo,musgo,musica,nacer,nacion,nadar,nadie,nariz,natal,natura,naval,nave,navidad,necio,negar,negocio,negro,negra,negros,negras,nervio,nieve,nieto,niño,niña,niños,niñas,nivel,noble,noche,nogal,nombre,nopal,norma,norte,nota,noticia,novato,novedad,novela,nuca,nudo,nuera,nuestra,nuestro,nuevo,nueva,nuevos,nuevas,nuez,nulo,numero,nunca,oasis,obrero,obra,obvio,oceano,octubre,odiar,odio,oeste,oferta,oficio,ofrece,olor,olfato,olvido,onda,opcion,opera,opinar,oponer,opuesto,oracion,oreja,orgullo,oriente,origen,oro,oscuro,otoño,oveja,padre,pais,pajaro,palabra,palacio,palco,palma,palo,paloma,pampa,pan,pancho,pantera,panza,papel,paquete,par,parte,partido,partir,pasar,paseo,pasion,paso,pasta,pastor,patron,paz,peaje,pecho,pedazo,pedir,peinar,pelea,pelo,pena,pensar,peor,pepino,perder,perdiz,perfil,perico,permiso,perrita,perrito,perro,persona,pertenecer,pesa,pesado,pescar,peso,pez,piano,picar,picaza,pico,piedra,piedras,piel,pierna,pieza,pijama,piloto,pino,pintor,pintura,piña,piojo,pisar,piscina,piso,pista,pizarra,placa,plan,plano,planta,plata,plato,playa,plaza,plomo,pluma,poco,poder,poesia,poeta,poker,pollo,polvo,poner,porcion,porte,porton,porvenir,posada,posible,potro,pozo,prado,precio,pregunta,premio,prensa,primo,proa,prole,promesa,pronto,propia,propio,propon,prosa,prueba,publicar,publico,pueblo,puente,puerco,puerta,puerto,pues,puesto,pulga,pulir,puma,punal,punto,pureza,puro,puzzle,quedar,queja,quemar,quepo,querer,queso,quien,quieto,quimera,quintal,quinto,quitar,raba,rabo,racha,radio,raiz,rama,rampa,rana,raro,rato,rayo,raza,real,reata,rebote,recibo,reciba,recio,recta,reflejo,regar,region,reir,reja,relato,reloj,remo,renta,reñir,replica,reposo,resaca,respeto,resta,retina,retiro,reto,retro,reuma,reuni,reves,rey,riba,ricas,rico,riego,ries,rifa,rigor,rincon,rio,risa,rival,rizo,robar,robo,roca,roce,rocio,rodaja,rodar,rojo,rollo,roma,romper,ronda,rosa,rosado,roto,rubio,ruco,rueca,rueda,ruego,ruido,rumbo,rumor,ruta,sabana,saber,sabio,sabor,sabroso,saca,saco,sacro,sagrado,sal,sala,salir,salida,salon,salsa,saltar,salud,salvo,sanar,sandia,sangre,sano,santa,santo,sapo,sarro,sastre,seca,secar,seco,secreto,sed,seda,segundo,segur,segunda,seguir,seis,sello,selva,semana,sembrar,semilla,sencillo,sendero,senor,seña,señal,señor,sentir,septimo,ser,sereno,sergio,serie,serio,servir,seta,setenta,setiembre,severo,siesta,sien,siete,sigilo,signo,silaba,silla,silogismo,silvestre,simio,simple,sin,sinodo,sino,siroco,sistema,sitial,sito,sobaco,sobre,socio,sodio,sofa,soga,sol,solar,solas,solido,solo,solo,sombra,sombrero,son,sonar,sonido,sopa,soplo,sorbo,sostener,sotana,suave,subir,subito,subte,sucio,suelo,sueño,suerte,suficiente,sufrir,sugerir,sujeto,sumar,sumo,super,suplica,supremo,sur,susto,sutil,tabla,tablon,tabu,taco,taza,tela,tarde,tarea,tarjeta,techo,teclado,tejido,telaraña,tema,temblor,temer,temor,temprano,tender,tendon,tener,tenis,tenor,terco,terno,terreno,tesoro,texto,tiempo,tienda,tieso,tigre,timbal,timido,tinta,tirar,titulo,tobillo,tocar,todavia,todo,tomate,tono,tope,torta,total,trabar,trabajo,traer,tragar,traje,trama,trampa,tras,traza,treinta,tren,trepar,tres,tribu,tribuna,trigo,trino,trono,tropa,trote,trozo,trueno,tubo,tumba,tumor,tunel,turba,turno,turron,tutor,ufano,ulcera,ultimo,umbral,uncir,unico,unidad,unir,uniforme,uno,uña,unos,unas,urbe,urgir,urna,uso,uva,uvas,vaca,vacuno,vacio,vaina,vajilla,vale,valer,valle,valor,valuar,valija,vanidad,vano,vapor,varieda,vario,vaso,vasto,vegetal,vejez,vela,velar,velo,venda,vencer,vender,venir,venta,ventaja,verano,verdad,verde,verja,verso,vestir,via,viajar,viaje,vicio,vida,viejo,vientre,viento,viernes,vigia,vil,vil,vinagre,vino,viña,violencia,violenta,vipera,virrey,virgen,virtud,virus,visado,vision,visita,vista,viuda,vivir,vivos,vivo,vocal,vocear,volar,voluntad,volver,votar,voto,voz,vuela,vuelco,vuelo,vuelta,vulgar,yegua,yelmo,yerno,yerros,yeso,yodo,yoga,yogur,zafiro,zafra,zarpa,zona,zumbar,zumo"
+  + ","
+  // 6-letter and longer: lots of common Spanish nouns + adjectives
+  + "abogado,acción,acordar,actitud,activo,acuerdo,adelante,adorno,aeropuerto,afecto,afuera,agotar,agresion,agudo,ahorro,ajedrez,alambre,albanil,alcance,alcohol,algodon,almuerzo,alegrar,almacen,aliado,aliento,alimento,allende,alquiler,alumno,amable,amante,ambito,ambiente,ameno,amistad,amplio,analisis,anciana,anciano,andamio,anillo,animal,animar,antena,anuncio,apenas,aplauso,aporte,apoyar,apretar,aprobar,aptitud,arbitro,arcaico,archivo,arcoiris,arduo,argumento,armario,arpegio,arquero,arquitecto,arreglo,arrendar,arribar,arroyo,artesano,asalto,asambl,asesino,asfalto,asomar,aspecto,astuto,asunto,atrevido,atribuir,audaz,audio,augurio,auspicio,austero,autista,autobus,automovil,autonomo,avance,aventura,aviador,ayudar,bacteria,balcon,baldosa,banca,bandera,bandido,banquete,baranda,bautizo,bautizar,baño,bárbaro,batalla,bebida,belga,bella,bellaco,bencina,bestia,billete,bisturi,bisonte,blanco,blandir,bobina,bochorno,boleto,bolsillo,bombero,bondad,bonete,bonito,bordado,boton,boutique,bravo,brillar,bronca,bruma,brusco,bucanero,bueno,bufanda,burguesa,burocracia,busqueda,cabaña,cabello,cabaret,cadena,cafeina,caja,calidad,calificar,callado,callado,callado,calzado,camara,camarero,cambio,camino,campesino,camposanto,canal,cancion,candado,canela,cangrejo,canon,canoa,cansado,cantidad,cantor,capacho,capacidad,capital,capitan,capote,capricho,caracter,caramelo,carbon,carcaj,carcel,cardenal,cargado,caricia,cariño,carnero,carrera,carruaje,casero,casino,castillo,castor,casualidad,catedra,causalidad,causa,cazador,cedazo,celebrar,celeste,celebridad,celibe,cenicero,censura,centavo,centro,cepillo,cercano,cerebro,certero,cesta,chacal,chacra,chaleco,chamana,chambelan,champaña,chancho,chasco,chatura,chinato,chispa,chiste,chofer,chubasco,cicatriz,cielito,ciencia,cientifico,cigarro,cinco,cinematografo,cinta,circo,circuito,ciudad,clamor,claridad,claustro,clavel,clavo,clemencia,cliente,clima,coartar,cobarde,cobertor,cobrar,codicia,codigo,cogote,cohete,cojin,coleccion,colega,colina,collar,colmena,colmillo,colon,coloso,columna,combate,combinar,comerciante,comienzo,comilon,comodo,compañero,compañia,compleja,complejo,componer,conducta,confiar,confuso,congelar,conjunto,conocer,conocida,conquistar,consejo,conseguir,consultar,contento,contar,contado,contra,convenir,corazon,corcho,coronel,correcto,correr,corriente,cortar,cortina,cosecha,coser,costa,costoso,costumbre,creativo,creencia,creer,crepusculo,creyente,criatura,crimen,cristal,critica,cromo,cronica,crudo,cruel,crujido,cruzar,cuaderno,cuadro,cuajar,cualquier,cuando,cuanto,cuartel,cuarto,cubierta,cubierto,cubo,cuchillo,cuello,cuenca,cuenta,cuento,cuerda,cuerdo,cuerpo,cuesta,cueva,cuidado,culebra,culpa,cumbre,cumplido,cumplir,cuna,cuneta,cupido,curiosa,curioso,curso,cuyo,damnificar,danzar,danza,debate,debate,debido,debutar,decadente,decidir,decision,decir,declarar,decoro,defensa,defecto,deformar,delante,delgado,delicia,delicada,delicado,delirio,delito,demanda,demente,demora,demoras,denso,dentro,depender,depredador,deporte,deposito,derecho,derretir,derribar,derrota,desafio,desamparo,desarrollar,desayuno,descenso,desconfianza,desconocido,descubrir,deseo,desembarco,desfile,desgracia,desierto,desnudo,despacho,despertar,despues,destacar,destino,destruir,desvelar,desviar,detalle,detener,deterioro,determinar,detrás,deuda,devolver,devorar,devoto,dialogo,diario,dibujo,dictador,diferente,dificil,digno,diluvio,diluvio,dinero,dinosaurio,diosa,direccion,director,disculpa,discurso,disfrutar,disgustar,disimular,disparar,distancia,divagar,diverso,dividir,divisar,divorcio,docena,docente,documento,dolor,domestico,domicilio,dominante,doncella,doña,dorar,dormir,dotacion,dragon,drama,duda,duendecillo,dulce,duquesa,durar,duro,echar,edicto,edificio,editor,educar,efectivo,efecto,egoismo,ejemplo,ejercer,elefante,elegante,elegir,elenco,elevado,elevar,eliminar,elocuente,elogio,embajada,embarcar,embarcadero,emocionar,empapar,empate,empeorar,empezar,emplear,empresa,empujar,enamorar,encanto,encender,encina,encontrar,encuentro,energico,enfermo,engañar,enojado,enredar,enseñar,enterar,entero,entonces,entrar,entrada,entrega,entregar,entrelazar,entrenar,enviar,envidiable,envidiar,enviudar,episodio,equilibrio,equipo,equivocar,erizo,erotic,error,escala,escalon,escapar,escarcha,escena,escenario,escoba,escolar,escolar,escolta,escondite,escoplo,escote,escribir,escribir,escudilla,escudo,escuela,escultor,esfera,esforzar,esfumar,esmalte,esmaltar,esmeralda,esmero,esmoquin,espacio,espada,espalda,español,especial,especie,especta,espejo,esperanza,espia,espina,espiritu,esposo,esposa,esquina,esquivar,estable,establecer,estadio,estado,estafa,estanque,estanqueta,estela,estepa,estilo,estima,estoico,estrella,estrofa,estuche,estudio,estufa,etapa,eterno,etico,evidente,evitar,exacto,exagerar,examen,exclamar,exhibir,exilio,existir,exito,exodo,experto,explicar,exponer,extremo,fabricar,fabrica,fabula,facial,facil,factor,facultad,falla,falta,familia,famoso,fanal,fantasia,fantasma,farmacia,faro,fatal,fatiga,favor,fecha,felicidad,felino,feliz,femenino,fenomeno,feria,feroz,festival,fideo,fiebre,fiera,figura,fijar,filete,filmar,filosofia,filtro,finanza,final,fingir,firmar,fiscal,fisico,flamenco,flecha,fluido,fomentar,fondo,forastero,foraneo,formar,fortuna,foto,fracaso,fragor,franja,frase,frecuente,frecuencia,fresa,fresco,frijol,frio,frontera,frutal,fuego,fuente,fugaz,funcion,fundar,futuro,gabela,gafas,galaxia,galera,galletas,galope,gallardo,ganaderia,ganado,ganador,ganga,garantia,garra,gasoil,gasolina,gastar,gavilan,gemir,generacion,general,generoso,genio,genoma,gente,germinar,gigante,girar,glaciar,gloria,glorieta,glotonería,gobernar,gobierno,goleta,golfo,golondrina,golpear,gorrion,gozar,grabar,gracia,gracias,grada,grado,grande,gratis,gratitud,gravedad,gravitar,grial,grieta,grifo,gritar,grosor,grueso,grupo,guante,guardar,guayaba,guerra,guiar,guitarra,gula,gusano,gustar,gusto,habano,haber,habil,habilidad,habitar,habito,hablar,hacedor,hacha,hacienda,halagar,hallar,hambriento,hangar,helado,heredar,herida,hermana,hermano,hermoso,heroe,herramienta,hervir,hibrido,hidalgo,hielera,hielo,hierba,hierro,higado,higiene,hipocrita,hipogrifo,hispano,historia,hocico,hogar,hojarasca,hojear,holgazan,hombre,hombro,homenaje,honesto,honor,horario,horizonte,horno,horror,hospital,hostal,hueco,huelga,huerto,huesped,humilde,humor,humorista,iconico,ideal,idioma,idolo,iglesia,igualdad,iguana,iluminar,iluso,ilustre,imagen,iman,imitar,imperio,implorar,importar,impreso,impulso,inaudito,incapaz,incierto,incluir,increible,independencia,indicar,indice,industria,inerte,infante,infierno,infinito,influir,informe,ingenio,ingresar,inicio,iniciar,inmenso,inmoral,inquilino,inscribir,insectos,insistir,inspirar,instalar,instante,instructor,insultar,intenso,intentar,interior,internar,interrumpir,invasor,inventar,inverso,invertir,invierno,invitar,iracundo,ironico,irreal,islote,izquierda,jabon,jacarandá,jadear,jamon,jardin,jarro,jaula,jazmin,jefe,jerarca,jerga,jinete,jirafa,jornada,joven,joyel,joyeria,juego,jueves,juerga,jugada,jugador,juicio,julio,junio,junto,jurado,jurar,justicia,juvenil,juzgar,laberinto,laborar,labrar,ladera,ladino,ladrar,ladron,lagarto,lago,lagrima,laguna,lampara,lance,lanzar,lapicero,lapidar,largo,laringe,laser,latido,latino,laudable,laurel,lavadora,lavar,leal,lealtad,lechuga,leer,legado,legal,legumbre,lejano,lengua,lenidad,lentitud,leon,letal,letra,levante,liana,liberar,libertad,libro,libreria,licencia,licor,lider,liebre,lienzo,ligar,ligero,limeño,limite,limpiar,limpio,linaje,lindo,linea,linterna,liquido,lirio,lirismo,liso,lista,literario,literatura,litio,litro,liviano,llaga,llama,llanto,llanura,llave,llegar,llenar,llevar,llorar,llover,lluvia,lobo,local,locura,lograr,logico,longeva,longitud,lozano,lucha,luchar,lucida,lucido,luego,lugar,lujo,lumbre,luna,lunes,lupa,luto,macabro,madera,madre,maduro,maestria,maestro,magico,mago,maleta,maletin,malicia,malo,maltrato,mañana,manada,mancha,mandar,manejo,manera,manga,manicomio,manjar,mano,manto,manzana,maquina,marca,marcha,marear,maremoto,marfil,margen,marido,marina,marino,mariposa,marisco,marmita,marqués,marrana,marron,martes,martillo,martir,marzo,masa,masacre,masaje,mascara,matador,matiz,matraz,matriz,maximo,mayor,mecanico,medalla,medias,medico,medida,medio,medula,mejilla,mejor,melena,melodia,memoria,mendigo,menor,mensaje,mente,mentir,mentira,menudo,mercado,merengue,merito,merma,mesa,mestizo,metafora,metal,meteorito,meter,metodo,metro,mezcla,microbio,microscopio,miedo,miembro,mientras,migrar,milagro,milicia,millon,mimar,mineral,minero,minoria,minuto,mirada,mirar,miseria,mismo,misterio,mitad,mitologia,mocoso,moda,modelo,modesto,modo,mojado,mojar,molde,moler,molino,momento,moneda,monito,monje,montaña,montar,monte,morada,moral,morder,moreno,moribundo,morir,mortal,mosca,mostrar,motin,motor,movil,mover,mucho,mudar,mudo,mueble,muelle,muerte,muerto,muestra,mujer,muleta,mulero,multa,mundano,mundo,muralla,murmullo,museo,musica,musitar,mutismo,nacer,nacimiento,nacion,nadador,nadar,nadie,naranja,narciso,nariz,nativa,nativo,naturaleza,naufragio,navaja,nave,navegante,navidad,necesidad,necesario,necio,negar,negocio,negro,negroide,nervio,nervioso,nido,nieto,niñera,nivel,nobleza,nocturno,noche,nombre,nopal,noria,norma,nortear,notable,noticia,novato,novedad,novela,nubarron,nube,nudillo,nudo,nuera,nuestra,nuestro,nuevo,nuez,numero,nunca,nupcial,nutricion,oasis,obediente,obispo,objeto,obligar,obrar,obrero,obrar,observar,obsesion,obstinado,obtener,obvio,ocaso,ocular,oculto,ocurrir,odiar,odio,oeste,oficial,oficio,ofrecer,olimpiada,olimpico,olvidar,olvidado,olla,opera,opinar,oponer,oportuno,oprimir,opuesto,oracion,oratoria,oreja,orfeon,orgullo,oriente,origen,orilla,oro,oscuro,oso,otoño,oveja,oxido,paciente,padecer,padre,pagar,pagina,pais,paisaje,pajaro,pala,palabra,palacio,paladar,palido,paloma,pampa,panaderia,panel,panera,panorama,pantano,pantera,pañuelo,papel,parado,paraiso,parar,parcela,pared,pareja,pariente,parlante,parque,parroquia,parte,particular,partido,partir,pasado,pasar,pascua,paseo,pasion,paso,pastel,pastor,patata,patente,patria,patrono,paz,peaje,peatonal,pecado,pecera,pecho,pedal,pedazo,pedido,pedir,pegamento,pegar,peinar,peldano,pelea,pelear,pelicano,pelicula,peligro,pellejo,pelo,peluca,pena,pendiente,pensador,pensamiento,pensar,peor,peñasco,pepino,pequeño,perdedor,perder,perdiz,perdon,perdurar,perezoso,perfil,perfume,perica,periodo,perla,permiso,perro,persona,personal,pertenecer,pesadilla,pesado,pescador,pescar,peso,pestaña,pesticida,petalo,petate,petroleo,piano,picaflor,picar,pico,pierna,pieza,pijama,piloto,pimienta,pino,pintor,pintura,piojo,pirata,piscina,piso,pista,pizarra,pizza,placa,placebo,plaga,plan,plancha,planear,planeta,planta,plata,platino,plato,playa,plaza,plebe,plomero,plomo,pluma,poblacion,pobre,poco,poder,poderoso,poesia,poeta,poker,polen,policia,politica,pollo,polvo,pomada,poner,poseer,potencia,potro,pozo,practica,practicar,prado,precio,preciso,predicar,prefijo,pregunta,prehistorico,premiar,premio,prensa,preparar,prestamo,prestar,pretender,prevenir,previo,primavera,primero,principio,prisa,prision,prisionero,probable,probar,problema,proceso,procurar,producir,producto,profesor,profundo,programa,promesa,promover,pronto,propio,proponer,prosa,proteccion,proteger,protesto,provecho,proveer,provocar,proximo,proyecto,prueba,publicar,publico,pueblo,puente,puerco,puerta,puerto,pueril,puesto,pulga,pulir,pulpo,pulque,puma,pupila,puro,quebrar,quedar,queja,quejar,quemar,querer,queso,quieto,quimera,quintilla,quinto,quirurgico,quitar,quizas,rabia,racha,racimo,racionar,radical,radio,raido,raiz,ramal,rama,rampa,rancho,rango,rapaz,raqueta,raro,rascacielos,rastro,ratificar,raton,ratonera,rayo,raza,razon,reaccion,realidad,realista,rebano,rebote,recibir,reciente,recio,recoger,recompensa,reconcilia,recordar,recortar,recreo,recta,rector,recurso,redactor,redondear,redoble,reducir,reflejo,reforma,refresco,refugio,regalar,regalo,regañar,regente,regimen,region,registro,reglar,regresar,regreso,reina,reino,reir,reja,relacion,relampago,relato,relax,religioso,relincho,reloj,rellenar,remediar,remedio,remite,remo,remolcar,remoto,rendir,rentable,renunciar,reñir,reparo,repaso,repetir,reposo,representar,reprochar,republica,reseña,reserva,resistir,resolver,respeto,respiro,respirar,respuesta,resta,restaurar,restos,resumen,retina,retirar,retiro,retoño,retorno,retraso,retrato,retroceder,reunion,revelar,reventar,revertir,revista,rey,rezar,riada,riba,ribera,ribete,ricaza,ricaza,rico,rienda,riesgo,rifa,rifle,rigido,riguroso,rincon,riñon,rio,riqueza,risa,rispido,ritmo,rito,rival,rivera,robar,robusto,roca,rocallosa,roce,rocio,rodaja,rodar,rodeo,rogar,rojizo,rojo,romance,romero,romper,roncar,ronquido,ropa,ropaje,rosa,rosado,rosario,rostro,rota,roto,rotura,rubi,rubio,rudo,rueda,ruedo,ruego,rugir,ruido,ruina,rumbear,rumbo,rumor,ruptura,rural,ruta,sabana,saber,sabio,sabor,sacar,sacerdote,saciar,saco,sacudir,sagaz,sagrado,sala,salado,salida,salir,saliva,salmon,salon,salsa,saltar,salud,saludo,salvar,salvo,sancion,sandalia,sangrar,sangre,sanidad,sano,santidad,santo,sapiencia,sarmiento,sastre,satira,seco,secreto,sed,seda,sedimento,sediento,seguir,segundo,seguro,seleccion,selva,sello,semana,semilla,sencillo,sendero,senor,sentencia,sentido,sentido,sentir,separar,sepulcro,sequia,ser,serenata,serio,serpiente,servir,servidumbre,seta,sevicia,sevicia,sicario,sien,sierra,siesta,siglo,significar,silaba,silencio,silla,silogismo,silvestre,simbolo,simio,simpatico,simpleza,siniestro,sinodo,sirena,sirviente,sistema,sitio,sobaco,soberano,soberbia,sobornar,sobrante,sobre,sobrina,sobrino,sobreviviente,social,socio,soez,sofa,sofrenar,sol,solar,soldado,soledad,solido,solo,sollozar,sombra,sombrero,someter,sonar,sonido,sonriente,sonrisa,soñar,sopa,soplo,soportar,sorbete,sordera,sorpresa,sospecha,sostener,sotana,suave,subir,subito,subterfugio,subterraneo,sucesion,suceso,sucio,sueldo,suelo,sueño,suerte,suficiente,sufrir,sugerir,sujetar,sujeto,sultan,sumar,sumo,super,suprema,suplicar,sur,suspenso,suspiro,sustento,sustento,sutil,tabaco,tabla,tablon,tabu,taco,tactica,tacto,talento,taller,tamaño,tampoco,tantear,tanto,tapa,tapete,tapiz,tardar,tarde,tarea,tarima,tarjeta,tarro,tatuaje,taza,techo,teclado,tedio,tegumento,teja,tejido,tela,telegrama,telegrafo,telon,tema,temblar,temer,temor,temperatura,tempestad,templo,temprano,tender,tenedor,tener,tensar,tension,tentar,teoria,tercero,terreno,terrible,terror,tesis,tesoro,texto,tibio,tiempo,tienda,tiento,tierra,tigre,timido,timon,tinieblas,tinta,tintura,tio,tipo,tiraje,tirar,tiro,tiroteo,titi,titular,titulo,tobillo,tobogan,tocar,todavia,tomar,tomate,tonelada,topico,torcer,tormenta,tornado,torneo,toro,torpe,torta,tortilla,tortuga,total,trabajar,trabajo,traer,traficar,traje,tramo,trampa,tranquilo,transcribir,transeunte,transito,trapecio,trasero,tratado,tratar,travesia,trayecto,treinta,tren,trepar,tres,tribu,tribuna,tributo,trigo,trino,triste,tristeza,triunfar,triunfo,trofeo,trono,tropezar,trovador,trozar,trozo,trueno,trueque,tuberia,tubo,tumba,tumbado,tumbo,tumor,tunel,turba,turbacion,turismo,turista,turron,tutor,ufano,ulcera,ultimo,ultraje,umbral,unanime,unico,unicornio,unidad,uniforme,union,unir,universal,universidad,untar,uña,urbanizar,urbano,urgir,urna,usado,usar,usuario,uva,vacacion,vacante,vaciar,vacuna,vagabundo,vago,vaina,valido,valiente,valija,valor,valle,vampiro,vampireska,vano,vapor,variar,variedad,vasija,vaso,vasto,vatio,vecino,vegetal,vehiculo,vejez,vela,velero,velocidad,vena,venado,vencer,vendaval,vendedor,vender,veneno,vengar,venir,venta,ventaja,ventana,ventura,verano,verdad,verde,verdura,vereda,verguenza,verja,verso,vertical,vertir,vestido,vestir,vetar,vez,via,viaje,vicio,victima,victoria,vida,vidrio,viejito,viejo,viento,viernes,viga,vigilar,vigor,villa,villano,vinagre,vinedo,vino,viola,violar,violencia,violeta,virgen,virtud,virus,visado,visible,vision,visita,visitar,vista,vital,vitamina,viuda,viudo,vivienda,vivir,vivo,vivacidad,vocabulario,volar,volcan,voluntad,voluntario,volver,votar,voto,voz,vuelo,vuelta,vulgar,xilografia,yegua,yelmo,yermo,yerno,yerro,yeso,yodo,yogur,yugo,zafiro,zafra,zaguan,zamarra,zambullir,zanahoria,zanja,zapato,zarpa,zarzal,zeppelin,zigzag,zinc,zona,zopilote,zorra,zorro,zumbar,zumo"
+).split(",");
+
+// Spanish verb conjugator — applies regular -ar / -er / -ir endings.
+// Irregular verbs (ser, ir, haber, tener, etc.) produce some non-canonical
+// forms, but those are still legal letter sequences the game can accept.
+// Better to over-accept than to make a verb unusable.
+function _conjugateEs(verb) {
+  const v = String(verb || "").toLowerCase().trim();
+  if (v.length < 4) return [v];
+  const stem = v.slice(0, -2);
+  const end = v.slice(-2);
+  const out = [v];
+  if (end === "ar") {
+    out.push(
+      stem + "ando",
+      stem + "ado", stem + "ada", stem + "ados", stem + "adas",
+      stem + "o", stem + "as", stem + "a", stem + "amos", stem + "ais", stem + "an",
+      stem + "e", stem + "aste", stem + "o", stem + "asteis", stem + "aron",
+      stem + "aba", stem + "abas", stem + "abamos", stem + "abais", stem + "aban",
+      stem + "are", stem + "aras", stem + "ara", stem + "aremos", stem + "areis", stem + "aran",
+      stem + "aria", stem + "arias", stem + "ariamos", stem + "ariais", stem + "arian",
+      stem + "e", stem + "es", stem + "emos", stem + "eis", stem + "en",
+      stem + "ara", stem + "aras", stem + "aramos", stem + "arais", stem + "aran",
+      stem + "ad"
+    );
+  } else if (end === "er") {
+    out.push(
+      stem + "iendo",
+      stem + "ido", stem + "ida", stem + "idos", stem + "idas",
+      stem + "o", stem + "es", stem + "e", stem + "emos", stem + "eis", stem + "en",
+      stem + "i", stem + "iste", stem + "io", stem + "imos", stem + "isteis", stem + "ieron",
+      stem + "ia", stem + "ias", stem + "iamos", stem + "iais", stem + "ian",
+      stem + "ere", stem + "eras", stem + "era", stem + "eremos", stem + "ereis", stem + "eran",
+      stem + "eria", stem + "erias", stem + "eriamos", stem + "eriais", stem + "erian",
+      stem + "a", stem + "as", stem + "amos", stem + "ais", stem + "an",
+      stem + "iera", stem + "ieras", stem + "ieramos", stem + "ierais", stem + "ieran",
+      stem + "ed"
+    );
+  } else if (end === "ir") {
+    out.push(
+      stem + "iendo",
+      stem + "ido", stem + "ida", stem + "idos", stem + "idas",
+      stem + "o", stem + "es", stem + "e", stem + "imos", stem + "is", stem + "en",
+      stem + "i", stem + "iste", stem + "io", stem + "imos", stem + "isteis", stem + "ieron",
+      stem + "ia", stem + "ias", stem + "iamos", stem + "iais", stem + "ian",
+      stem + "ire", stem + "iras", stem + "ira", stem + "iremos", stem + "ireis", stem + "iran",
+      stem + "iria", stem + "irias", stem + "iriamos", stem + "iriais", stem + "irian",
+      stem + "a", stem + "as", stem + "amos", stem + "ais", stem + "an",
+      stem + "iera", stem + "ieras", stem + "ieramos", stem + "ierais", stem + "ieran",
+      stem + "id"
+    );
+  }
+  return out;
+}
+
+// Pre-expand every Spanish verb into its conjugated forms.
+const _esVerbConjugations = [];
+ES_VERBS.forEach(v => _conjugateEs(v).forEach(f => _esVerbConjugations.push(f)));
+
+// Build the Spanish WORDS set + themed sets, with accent stripping baked in.
+function _esPrep(arr) {
+  return arr
+    .map(w => _stripDiacritics(String(w || "").toLowerCase().trim()).toUpperCase())
+    .filter(w => w.length >= 3 && /^[A-ZÑ]+$/.test(w))
+    .map(w => w.replace(/Ñ/g, "N"));
+}
+const WORDS_ES = new Set([
+  ..._esPrep(ES_WORD_LIST),
+  ..._esPrep(ES_WORD_LIST_EXT),
+  ..._esPrep(ES_PLACES),
+  ..._esPrep(ES_COLORS),
+  ..._esPrep(ES_FOOD),
+  ..._esPrep(ES_ANIMALS),
+  ..._esPrep(ES_NATURE),
+  ..._esPrep(ES_VERBS),
+  ..._esPrep(_esVerbConjugations),
+]);
+const PLACES_SET_ES  = new Set(_esPrep(ES_PLACES));
+const COLORS_SET_ES  = new Set(_esPrep(ES_COLORS));
+const FOOD_SET_ES    = new Set(_esPrep(ES_FOOD));
+const ANIMALS_SET_ES = new Set(_esPrep(ES_ANIMALS));
+const NATURE_SET_ES  = new Set(_esPrep(ES_NATURE));
+const VERB_SET_ES    = new Set(_esPrep(ES_VERBS));
+
+// Stash both EN + ES dictionaries on window so the Lang module can switch.
+window.WORDS_EN       = WORDS;
+window.WORDS_ES       = WORDS_ES;
+window.VERB_SET_EN    = VERB_SET;
+window.VERB_SET_ES    = VERB_SET_ES;
+window.NATURE_SET_EN  = NATURE_SET;
+window.NATURE_SET_ES  = NATURE_SET_ES;
+// PLACES_SET / FOOD_SET / etc. for EN are defined further down — we patch
+// the ES variants onto window when we encounter those declarations too.
+window.PLACES_SET_ES  = PLACES_SET_ES;
+window.COLORS_SET_ES  = COLORS_SET_ES;
+window.FOOD_SET_ES    = FOOD_SET_ES;
+window.ANIMALS_SET_ES = ANIMALS_SET_ES;
+
+// ─── Lang module: language preference + UI translation helper ──────────────
+// Persists in localStorage. Auto-detects browser locale on first load. Call
+// Lang.set(...) to swap the active dictionary + themed sets. Use Lang.t(en, es)
+// to pick the right string at render time.
+window.Lang = (function () {
+  const KEY = "wordsmith_lang";
+  function detect() {
+    try {
+      const stored = localStorage.getItem(KEY);
+      if (stored === "en" || stored === "es") return stored;
+    } catch (e) {}
+    if (typeof navigator !== "undefined" && navigator.language && navigator.language.toLowerCase().startsWith("es")) {
+      return "es";
+    }
+    return "en";
+  }
+  let current = detect();
+  function apply(lang) {
+    current = lang;
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+    window.__lang = lang;
+    // Swap active dictionaries / themed sets.
+    window.WORDS      = lang === "es" ? window.WORDS_ES      : window.WORDS_EN;
+    window.VERB_SET   = lang === "es" ? window.VERB_SET_ES   : window.VERB_SET_EN;
+    window.NATURE_SET = lang === "es" ? window.NATURE_SET_ES : window.NATURE_SET_EN;
+    // PLACES/COLORS/FOOD/ANIMALS swap is done after their EN sets are built.
+    if (window.PLACES_SET_EN)  window.PLACES_SET  = lang === "es" ? window.PLACES_SET_ES  : window.PLACES_SET_EN;
+    if (window.COLORS_SET_EN)  window.COLORS_SET  = lang === "es" ? window.COLORS_SET_ES  : window.COLORS_SET_EN;
+    if (window.FOOD_SET_EN)    window.FOOD_SET    = lang === "es" ? window.FOOD_SET_ES    : window.FOOD_SET_EN;
+    if (window.ANIMALS_SET_EN) window.ANIMALS_SET = lang === "es" ? window.ANIMALS_SET_ES : window.ANIMALS_SET_EN;
+  }
+  function set(lang) {
+    if (lang !== "en" && lang !== "es") lang = "en";
+    apply(lang);
+    return current;
+  }
+  function get() { return current; }
+  function t(en, es) { return current === "es" ? (es != null ? es : en) : en; }
+  apply(current);  // initial sync
+  return { set, get, t };
+})();
+
 // ─── Additional themed word sets for the new boss challenges ──────────────
 const PLACES = ("city,cities,town,towns,village,villages,hamlet,hamlets,country,countries,nation,nations,state,states,region,regions,county,counties,province,provinces,kingdom,kingdoms,empire,empires,palace,palaces,castle,castles,temple,temples,church,churches,chapel,chapels,mosque,mosques,synagogue,school,schools,college,colleges,academy,academies,university,park,parks,plaza,plazas,square,squares,street,streets,avenue,avenues,road,roads,lane,lanes,alley,alleys,bridge,bridges,tower,towers,museum,museums,library,libraries,theater,theaters,theatre,theatres,cinema,cinemas,stadium,stadiums,arena,arenas,market,markets,harbor,harbors,harbour,harbours,port,ports,airport,airports,station,stations,depot,depots,terminal,terminals,beach,beaches,coast,coasts,shore,shores,island,islands,islet,islets,peninsula,cape,capes,mountain,mountains,hill,hills,valley,valleys,canyon,canyons,gorge,gorges,ravine,ravines,forest,forests,desert,deserts,jungle,jungles,prairie,prairies,meadow,meadows,tundra,reef,reefs,river,rivers,creek,creeks,brook,brooks,stream,streams,lake,lakes,pond,ponds,ocean,oceans,sea,seas,bay,bays,gulf,gulfs,strait,straits,channel,channels,delta,deltas,plain,plains,plateau,plateaus,oasis,oases,glade,glades,grove,groves,thicket,thickets,suburb,suburbs,district,districts,borough,boroughs,downtown,uptown,countryside,outback,bayou,bayous,fjord,fjords,lagoon,lagoons,marsh,marshes,swamp,swamps,wetland,wetlands,wood,woods,woodland,woodlands,grotto,grottos,cave,caves,cavern,caverns,den,dens,nook,nooks,corner,corners,zone,zones,sector,sectors,quarter,quarters,ward,wards,parish,terrace,terraces,boulevard,boulevards,corridor,corridors,courtyard,courtyards,arcade,arcades,gallery,galleries,pavilion,pavilions,villa,villas,manor,manors,mansion,mansions,cabin,cabins,cottage,cottages,lodge,lodges,inn,inns,hostel,hostels,hotel,hotels,motel,motels,resort,resorts,spa,spas,ranch,ranches,farm,farms,estate,estates,vineyard,vineyards,orchard,orchards,garden,gardens,patio,patios,porch,porches,balcony,balconies,rooftop,rooftops,attic,attics,cellar,cellars,vault,vaults,dungeon,dungeons,catacomb,catacombs,monastery,convent,convents,abbey,abbeys,shrine,shrines,sanctuary,sanctuaries,oracle,citadel,citadels,fortress,fortresses,fort,forts,barracks,outpost,outposts,frontier,frontiers,border,borders,horizon,horizons,gateway,gateways,portal,portals,passage,passages,tunnel,tunnels,bunker,bunkers,silo,silos,greenhouse,observatory,planetarium,aquarium,zoo,zoos,plaza,piazza,paris,london,tokyo,rome,madrid,berlin,cairo,sydney,boston,dallas,miami,denver,seattle,atlanta,china,japan,france,spain,italy,germany,russia,brazil,mexico,canada,greece,egypt,kenya,ghana,india,nepal,asia,africa,europe,america,arctic,texas,maine,utah,ohio,iowa,idaho,oregon,florida,arizona,georgia,kansas,nevada,alaska,hawaii,quebec,ontario,andes,alps,nile,amazon,thames,sahara,gobi,everest,fuji,kilauea,etna,vesuvius,mecca,athens,sparta,troy,carthage,babylon,thebes,delphi,olympia,pompeii,arch,archway,monument,statue,gully,glen,gulch,marina,wharf,pier,dock,jetty,reservoir,canal,canals,aqueduct,viaduct,boardwalk,promenade,esplanade,palisade,quay,quays,wharves,piers,docks,jetties,reservoirs,marinas,inlet,inlets,cove,coves,sound,sounds,fountain,fountains,well,wells,spring,springs,parlor,parlors,foyer,foyers,loft,lofts,suite,suites,room,rooms,hall,halls,chamber,chambers,annex,annexes,wing,wings,floor,floors,storey,stories," +
   // ─── EXPANSION: common everyday-life places, shops, services ─────────────
@@ -3981,86 +4333,79 @@ const MUST_MAKE_POOL = "spark,grant,bread,brick,clean,clear,cloud,crown,dream,fr
 // All the boss "modifier" variants. Picked at random when entering a boss level.
 // modifier: tag passed to wordPassesModifier (or null when the challenge isn't about words).
 // flags:    extra runtime constraints (noPowerups, mustMakeWord, noDrag, dominoRequired, etc.)
+// labelEs / descEs: Spanish translations. pickBossChallenge swaps them in
+// when Lang.get() === "es".
 const BOSS_CHALLENGES = [
-  { id: "verbs",      label: "Verbs only",        desc: "Only verbs count toward your score.",                 modifier: "verbs"    },
-  { id: "nature",     label: "Nature only",       desc: "Only nature-themed words count.",                     modifier: "nature"   },
-  { id: "places",     label: "Places only",       desc: "Only place names and place words count.",             modifier: "places"   },
-  { id: "colors",     label: "Colors only",       desc: "Only color words count toward your score.",           modifier: "colors"   },
-  { id: "food",       label: "Food only",         desc: "Only edible words count. Get hungry.",                modifier: "food"     },
-  { id: "animals",    label: "Animals only",      desc: "Only creatures of the world count.",                  modifier: "animals"  },
-  { id: "minLen4",    label: "4+ letters only",   desc: "Only words 4 letters or longer count.",               modifier: "minLen4"  },
-  { id: "noPowerups", label: "No powerups",       desc: "All powerups are disabled. Pure word skill.",         modifier: null, flags: { noPowerups: true } },
-  { id: "mustMake",   label: "Must spell a word", desc: "Spell the target word AND hit the points goal.",      modifier: null, flags: { mustMakeWord: true } },
-  // Banned-letter challenge — randomly picks one vowel to ban. wordPassesModifier
-  // reads bossChallengeRef.bannedLetter at runtime.
-  { id: "noVowel",    label: "Banned vowel",      desc: "One vowel is banned. Picked at level start.",         modifier: "noVowel",  flags: { bannedVowel: true } },
-  // Exact-length — randomly chooses 4, 5, or 6 at level start.
-  { id: "exactLen",   label: "Exact length",      desc: "Only words of an exact length count.",                modifier: "exactLen", flags: { exactLength: true } },
-  // No-drag — refuses tile drag, must rely on dice + rotation.
-  { id: "noDrag",     label: "No dragging",       desc: "Placed tiles can't be dragged. Plan ahead.",          modifier: null, flags: { noDrag: true } },
-  // Domino — only placements that form 2+ words simultaneously score. Single-
-  // word placements yield 0. E.g. place a letter that completes both a
-  // horizontal AND a vertical word at once and BOTH score.
-  { id: "domino",     label: "Domino mode",       desc: "Only multi-word placements score (place a letter that creates 2+ words at once).", modifier: null, flags: { dominoRequired: true } },
-  // Speed run — half the time but every word pays 2×.
-  { id: "speedRun",   label: "Speed run",         desc: "Half the clock — every word pays 2× points.",         modifier: null, flags: { speedRun: true } },
-  // Locked bottom — sparkle seeds at the bottom row can't be drag-cleared and
-  // are flagged with extra weight (visible). You must form words including them.
-  { id: "lockedFloor",label: "Locked floor",      desc: "Bottom row is glued — make words through it.",        modifier: null, flags: { lockedFloor: true } },
-  // Limited moves — give the player a budget of N placed-tile drags. Every
-  // drag of a placed tile decrements. Reach 0 → drags refused.
-  { id: "limMoves",   label: "Limited moves",     desc: "Only a handful of placed-tile swaps allowed.",        modifier: null, flags: { limitedMoves: true } },
-  // Must-contain — every scoring word must contain a specific letter. Picks
-  // from rare letters so it's actually a challenge (X, Z, Q, J, K).
-  { id: "containL",   label: "Must contain ?",    desc: "Every word must include the chosen letter.",          modifier: "contains", flags: { containsLetter: true } },
-  // Plurals-only — words must look like plural forms (ends -s/-es/-ies with a
-  // valid singular form). Tests whether the player can chain modifiers.
-  { id: "plurals",    label: "Plurals only",      desc: "Only plural words count toward your score.",          modifier: "plurals" },
-  // No-repeats — words you've already scored this RUN no longer score. Forces
-  // variety. Tracked at processWordsAt time using foundWordsRef.
-  { id: "noRepeat",   label: "No repeats",        desc: "Words already found this run don't score again.",     modifier: null, flags: { noRepeats: true } },
-  // Stonebreaker — board starts seeded with stones; player wins by destroying
-  // every stone. No new stones spawn during this boss. Player gets free
-  // Hammers + Dynamite so it's actually clearable.
-  { id: "stones",     label: "Stonebreaker",      desc: "Destroy every stone on the board. No new stones will spawn — finish what's there.",
-    modifier: null, flags: { stoneCrusher: true } },
+  { id: "verbs",      label: "Verbs only",        labelEs: "Solo verbos",      desc: "Only verbs count toward your score.",                 descEs: "Solo los verbos suman puntos.",                                                                modifier: "verbs"    },
+  { id: "nature",     label: "Nature only",       labelEs: "Solo naturaleza",  desc: "Only nature-themed words count.",                     descEs: "Solo cuentan las palabras de naturaleza.",                                                     modifier: "nature"   },
+  { id: "places",     label: "Places only",       labelEs: "Solo lugares",     desc: "Only place names and place words count.",             descEs: "Solo cuentan los nombres de lugares.",                                                          modifier: "places"   },
+  { id: "colors",     label: "Colors only",       labelEs: "Solo colores",     desc: "Only color words count toward your score.",           descEs: "Solo cuentan las palabras de colores.",                                                         modifier: "colors"   },
+  { id: "food",       label: "Food only",         labelEs: "Solo comida",      desc: "Only edible words count. Get hungry.",                descEs: "Solo cuentan las palabras comestibles. A tener hambre.",                                        modifier: "food"     },
+  { id: "animals",    label: "Animals only",      labelEs: "Solo animales",    desc: "Only creatures of the world count.",                  descEs: "Solo cuentan las criaturas del mundo.",                                                         modifier: "animals"  },
+  { id: "minLen4",    label: "4+ letters only",   labelEs: "Mínimo 4 letras",  desc: "Only words 4 letters or longer count.",               descEs: "Solo cuentan las palabras de 4 letras o más.",                                                   modifier: "minLen4"  },
+  { id: "noPowerups", label: "No powerups",       labelEs: "Sin poderes",      desc: "All powerups are disabled. Pure word skill.",         descEs: "Los poderes están desactivados. Pura habilidad.",                                              modifier: null, flags: { noPowerups: true } },
+  { id: "mustMake",   label: "Must spell a word", labelEs: "Forja la palabra", desc: "Spell the target word AND hit the points goal.",      descEs: "Forja la palabra objetivo Y alcanza el puntaje.",                                              modifier: null, flags: { mustMakeWord: true } },
+  { id: "noVowel",    label: "Banned vowel",      labelEs: "Vocal prohibida",  desc: "One vowel is banned. Picked at level start.",         descEs: "Una vocal está prohibida. Se elige al empezar.",                                                modifier: "noVowel",  flags: { bannedVowel: true } },
+  { id: "exactLen",   label: "Exact length",      labelEs: "Longitud exacta",  desc: "Only words of an exact length count.",                descEs: "Solo cuentan palabras de una longitud exacta.",                                                 modifier: "exactLen", flags: { exactLength: true } },
+  { id: "noDrag",     label: "No dragging",       labelEs: "Sin arrastrar",    desc: "Placed tiles can't be dragged. Plan ahead.",          descEs: "No puedes mover las fichas colocadas. Planea bien.",                                            modifier: null, flags: { noDrag: true } },
+  { id: "domino",     label: "Domino mode",       labelEs: "Modo dominó",      desc: "Only multi-word placements score (place a letter that creates 2+ words at once).", descEs: "Solo puntúan jugadas que forman 2+ palabras a la vez.", modifier: null, flags: { dominoRequired: true } },
+  { id: "speedRun",   label: "Speed run",         labelEs: "Contra reloj",     desc: "Half the clock — every word pays 2× points.",         descEs: "Mitad del tiempo — cada palabra vale el doble.",                                                modifier: null, flags: { speedRun: true } },
+  { id: "lockedFloor",label: "Locked floor",      labelEs: "Suelo bloqueado",  desc: "Bottom row is glued — make words through it.",        descEs: "La fila inferior está pegada — forma palabras a través de ella.",                              modifier: null, flags: { lockedFloor: true } },
+  { id: "limMoves",   label: "Limited moves",     labelEs: "Movimientos limitados", desc: "Only a handful of placed-tile swaps allowed.",  descEs: "Solo se permiten unos pocos intercambios de fichas.",                                            modifier: null, flags: { limitedMoves: true } },
+  { id: "containL",   label: "Must contain ?",    labelEs: "Debe contener ?",  desc: "Every word must include the chosen letter.",          descEs: "Cada palabra debe incluir la letra elegida.",                                                   modifier: "contains", flags: { containsLetter: true } },
+  { id: "plurals",    label: "Plurals only",      labelEs: "Solo plurales",    desc: "Only plural words count toward your score.",          descEs: "Solo las palabras en plural suman puntos.",                                                     modifier: "plurals" },
+  { id: "noRepeat",   label: "No repeats",        labelEs: "Sin repetir",      desc: "Words already found this run don't score again.",     descEs: "Las palabras ya encontradas esta partida no suman de nuevo.",                                  modifier: null, flags: { noRepeats: true } },
+  { id: "stones",     label: "Stonebreaker",      labelEs: "Rompepiedras",     desc: "Destroy every stone on the board. No new stones will spawn — finish what's there.", descEs: "Destruye cada piedra del tablero. No aparecerán nuevas.", modifier: null, flags: { stoneCrusher: true } },
 ];
 
 function pickBossChallenge() {
   const c = BOSS_CHALLENGES[Math.floor(Math.random() * BOSS_CHALLENGES.length)];
-  // For the mustMake challenge, pre-select the word the player must spell.
+  const isEs = window.Lang && window.Lang.get() === "es";
+  // Pick language-appropriate label + desc up-front. All per-flag specializations
+  // below override desc (and sometimes label) with parameterized strings.
+  const base = { ...c, label: isEs && c.labelEs ? c.labelEs : c.label, desc: isEs && c.descEs ? c.descEs : c.desc };
   if (c.flags && c.flags.mustMakeWord) {
     const w = MUST_MAKE_POOL[Math.floor(Math.random() * MUST_MAKE_POOL.length)].toUpperCase();
-    return { ...c, mustMakeWord: w, desc: `Spell the word "${w}" — and still hit the points goal.` };
+    return { ...base, mustMakeWord: w,
+      desc: isEs ? `Forja la palabra "${w}" — y alcanza el puntaje.` : `Spell the word "${w}" — and still hit the points goal.` };
   }
-  // Banned-vowel: pre-pick which vowel is forbidden.
   if (c.flags && c.flags.bannedVowel) {
     const v = "AEIOU"[Math.floor(Math.random() * 5)];
-    return { ...c, bannedLetter: v, desc: `The letter "${v}" is banned. Words containing it don't count.` };
+    return { ...base, bannedLetter: v,
+      desc: isEs ? `La letra "${v}" está prohibida. Las palabras con ella no cuentan.` : `The letter "${v}" is banned. Words containing it don't count.` };
   }
-  // Exact-length: pre-pick which length is required (4, 5, or 6).
   if (c.flags && c.flags.exactLength) {
     const n = 4 + Math.floor(Math.random() * 3);
-    return { ...c, requiredLength: n, desc: `Only ${n}-letter words count toward your score.` };
+    return { ...base, requiredLength: n,
+      desc: isEs ? `Solo cuentan las palabras de exactamente ${n} letras.` : `Only ${n}-letter words count toward your score.` };
   }
-  // Limited-moves: pre-pick the swap budget (6-10).
   if (c.flags && c.flags.limitedMoves) {
     const n = 6 + Math.floor(Math.random() * 5);
-    return { ...c, moveBudget: n, desc: `You only get ${n} placed-tile swaps. Use them wisely.` };
+    return { ...base, moveBudget: n,
+      desc: isEs ? `Solo tienes ${n} intercambios. Úsalos bien.` : `You only get ${n} placed-tile swaps. Use them wisely.` };
   }
-  // Must-contain: pre-pick the required letter from rare-but-formable letters.
   if (c.flags && c.flags.containsLetter) {
-    const pool = "RSTLNEDAOIBCFGHMPK".split("");  // skewed to formable letters; mostly mid-rarity
+    const pool = "RSTLNEDAOIBCFGHMPK".split("");
     const letter = pool[Math.floor(Math.random() * pool.length)];
-    return { ...c, requiredLetter: letter, label: `Must contain "${letter}"`, desc: `Every word must include the letter "${letter}" to count.` };
+    return { ...base, requiredLetter: letter,
+      label: isEs ? `Debe contener "${letter}"` : `Must contain "${letter}"`,
+      desc: isEs ? `Cada palabra debe incluir la letra "${letter}" para contar.` : `Every word must include the letter "${letter}" to count.` };
   }
-  return { ...c };
+  return base;
 }
 
 const PLACES_SET  = new Set(PLACES.map(w => w.toUpperCase().trim()).filter(w => w.length >= 3));
 const COLORS_SET  = new Set(COLORS.map(w => w.toUpperCase().trim()).filter(w => w.length >= 3));
 const FOOD_SET    = new Set(FOOD.map(w => w.toUpperCase().trim()).filter(w => w.length >= 3));
 const ANIMALS_SET = new Set(ANIMALS.map(w => w.toUpperCase().trim()).filter(w => w.length >= 3));
+// Stash EN themed sets on window + re-run Lang.set so the currently-active
+// language gets the right set bound. (The Lang module ran earlier when only
+// WORDS / VERB / NATURE were available; now we wire the remaining themed sets.)
+window.PLACES_SET_EN  = PLACES_SET;
+window.COLORS_SET_EN  = COLORS_SET;
+window.FOOD_SET_EN    = FOOD_SET;
+window.ANIMALS_SET_EN = ANIMALS_SET;
+window.Lang.set(window.Lang.get());
 
 // Also fold every themed pool into the main WORDS set so they register during
 // normal play. The per-modifier *_SET filters above stay separate so boss
@@ -4667,6 +5012,14 @@ window.WordsmithSave = (function () {
       totalPlayMs: 0,
       bossesBeaten: 0,
       totalCoinsEarned: 0,
+      totalPurchases: 0,
+      // Per-letter use count across all runs.
+      letterCounts: {},
+      // Every distinct word ever scored — used for "% of dictionary covered"
+      // AND for telling the player how many of THIS RUN's words were new.
+      vocabulary: [],
+      // Snapshot of the last run's new-word count, displayed on game-over.
+      lastRunNewWords: 0,
       perCategory: { verbs: 0, nature: 0, places: 0, colors: 0, food: 0, animals: 0 },
     };
   }
@@ -4881,6 +5234,10 @@ function App() {
   // Timestamp when the current run started — drives WPM stat on the game-over
   // screen. Reset in startGame().
   const runStartTimeRef = useRef(Date.now());
+  // Snapshot of lifetime vocabulary size at the moment a run starts. Game-over
+  // diffs against this to compute how many words the player ADDED to their
+  // lifetime vocabulary this run (the "new words discovered" stat).
+  const preRunVocabSizeRef = useRef(0);
 
   useEffect(() => { coinsRef.current = coins; }, [coins]);
   useEffect(() => { livesRef.current = lives; }, [lives]);
@@ -5052,6 +5409,15 @@ function App() {
       coinsRef.current = coinsRef.current + total;
       setCoins(c => c + total);
       setLastCoinAward({ base, words, sizeBonus, blocksBonus, timeBonus, overscoreBonus, total });
+      // Roll the coin haul into lifetime "coins earned" stat (counts EARNED,
+      // not balance — buying things later doesn't subtract from this tally).
+      try {
+        const Save = window.WordsmithSave;
+        if (Save) {
+          const s = Save.loadStats();
+          Save.saveStats({ ...s, totalCoinsEarned: (s.totalCoinsEarned || 0) + total });
+        }
+      } catch (e) {}
     } else if (phase === "game-over") {
       if (window.Sound) Sound.gameOver();
       if (livesRef.current > 0) {
@@ -5082,6 +5448,11 @@ function App() {
             if (inSet(W.FOOD_SET, w))    f += 1;
             if (inSet(W.COLORS_SET, w))  c += 1;
           });
+          // NEW-WORDS COUNT: diff the lifetime vocabulary size now against
+          // its size at run start (stored in preRunVocabSizeRef). That gives
+          // an accurate "words you discovered for the first time this run"
+          // — incremental writes during the run already grew the vocab.
+          const newWordsThisRun = Math.max(0, (cur.vocabulary || []).length - (preRunVocabSizeRef.current || 0));
           Save.saveStats({
             ...cur,
             runs: cur.runs + 1,
@@ -5090,6 +5461,7 @@ function App() {
             totalWords: cur.totalWords + wordsThisRun.length,
             longestWord: longestThisRun,
             totalPlayMs: cur.totalPlayMs + Math.max(0, Date.now() - runStartTimeRef.current),
+            lastRunNewWords: newWordsThisRun,
             perCategory: {
               verbs:   (cats.verbs   || 0) + v,
               places:  (cats.places  || 0) + p,
@@ -5351,6 +5723,13 @@ function App() {
     if (window.Sound) Sound.start();
     // Reset run timer — used by the end-of-run stats (words-per-minute, etc).
     runStartTimeRef.current = Date.now();
+    // Snapshot lifetime vocabulary size BEFORE this run starts. Game-over
+    // diffs against this to compute "new words discovered" accurately even
+    // though processWordsAt grows vocab incrementally.
+    try {
+      const Save = window.WordsmithSave;
+      if (Save) preRunVocabSizeRef.current = (Save.loadStats().vocabulary || []).length;
+    } catch (e) { preRunVocabSizeRef.current = 0; }
     setLevelIdx(0);
     setScore(0);
     scoreRef.current = 0;
@@ -5499,6 +5878,15 @@ function App() {
       // Default: add one of the powerup keyed by item.name
       setPowerups(p => ({ ...p, [item.name]: (p[item.name] || 0) + 1 }));
     }
+    // Lifetime stat: every successful buy bumps totalPurchases by 1 (trade
+    // counts too, since it's a successful shop interaction).
+    try {
+      const Save = window.WordsmithSave;
+      if (Save) {
+        const s = Save.loadStats();
+        Save.saveStats({ ...s, totalPurchases: (s.totalPurchases || 0) + 1 });
+      }
+    } catch (e) {}
   }, []);
 
   // ─── Block falling tick ────────────────────────────────────
@@ -6275,6 +6663,25 @@ function App() {
     setScore(s => s + total);
     setFoundWords(prev => [...prev, ...validWords.map(w => w.word)]);
     setLevelWords(prev => [...prev, ...validWords.map(w => w.word)]);
+    // LIFETIME stats: tally each letter used across all scored words AND grow
+    // the lifetime vocabulary (used for "% of dictionary" + "new-words-this-
+    // run" at game-over). Cheap aggregation so we can keep it inline here.
+    try {
+      const Save = window.WordsmithSave;
+      if (Save) {
+        const s = Save.loadStats();
+        const lc = { ...(s.letterCounts || {}) };
+        const vocab = new Set(s.vocabulary || []);
+        validWords.forEach(w => {
+          for (let i = 0; i < w.word.length; i++) {
+            const ch = w.word[i];
+            lc[ch] = (lc[ch] || 0) + 1;
+          }
+          vocab.add(w.word);
+        });
+        Save.saveStats({ ...s, letterCounts: lc, vocabulary: [...vocab] });
+      }
+    } catch (e) {}
     // "Must spell X" boss challenge — flag if the required word was among the found.
     // NOTE: can't use `const c` here — processWordsAt's parameter `c` (column) shadows
     // the same identifier, which is a JS SyntaxError at the top of the arrow body.
@@ -7510,7 +7917,7 @@ function App() {
             <div className="level-banner">
               <div className="banner-icon">{level.id}</div>
               <div style={{ flex: 1 }}>
-                <div className="banner-text">Level {level.id} · {level.name}</div>
+                <div className="banner-text">{window.Lang.t("Level", "Nivel")} {level.id} · {level.name === "BOSS ORDER" ? window.Lang.t("BOSS ORDER", "ORDEN DEL JEFE") : level.name}</div>
               </div>
               <div className="banner-subtext">{Math.max(0, score - levelStartScore)} / {level.target}</div>
             </div>
@@ -7693,17 +8100,17 @@ function Hud({ level, score, timeLeft, blocksLeft, scorePops, coins, lives, paus
         onClick={onTogglePause ? () => { window.Sound && Sound.tap(); onTogglePause(); } : undefined}
         aria-label={onTogglePause ? (paused ? "Resume game" : "Pause game") : undefined}
       >
-        <div className="hud-label">{paused ? "PAUSED · TAP TO RESUME" : "TIME · TAP TO PAUSE"}</div>
+        <div className="hud-label">{paused ? window.Lang.t("PAUSED · TAP TO RESUME", "PAUSA · TOCA PARA SEGUIR") : window.Lang.t("TIME · TAP TO PAUSE", "TIEMPO · TOCA PARA PAUSAR")}</div>
         <div className={`hud-value ${timeClass}`}>
           {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
         </div>
       </TimeTag>
       <div className="hud-pill">
-        <div className="hud-label">BLOCKS</div>
+        <div className="hud-label">{window.Lang.t("BLOCKS", "BLOQUES")}</div>
         <div className="hud-value">{blocksLeft}</div>
       </div>
-      <div className="hud-pill hud-lives" title={`${lives} lives`}>
-        <div className="hud-label">LIVES</div>
+      <div className="hud-pill hud-lives" title={`${lives} ${window.Lang.t("lives", "vidas")}`}>
+        <div className="hud-label">{window.Lang.t("LIVES", "VIDAS")}</div>
         <div className="hud-value hud-lives-value">{"❤️".repeat(Math.min(5, Math.max(0, lives)))}</div>
         {/* Coins are now hidden during gameplay — they only appear in the shop screen
             to keep the HUD focused on what affects the current run. */}
@@ -8128,9 +8535,38 @@ function StartScreen({ onStart, onResume }) {
     }
   };
   const showInstallButton = !isStandalone && (deferredPrompt || isIOS);
+  // Language toggle state. Reading from window.Lang on each render so the
+  // toggle UI flips immediately when clicked. setLang triggers a re-render
+  // by storing the lang string in local state, even though the actual swap
+  // happens via window.Lang.set.
+  const [lang, setLang] = React.useState(() => (window.Lang ? window.Lang.get() : "en"));
+  const T = window.Lang ? window.Lang.t : ((en) => en);
+  const switchLang = (next) => {
+    if (next === lang) return;
+    if (window.Lang) window.Lang.set(next);
+    setLang(next);
+    if (window.Sound) Sound.tap();
+  };
   return (
     <div className="overlay" style={{ animation: "none" }}>
       <div className="overlay-card start-card">
+        {/* LANGUAGE TOGGLE — tiny pill in the top-right of the start card.
+            Persists in localStorage so the choice survives reloads + installs. */}
+        <div className="lang-toggle">
+          <button
+            type="button"
+            className={`lang-pill ${lang === "en" ? "active" : ""}`}
+            onClick={() => switchLang("en")}
+            aria-label="English"
+          >EN</button>
+          <button
+            type="button"
+            className={`lang-pill ${lang === "es" ? "active" : ""}`}
+            onClick={() => switchLang("es")}
+            aria-label="Español"
+          >ES</button>
+        </div>
+
         {/* Animated letter blocks — two lines ("WORD" + "SMITH"). Each letter
             gets its own hue via letterHue(), matching the in-game tile colors
             instead of a uniform gold. */}
@@ -8152,30 +8588,42 @@ function StartScreen({ onStart, onResume }) {
             ))}
           </div>
         </div>
-        <div className="start-tag">FORGE THE WORDS · FEED THE PRESS</div>
+        <div className="start-tag">{T("FORGE THE WORDS · FEED THE PRESS", "FORJA LAS PALABRAS · ALIMENTA LA PRENSA")}</div>
 
         {/* LORE — reframed to fit the workshop setting (no "letters fall from
             the sky" anymore — letters come from the forge). */}
         <p className="start-lore">
-          The gnomes' printing press is starving. They need <em>words</em> — fresh ones, every day,
-          forged in your workshop from the letters that tumble off the anvil.
-          <br/><br/>
-          You are the <strong>Wordsmith</strong>. Spell what the press demands. Trade coins with
-          Rich the merchant. Don't let the press run dry.
+          {lang === "es" ? (
+            <>
+              La imprenta de los gnomos se muere de hambre. Necesitan <em>palabras</em> — frescas, cada día,
+              forjadas en tu taller con las letras que caen del yunque.
+              <br/><br/>
+              Tú eres el <strong>Forjador de Palabras</strong>. Forja lo que pide la prensa. Comercia con
+              Rich el mercader. No dejes que la prensa se quede sin palabras.
+            </>
+          ) : (
+            <>
+              The gnomes' printing press is starving. They need <em>words</em> — fresh ones, every day,
+              forged in your workshop from the letters that tumble off the anvil.
+              <br/><br/>
+              You are the <strong>Wordsmith</strong>. Spell what the press demands. Trade coins with
+              Rich the merchant. Don't let the press run dry.
+            </>
+          )}
         </p>
 
         <div className="start-controls">
           <div className="control-line">
-            <span className="control-key">drag</span>
-            <span>Drag a falling letter to position it</span>
+            <span className="control-key">{T("drag", "arrastra")}</span>
+            <span>{T("Drag a falling letter to position it", "Arrastra una letra para posicionarla")}</span>
           </div>
           <div className="control-line">
-            <span className="control-key">tap</span>
-            <span>Tap a falling letter to roll its face</span>
+            <span className="control-key">{T("tap", "toca")}</span>
+            <span>{T("Tap a falling letter to roll its face", "Toca una letra para rotar su cara")}</span>
           </div>
           <div className="control-line">
-            <span className="control-key">swipe ↓</span>
-            <span>Hard drop into the column</span>
+            <span className="control-key">{T("swipe ↓", "desliza ↓")}</span>
+            <span>{T("Hard drop into the column", "Caída rápida en la columna")}</span>
           </div>
         </div>
 
@@ -8184,23 +8632,23 @@ function StartScreen({ onStart, onResume }) {
             className="overlay-btn resume-btn"
             onClick={() => { window.Sound && Sound.tap(); onResume(savedRun); }}
           >
-            ▶ Resume run · Lvl {(savedRun.levelIdx || 0) + 1} · {(savedRun.score || 0).toLocaleString()} pts
+            ▶ {T("Resume run", "Continuar")} · {T("Lvl", "Nv")} {(savedRun.levelIdx || 0) + 1} · {(savedRun.score || 0).toLocaleString()} {T("pts", "pts")}
           </button>
         )}
         <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onStart(); }}>
-          {savedRun ? "Start a new run" : "Begin Forging"}
+          {savedRun ? T("Start a new run", "Nueva partida") : T("Begin Forging", "Empezar a Forjar")}
         </button>
 
         <button
           className="overlay-btn secondary records-btn"
           onClick={() => { window.Sound && Sound.tap(); setShowRecords(true); }}
         >
-          🏆 Records
+          🏆 {T("Records", "Récords")}
         </button>
 
         {showInstallButton && (
           <button className="overlay-btn secondary install-btn" onClick={handleInstall}>
-            <span className="install-icon">⤓</span> Install · Play fullscreen
+            <span className="install-icon">⤓</span> {T("Install · Play fullscreen", "Instalar · Pantalla completa")}
           </button>
         )}
 
@@ -8218,14 +8666,14 @@ function StartScreen({ onStart, onResume }) {
         <div className="overlay ios-install-overlay" onClick={() => setShowIOSInstall(false)}>
           <div className="overlay-card ios-install-card" onClick={e => e.stopPropagation()}>
             <button className="pause-close" type="button" onClick={() => setShowIOSInstall(false)} aria-label="Close">×</button>
-            <div className="overlay-eyebrow">INSTALL ON iOS</div>
-            <h1 className="overlay-title">Add to Home Screen</h1>
+            <div className="overlay-eyebrow">{T("INSTALL ON iOS", "INSTALAR EN iOS")}</div>
+            <h1 className="overlay-title">{T("Add to Home Screen", "Añadir a pantalla de inicio")}</h1>
             <ol className="ios-install-steps">
-              <li>Tap the <strong>Share</strong> button <span className="ios-share-glyph">⬆</span> in Safari's bottom bar.</li>
-              <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
-              <li>Tap <strong>Add</strong>. Wordsmith opens fullscreen from your home screen.</li>
+              <li>{T(<>Tap the <strong>Share</strong> button <span className="ios-share-glyph">⬆</span> in Safari's bottom bar.</>, <>Toca el botón <strong>Compartir</strong> <span className="ios-share-glyph">⬆</span> en la barra inferior de Safari.</>)}</li>
+              <li>{T(<>Scroll down and tap <strong>Add to Home Screen</strong>.</>, <>Desplázate y toca <strong>Añadir a pantalla de inicio</strong>.</>)}</li>
+              <li>{T(<>Tap <strong>Add</strong>. Wordsmith opens fullscreen from your home screen.</>, <>Toca <strong>Añadir</strong>. Wordsmith se abre a pantalla completa desde tu pantalla de inicio.</>)}</li>
             </ol>
-            <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); setShowIOSInstall(false); }}>Got it</button>
+            <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); setShowIOSInstall(false); }}>{T("Got it", "¡Listo!")}</button>
           </div>
         </div>
       )}
@@ -8236,6 +8684,7 @@ function StartScreen({ onStart, onResume }) {
 // ─── Records / Stats screen ─────────────────────────────────────
 // Shows lifetime stats from localStorage. Player can reset with confirmation.
 function RecordsScreen({ onClose }) {
+  const T = window.Lang ? window.Lang.t : ((en) => en);
   const [stats, setStats] = React.useState(() => {
     try { return window.WordsmithSave.loadStats(); }
     catch (e) { return window.WordsmithSave.defaultStats(); }
@@ -8252,70 +8701,103 @@ function RecordsScreen({ onClose }) {
     const totalSec = Math.floor((ms || 0) / 1000);
     const h = Math.floor(totalSec / 3600);
     const m = Math.floor((totalSec % 3600) / 60);
-    if (h > 0) return `${h}h ${m}m`;
-    return `${m}m`;
+    if (h > 0) return `${h}${T("h", "h")} ${m}${T("m", "m")}`;
+    return `${m}${T("m", "m")}`;
   };
   return (
     <div className="overlay records-overlay" onClick={onClose}>
       <div className="overlay-card records-card" onClick={e => e.stopPropagation()}>
         <button className="pause-close" type="button" onClick={onClose} aria-label="Close">×</button>
-        <div className="overlay-eyebrow">RECORDS</div>
-        <h1 className="overlay-title">Hall of the Smith</h1>
-        <div className="records-grid">
-          <div className="records-cell">
-            <div className="records-num">{(stats.bestScore || 0).toLocaleString()}</div>
-            <div className="records-lbl">Best score</div>
-          </div>
-          <div className="records-cell">
-            <div className="records-num">{stats.bestLevel || 1}</div>
-            <div className="records-lbl">Highest level</div>
-          </div>
-          <div className="records-cell">
-            <div className="records-num">{(stats.totalWords || 0).toLocaleString()}</div>
-            <div className="records-lbl">Words forged</div>
-          </div>
-          <div className="records-cell">
-            <div className="records-num">{(stats.longestWord || "—").length || "—"}</div>
-            <div className="records-lbl">Longest word</div>
-            {stats.longestWord && <div className="records-sub">{stats.longestWord}</div>}
-          </div>
-          <div className="records-cell">
-            <div className="records-num">{stats.runs || 0}</div>
-            <div className="records-lbl">Runs played</div>
-          </div>
-          <div className="records-cell">
-            <div className="records-num">{fmtTime(stats.totalPlayMs)}</div>
-            <div className="records-lbl">Time at the forge</div>
-          </div>
-        </div>
+        <div className="overlay-eyebrow">{T("RECORDS", "RÉCORDS")}</div>
+        <h1 className="overlay-title">{T("Hall of the Smith", "Salón del Herrero")}</h1>
+        {/* Compute derived stats inline — dictionary coverage + favourite letter. */}
+        {(() => {
+          const dictSize = (window.WORDS && window.WORDS.size) || 0;
+          const vocabSize = (stats.vocabulary || []).length;
+          const coveragePct = dictSize ? Math.min(100, (vocabSize / dictSize) * 100) : 0;
+          const letterCounts = stats.letterCounts || {};
+          let topLetter = "—", topLetterCount = 0;
+          for (const k in letterCounts) {
+            if (letterCounts[k] > topLetterCount) { topLetter = k; topLetterCount = letterCounts[k]; }
+          }
+          return (
+            <div className="records-grid">
+              <div className="records-cell">
+                <div className="records-num">{(stats.bestScore || 0).toLocaleString()}</div>
+                <div className="records-lbl">{T("Best score", "Mejor puntaje")}</div>
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{stats.bestLevel || 1}</div>
+                <div className="records-lbl">{T("Highest level", "Nivel más alto")}</div>
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{(stats.totalWords || 0).toLocaleString()}</div>
+                <div className="records-lbl">{T("Words forged (all time)", "Palabras forjadas (total)")}</div>
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{vocabSize.toLocaleString()}</div>
+                <div className="records-lbl">{T("Unique words known", "Palabras únicas")}</div>
+                {dictSize > 0 && (
+                  <div className="records-sub">{coveragePct.toFixed(1)}% {T("of dictionary", "del diccionario")}</div>
+                )}
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{(stats.longestWord || "—").length || "—"}</div>
+                <div className="records-lbl">{T("Longest word", "Palabra más larga")}</div>
+                {stats.longestWord && <div className="records-sub">{stats.longestWord}</div>}
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{topLetter}</div>
+                <div className="records-lbl">{T("Favourite letter", "Letra favorita")}</div>
+                {topLetterCount > 0 && <div className="records-sub">{topLetterCount.toLocaleString()} {T("uses", "usos")}</div>}
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{(stats.totalCoinsEarned || 0).toLocaleString()}</div>
+                <div className="records-lbl">{T("Coins earned", "Monedas ganadas")}</div>
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{(stats.totalPurchases || 0).toLocaleString()}</div>
+                <div className="records-lbl">{T("Shop purchases", "Compras")}</div>
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{stats.runs || 0}</div>
+                <div className="records-lbl">{T("Runs played", "Partidas jugadas")}</div>
+              </div>
+              <div className="records-cell">
+                <div className="records-num">{fmtTime(stats.totalPlayMs)}</div>
+                <div className="records-lbl">{T("Time at the forge", "Tiempo en la fragua")}</div>
+              </div>
+            </div>
+          );
+        })()}
         {(stats.perCategory && (
           stats.perCategory.verbs + stats.perCategory.places + stats.perCategory.nature +
           stats.perCategory.animals + stats.perCategory.food + stats.perCategory.colors > 0
         )) && (
           <div className="records-cats">
-            <div className="records-cats-label">Lifetime by theme</div>
+            <div className="records-cats-label">{T("Lifetime by theme", "Total por tema")}</div>
             <div className="records-cats-row">
-              {stats.perCategory.verbs   > 0 && <span className="run-stat-cat verbs">⚒ {stats.perCategory.verbs} verbs</span>}
-              {stats.perCategory.places  > 0 && <span className="run-stat-cat places">🏛 {stats.perCategory.places} places</span>}
-              {stats.perCategory.nature  > 0 && <span className="run-stat-cat nature">🌿 {stats.perCategory.nature} nature</span>}
-              {stats.perCategory.animals > 0 && <span className="run-stat-cat animals">🦊 {stats.perCategory.animals} animals</span>}
-              {stats.perCategory.food    > 0 && <span className="run-stat-cat food">🍞 {stats.perCategory.food} food</span>}
-              {stats.perCategory.colors  > 0 && <span className="run-stat-cat colors">🎨 {stats.perCategory.colors} colors</span>}
+              {stats.perCategory.verbs   > 0 && <span className="run-stat-cat verbs">⚒ {stats.perCategory.verbs} {T("verbs", "verbos")}</span>}
+              {stats.perCategory.places  > 0 && <span className="run-stat-cat places">🏛 {stats.perCategory.places} {T("places", "lugares")}</span>}
+              {stats.perCategory.nature  > 0 && <span className="run-stat-cat nature">🌿 {stats.perCategory.nature} {T("nature", "naturaleza")}</span>}
+              {stats.perCategory.animals > 0 && <span className="run-stat-cat animals">🦊 {stats.perCategory.animals} {T("animals", "animales")}</span>}
+              {stats.perCategory.food    > 0 && <span className="run-stat-cat food">🍞 {stats.perCategory.food} {T("food", "comida")}</span>}
+              {stats.perCategory.colors  > 0 && <span className="run-stat-cat colors">🎨 {stats.perCategory.colors} {T("colors", "colores")}</span>}
             </div>
           </div>
         )}
         {!confirmReset ? (
           <>
-            <button className="overlay-btn" onClick={onClose}>Back</button>
+            <button className="overlay-btn" onClick={onClose}>{T("Back", "Volver")}</button>
             <button className="overlay-btn secondary records-reset" onClick={() => setConfirmReset(true)}>
-              Reset all records
+              {T("Reset all records", "Borrar todos los récords")}
             </button>
           </>
         ) : (
           <>
-            <p className="records-confirm">This wipes every record. There's no undo.</p>
-            <button className="overlay-btn records-confirm-btn" onClick={doReset}>Yes, reset everything</button>
-            <button className="overlay-btn secondary" onClick={() => setConfirmReset(false)}>Cancel</button>
+            <p className="records-confirm">{T("This wipes every record. There's no undo.", "Esto borra todos los récords. No se puede deshacer.")}</p>
+            <button className="overlay-btn records-confirm-btn" onClick={doReset}>{T("Yes, reset everything", "Sí, borrar todo")}</button>
+            <button className="overlay-btn secondary" onClick={() => setConfirmReset(false)}>{T("Cancel", "Cancelar")}</button>
           </>
         )}
       </div>
@@ -8324,66 +8806,40 @@ function RecordsScreen({ onClose }) {
 }
 
 function PauseOverlay({ onResume, onHome, onRestart }) {
-  // Tile bestiary entries. Lore-flavored copy because plain text "decay tiles
-  // turn to stone in 10s" reads like a dry tooltip; couching it as the
-  // blacksmith's apprentice fumbling the alloy is way more on-brand.
+  const T = window.Lang ? window.Lang.t : ((en) => en);
   const tiles = [
-    {
-      cls: "demo-tile demo-letter",
-      glyph: "A",
-      name: "Common ingots",
-      desc: "Bread and butter. Drag, rotate, slot them anywhere — that's the whole job.",
-    },
-    {
-      cls: "demo-tile demo-sparkle",
-      glyph: "S",
-      name: "Star-forged",
-      desc: "The forge sneezed something special. Use one in a word for a fat point bonus.",
-    },
-    {
-      cls: "demo-tile demo-gold",
-      glyph: "G",
-      name: "Goldwork",
-      desc: "Plated by the boss himself. Any word that runs through one pays double.",
-    },
-    {
-      cls: "demo-tile demo-wild",
-      glyph: "✦",
-      name: "Wild blank",
-      desc: "An unstamped slug. Tap it on the board to brand it with whatever letter you need.",
-    },
-    {
-      cls: "demo-tile demo-boon",
-      glyph: "❄",
-      name: "Boon ingots",
-      desc: "Carry a tiny powerup baked in (stasis, dynamite, scramble, wild, life, super-blast). Look for the little icon in the top-right corner — using the tile in a word OR smashing it with a Hammer fires the powerup.",
-    },
-    {
-      cls: "demo-tile demo-stuck",
-      glyph: "K",
-      name: "Welded stock",
-      desc: "Cooled crooked and seized to the bench. You can spell through it, but it isn't moving.",
-    },
-    {
-      cls: "demo-tile demo-decay",
-      glyph: "D",
-      name: "Wrong-alloy castings",
-      desc: "Apprentice mixed the wrong alloy again. Use them in a word before the inner fill rises — sit still too long and they petrify.",
-    },
-    {
-      cls: "demo-tile demo-stone",
-      glyph: "🪨",
-      name: "Rocks",
-      desc: "Sometimes the smithy lets a chunk of slag slip in. Smack it mid-air to shatter it; let it land and you're stuck with a permanent obstacle. Only Hammer or Dynamite clears a landed one.",
-    },
+    { cls: "demo-tile demo-letter",  glyph: "A",  name: T("Common ingots", "Lingotes comunes"),
+      desc: T("Bread and butter. Drag, rotate, slot them anywhere — that's the whole job.",
+              "Pan y mantequilla. Arrastra, rota, colócalos donde sea — ese es el trabajo.") },
+    { cls: "demo-tile demo-sparkle", glyph: "S",  name: T("Star-forged", "Forjado de estrella"),
+      desc: T("The forge sneezed something special. Use one in a word for a fat point bonus.",
+              "La forja estornudó algo especial. Úsalo en una palabra para un buen bono.") },
+    { cls: "demo-tile demo-gold",    glyph: "G",  name: T("Goldwork", "Trabajo de oro"),
+      desc: T("Plated by the boss himself. Any word that runs through one pays double.",
+              "Bañado por el mismísimo jefe. Cualquier palabra que pase por él paga doble.") },
+    { cls: "demo-tile demo-wild",    glyph: "✦",  name: T("Wild blank", "Comodín"),
+      desc: T("An unstamped slug. Tap it on the board to brand it with whatever letter you need.",
+              "Una pieza sin marcar. Tócala en el tablero para grabarle la letra que necesites.") },
+    { cls: "demo-tile demo-boon",    glyph: "❄",  name: T("Boon ingots", "Lingotes con poder"),
+      desc: T("Carry a tiny powerup baked in (stasis, dynamite, scramble, wild, life, super-blast). Look for the little icon in the top-right corner — using the tile in a word OR smashing it with a Hammer fires the powerup.",
+              "Traen un poder dentro (éstasis, dinamita, mezcla, comodín, vida, super-explosión). Busca el iconito en la esquina superior — usarla en una palabra O golpearla con un martillo activa el poder.") },
+    { cls: "demo-tile demo-stuck",   glyph: "K",  name: T("Welded stock", "Pieza soldada"),
+      desc: T("Cooled crooked and seized to the bench. You can spell through it, but it isn't moving.",
+              "Se enfrió torcida y quedó pegada al banco. Puedes formar palabras con ella, pero no se mueve.") },
+    { cls: "demo-tile demo-decay",   glyph: "D",  name: T("Wrong-alloy castings", "Aleación incorrecta"),
+      desc: T("Apprentice mixed the wrong alloy again. Use them in a word before the inner fill rises — sit still too long and they petrify.",
+              "El aprendiz se equivocó de aleación otra vez. Úsalas antes de que se llenen por dentro — si esperan demasiado, se petrifican.") },
+    { cls: "demo-tile demo-stone",   glyph: "🪨", name: T("Rocks", "Rocas"),
+      desc: T("Sometimes the smithy lets a chunk of slag slip in. Smack it mid-air to shatter it; let it land and you're stuck with a permanent obstacle. Only Hammer or Dynamite clears a landed one.",
+              "A veces la herrería deja colar un trozo de escoria. Golpéala en el aire para romperla; si aterriza, te quedas con un obstáculo permanente. Solo el martillo o la dinamita la limpian.") },
   ];
   return (
     <div className="overlay pause-overlay">
       <div className="overlay-card pause-card">
-        <button className="pause-close" type="button" onClick={() => { window.Sound && Sound.tap(); onResume(); }} aria-label="Close pause menu">×</button>
-        <div className="overlay-eyebrow">PAUSED</div>
-        <h1 className="overlay-title">Catch your breath</h1>
-        <p className="overlay-desc">The forge waits. Here's what you're working with:</p>
+        <button className="pause-close" type="button" onClick={() => { window.Sound && Sound.tap(); onResume(); }} aria-label={T("Close pause menu", "Cerrar pausa")}>×</button>
+        <div className="overlay-eyebrow">{T("PAUSED", "EN PAUSA")}</div>
+        <h1 className="overlay-title">{T("Catch your breath", "Toma aire")}</h1>
+        <p className="overlay-desc">{T("The forge waits. Here's what you're working with:", "La forja espera. Esto es con lo que trabajas:")}</p>
 
         <div className="pause-tile-list">
           {tiles.map(t => (
@@ -8397,17 +8853,19 @@ function PauseOverlay({ onResume, onHome, onRestart }) {
           ))}
         </div>
 
-        <p className="pause-hint">Tip · Drag a placed tile to a new column. Tap the falling block to rotate it. Tap an upcoming letter to swap it in.</p>
+        <p className="pause-hint">{T("Tip · Drag a placed tile to a new column. Tap the falling block to rotate it. Tap an upcoming letter to swap it in.",
+                                       "Consejo · Arrastra una ficha colocada a otra columna. Toca el bloque que cae para rotarlo. Toca una letra próxima para intercambiarla.")}</p>
 
-        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onResume(); }}>Back to the forge</button>
-        <button className="overlay-btn secondary" onClick={() => { window.Sound && Sound.tap(); onRestart(); }}>Restart run</button>
-        <button className="overlay-btn secondary" onClick={() => { window.Sound && Sound.tap(); onHome(); }}>Quit to title</button>
+        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onResume(); }}>{T("Back to the forge", "Volver a la forja")}</button>
+        <button className="overlay-btn secondary" onClick={() => { window.Sound && Sound.tap(); onRestart(); }}>{T("Restart run", "Reiniciar partida")}</button>
+        <button className="overlay-btn secondary" onClick={() => { window.Sound && Sound.tap(); onHome(); }}>{T("Quit to title", "Salir al menú")}</button>
       </div>
     </div>
   );
 }
 
 function BossIntroOverlay({ level, bossChallenge, onBegin }) {
+  const T = window.Lang ? window.Lang.t : ((en) => en);
   // Prefer dynamic boss challenge details when present; fall back to level metadata.
   const label = bossChallenge ? bossChallenge.label : level.modifierLabel;
   const desc  = bossChallenge ? bossChallenge.desc  : level.modifierDesc;
@@ -8415,56 +8873,42 @@ function BossIntroOverlay({ level, bossChallenge, onBegin }) {
     <div className="overlay">
       <div className="overlay-card">
         <div className="boss-warning">!</div>
-        <div className="overlay-eyebrow boss">BOSS ORDER</div>
+        <div className="overlay-eyebrow boss">{T("BOSS ORDER", "ORDEN DEL JEFE")}</div>
         <h1 className="overlay-title">{label}</h1>
         <p className="overlay-desc">
           {desc}
-          <br/>Hit <strong>{level.target}</strong> points in <strong>{level.time}s</strong> with <strong>{level.blocks}</strong> blocks.
+          <br/>{T(<>Hit <strong>{level.target}</strong> points in <strong>{level.time}s</strong> with <strong>{level.blocks}</strong> blocks.</>,
+                   <>Logra <strong>{level.target}</strong> puntos en <strong>{level.time}s</strong> con <strong>{level.blocks}</strong> bloques.</>)}
         </p>
         {bossChallenge && bossChallenge.mustMakeWord && (
           <div className="boss-mustmake">
-            <div className="boss-mustmake-label">SPELL THIS WORD</div>
+            <div className="boss-mustmake-label">{T("SPELL THIS WORD", "FORJA ESTA PALABRA")}</div>
             <div className="boss-mustmake-word">{bossChallenge.mustMakeWord}</div>
           </div>
         )}
-        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onBegin(); }}>Bring it</button>
+        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onBegin(); }}>{T("Bring it", "¡Adelante!")}</button>
       </div>
     </div>
   );
 }
 
 function ShopOverlay({ points, coins, lives, powerups, lastCoinAward, onBuy, onContinue, nextTarget, nextLevelIdx }) {
-  // Coin-only shop (per user request). Coins are earned by performing well during
-  // levels — number of words, word length, blocks left, time left, overscore bonus —
-  // and are the sole currency for everything you can buy.
-  // The exception is the TRADE button, which exists for desperate players who built
-  // up a big point buffer but ran low on coins — it burns 30 of their banked points
-  // in exchange for 1 coin, eating into next level's score cushion.
+  const T = window.Lang ? window.Lang.t : ((en) => en);
   const items = [
-    { name: "hammer",   emoji: "🔨", label: "Hammer",     desc: "Destroy one tile of your choice",                  price: 6,  currency: "coins", color: "linear-gradient(135deg, #ff7a59, #ff4d6d)" },
-    { name: "scramble", emoji: "⚡", label: "Scramble",   desc: "Shock the board — re-randomize every letter",      price: 10, currency: "coins", color: "linear-gradient(135deg, #b496ff, #6e7aff)" },
-    { name: "dynamite", emoji: "🧨", label: "Dynamite",   desc: "Clear a whole row + column at once",               price: 14, currency: "coins", color: "linear-gradient(135deg, #ffb958, #ff7a59)" },
-    { name: "stasis",   emoji: "❄️", label: "Stasis",     desc: "Freeze the timer and falls for 10 seconds",        price: 12, currency: "coins", color: "linear-gradient(135deg, #b8d8ff, #6e7aff)" },
-    { name: "wild",     img: "Multicolor.png", label: "Wild",      desc: "Plant a wildcard letter in any cell",          price: 18, currency: "coins", color: "linear-gradient(135deg, #ff7ad9, #c860ff, #6e7aff)" },
-    { name: "gold",     img: "Drop.png",       label: "Gold mark", desc: "Tap a tile — next word through it scores 2×",  price: 14, currency: "coins", color: "linear-gradient(135deg, #fff4b8, #f7c948, #c08820)" },
-    { name: "life",     emoji: "❤️", label: "Extra Life", desc: "Cheating death isn't cheap",                       price: 40, currency: "coins", reward: "life",      color: "linear-gradient(135deg, #ff5588, #ff7a59)" },
+    { name: "hammer",   emoji: "🔨", label: T("Hammer", "Martillo"),    desc: T("Destroy one tile of your choice", "Destruye una ficha a tu elección"),                  price: 6,  currency: "coins", color: "linear-gradient(135deg, #ff7a59, #ff4d6d)" },
+    { name: "scramble", emoji: "⚡", label: T("Scramble", "Mezclar"),   desc: T("Shock the board — re-randomize every letter", "Sacude el tablero — re-mezcla todas las letras"),      price: 10, currency: "coins", color: "linear-gradient(135deg, #b496ff, #6e7aff)" },
+    { name: "dynamite", emoji: "🧨", label: T("Dynamite", "Dinamita"),  desc: T("Clear a whole row + column at once", "Limpia una fila + columna entera"),               price: 14, currency: "coins", color: "linear-gradient(135deg, #ffb958, #ff7a59)" },
+    { name: "stasis",   emoji: "❄️", label: T("Stasis", "Éstasis"),     desc: T("Freeze the timer and falls for 10 seconds", "Congela el tiempo y las caídas por 10 segundos"),        price: 12, currency: "coins", color: "linear-gradient(135deg, #b8d8ff, #6e7aff)" },
+    { name: "wild",     img: "Multicolor.png", label: T("Wild", "Comodín"),     desc: T("Plant a wildcard letter in any cell", "Coloca una letra comodín en cualquier celda"),          price: 18, currency: "coins", color: "linear-gradient(135deg, #ff7ad9, #c860ff, #6e7aff)" },
+    { name: "gold",     img: "Drop.png",       label: T("Gold mark", "Marca de oro"), desc: T("Tap a tile — next word through it scores 2×", "Toca una ficha — la próxima palabra que la cruce vale 2×"),  price: 14, currency: "coins", color: "linear-gradient(135deg, #fff4b8, #f7c948, #c08820)" },
+    { name: "life",     emoji: "❤️", label: T("Extra Life", "Vida extra"), desc: T("Cheating death isn't cheap", "Engañar a la muerte cuesta"),                       price: 40, currency: "coins", reward: "life",      color: "linear-gradient(135deg, #ff5588, #ff7a59)" },
   ];
-  // Visualize the player's points relative to what they'll need to clear the next level.
-  // The bar fills with the current points; a target marker sits at (points + nextTarget),
-  // so as the player buys items the fill shrinks LEFT, growing the gap to the marker —
-  // a literal picture of "how far away the next-level goal is getting."
-  // DEFINED FIRST so tradePrice (below) can read the real target — earlier
-  // ordering bug meant `target` was undefined when tradePrice computed,
-  // so the trade was always 25 pts regardless of level. Moved up to fix.
   const target = typeof nextTarget === "number" ? nextTarget : 0;
-  // The trade button is rendered separately as a full-width strip beneath the grid.
-  // TRADE — PRICE SCALES WITH NEXT-LEVEL TARGET. Each coin costs ~7% of the
-  // next level's target with a 40-pt floor. So at level 1 (target ~500) →
-  // ~40 pts/coin; level 10 (~2000) → ~140; level 50 (~5000) → ~350; level
-  // 100 (~7500) → ~525. Felt-right curve: trivial early, real cost mid-game,
-  // a meaningful trade-off late without being punishing.
   const tradePrice = Math.max(40, Math.round((target || 500) * 0.07));
-  const tradeItem  = { name: "trade", emoji: "💱", label: `Trade ${tradePrice} pts → 1 🪙`, desc: "One-way exchange. Cost scales with next-level target.", price: tradePrice, currency: "points", reward: { coin: 1 }, color: "linear-gradient(135deg, #6ee7a5, #2eb98a)" };
+  const tradeItem  = { name: "trade", emoji: "💱",
+    label: T(`Trade ${tradePrice} pts → 1 🪙`, `Cambiar ${tradePrice} pts → 1 🪙`),
+    desc:  T("One-way exchange. Cost scales with next-level target.", "Cambio sin retorno. El costo escala con el objetivo del próximo nivel."),
+    price: tradePrice, currency: "points", reward: { coin: 1 }, color: "linear-gradient(135deg, #6ee7a5, #2eb98a)" };
   const max = Math.max(points + target, 1);
   const fillPct = Math.max(0, Math.min(100, (points / max) * 100));
   const markerPct = 100;  // marker sits at points+target which is `max` → 100%
@@ -8483,9 +8927,9 @@ function ShopOverlay({ points, coins, lives, powerups, lastCoinAward, onBuy, onC
             next to it tells the player which level they're about to enter so
             they can size purchases against the next target. */}
         <div className="shop-header">
-          <div className="overlay-eyebrow">RICH'S SHOP</div>
+          <div className="overlay-eyebrow">{T("RICH'S SHOP", "TIENDA DE RICH")}</div>
           {typeof nextLevelIdx === "number" && (
-            <div className="shop-level-pill">NEXT · LVL {nextLevelIdx + 1}</div>
+            <div className="shop-level-pill">{T("NEXT · LVL", "SIG · NV")} {nextLevelIdx + 1}</div>
           )}
         </div>
         <div className="shop-balance-row">
@@ -8514,7 +8958,7 @@ function ShopOverlay({ points, coins, lives, powerups, lastCoinAward, onBuy, onC
                   the *gap* (target) is fixed regardless of spending — but the
                   static "Need X more" caption misled players into thinking the
                   display was broken. This version reacts. */}
-              <strong>{points.toLocaleString()}</strong> pts → need <strong>{(points + target).toLocaleString()}</strong> to clear next level
+              <strong>{points.toLocaleString()}</strong> {T("pts → need", "pts → necesitas")} <strong>{(points + target).toLocaleString()}</strong> {T("to clear next level", "para pasar el próximo nivel")}
             </div>
           </div>
         )}
@@ -8569,16 +9013,17 @@ function ShopOverlay({ points, coins, lives, powerups, lastCoinAward, onBuy, onC
             <div className="shop-item-label">{tradeItem.label}</div>
             <div className="shop-item-desc">{tradeItem.desc}</div>
           </div>
-          <div className="shop-item-price points">{tradeItem.price} pts</div>
+          <div className="shop-item-price points">{tradeItem.price} {T("pts", "pts")}</div>
         </button>
 
-        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onContinue(); }}>Continue →</button>
+        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onContinue(); }}>{T("Continue →", "Continuar →")}</button>
       </div>
     </div>
   );
 }
 
 function LevelClearOverlay({ level, score, blocksLeft, levelWords, levelStartScore, coinAward, onNext }) {
+  const T = window.Lang ? window.Lang.t : ((en) => en);
   const earned = Math.max(0, score - levelStartScore);
   const uniqueWords = [...new Set(levelWords)];
   // Build the VISIBLE coin lines up-front (skip zero-value lines) so the payout
@@ -8586,12 +9031,12 @@ function LevelClearOverlay({ level, score, blocksLeft, levelWords, levelStartSco
   const visibleCoinLines = React.useMemo(() => {
     if (!coinAward) return [];
     return [
-      ["base",          coinAward.base,          "Base reward"],
-      ["words",         coinAward.words,         "Words bonus"],
-      ["sizeBonus",     coinAward.sizeBonus,     "Long words"],
-      ["blocksBonus",   coinAward.blocksBonus,   "Blocks left"],
-      ["timeBonus",     coinAward.timeBonus,     "Time left"],
-      ["overscoreBonus",coinAward.overscoreBonus,"Overscore"],
+      ["base",          coinAward.base,          T("Base reward", "Recompensa base")],
+      ["words",         coinAward.words,         T("Words bonus", "Bono por palabras")],
+      ["sizeBonus",     coinAward.sizeBonus,     T("Long words", "Palabras largas")],
+      ["blocksBonus",   coinAward.blocksBonus,   T("Blocks left", "Bloques restantes")],
+      ["timeBonus",     coinAward.timeBonus,     T("Time left", "Tiempo restante")],
+      ["overscoreBonus",coinAward.overscoreBonus,T("Overscore", "Súper puntaje")],
     ].filter(([, v]) => v && v > 0);
   }, [coinAward]);
   // Two-phase animation:
@@ -8665,23 +9110,23 @@ function LevelClearOverlay({ level, score, blocksLeft, levelWords, levelStartSco
             <span key={i} className={`confetti c${i % 6}`} style={{ left: (4 + (i * 4) % 92) + "%", animationDelay: (i * 0.04) + "s" }} />
           ))}
         </div>
-        <div className="overlay-eyebrow">LEVEL {level.id} CLEAR</div>
-        <h1 className="overlay-title">Nicely done!</h1>
+        <div className="overlay-eyebrow">{T("LEVEL", "NIVEL")} {level.id} {T("CLEAR", "SUPERADO")}</div>
+        <h1 className="overlay-title">{T("Nicely done!", "¡Bien hecho!")}</h1>
         <div className={`overlay-stats ${transferred ? "stats-centered" : ""}`}>
           {/* Earned floats away after the transfer phase. */}
           <div className={`overlay-stat ${transferred ? "earned-fly" : ""}`}>
-            <div className="overlay-stat-label">Earned</div>
+            <div className="overlay-stat-label">{T("Earned", "Ganado")}</div>
             <div className="overlay-stat-value count-pop">+{displayEarned}</div>
           </div>
           {/* TOTAL POINTS slides to the center once EARNED has flown away. */}
           <div className={`overlay-stat ${transferred ? "total-centered" : ""}`}>
-            <div className="overlay-stat-label">Total points</div>
+            <div className="overlay-stat-label">{T("Total points", "Puntos totales")}</div>
             <div className={`overlay-stat-value ${transferred ? "total-bump" : ""}`}>{displayTotal.toLocaleString()}</div>
           </div>
         </div>
         {coinAward && visibleCoinLines.length > 0 && (
           <div className="coin-award-breakdown">
-            <div className="coin-award-title">+{coinAward.total} 🪙 coins</div>
+            <div className="coin-award-title">+{coinAward.total} 🪙 {T("coins", "monedas")}</div>
             <div className="coin-award-lines">
               {visibleCoinLines.map(([k, v, lbl], i) => (
                 <div key={k} className={`coin-award-line ${coinStep >= i ? "show" : ""}`}>
@@ -8694,7 +9139,7 @@ function LevelClearOverlay({ level, score, blocksLeft, levelWords, levelStartSco
         )}
         {uniqueWords.length > 0 && (
           <>
-            <div className="words-section-label">{uniqueWords.length} word{uniqueWords.length === 1 ? "" : "s"} found this level</div>
+            <div className="words-section-label">{uniqueWords.length} {T(uniqueWords.length === 1 ? "word found this level" : "words found this level", uniqueWords.length === 1 ? "palabra de este nivel" : "palabras de este nivel")}</div>
             <div className="go-words-list scrollable">
               {uniqueWords.map((w, i) => (
                 <div key={i} className="go-word-chip" data-len={w.length}>{w}</div>
@@ -8702,13 +9147,14 @@ function LevelClearOverlay({ level, score, blocksLeft, levelWords, levelStartSco
             </div>
           </>
         )}
-        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onNext(); }}>Continue →</button>
+        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onNext(); }}>{T("Continue →", "Continuar →")}</button>
       </div>
     </div>
   );
 }
 
 function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, lives, runDurationMs, onRetryLevel, onRestart, onHome }) {
+  const T = window.Lang ? window.Lang.t : ((en) => en);
   const uniqueWords = [...new Set(foundWords)];
   const cleared = score >= (levelStartScore + level.target);
   const hasLivesLeft = lives > 0;
@@ -8746,9 +9192,14 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
   // ─── Procedural story generator ────────────────────────────
   // Mad-libs templates. Fills slots from the player's collected words by
   // category. New seed each render so it changes every time the player loses.
-  const story = React.useMemo(() => {
+  // Procedurally cooked gazette — picks a headline + a story template from the
+  // run's actual words. Stays this template-based until the AI version lands;
+  // the templates lean into gnome-world absurdity so it reads as flavour
+  // rather than filler.
+  const gazette = React.useMemo(() => {
     const pick = arr => arr && arr.length ? arr[Math.floor(Math.random() * arr.length)] : null;
     const W = window;
+    const isEs = W.Lang && W.Lang.get() === "es";
     const byCat = (set) => uniqueWords.filter(w => set && set.has(w));
     const verbs   = byCat(W.VERB_SET);
     const places  = byCat(W.PLACES_SET);
@@ -8759,24 +9210,93 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
     const longish = uniqueWords.filter(w => w.length >= 5);
     const any = uniqueWords;
     const cap = w => w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : "";
+    const up  = w => w ? w.toUpperCase() : "";
     const lc  = w => w ? w.toLowerCase() : "";
-    if (any.length < 3) return "The press fell silent. The gnomes wait for tomorrow's words.";
-    const templates = [
-      `In the ${lc(pick(places)) || "deep wood"}, a ${lc(pick(animals)) || "fox"} ${lc(pick(verbs)) || "ran"} past a ${lc(pick(colors)) || "silver"} ${lc(pick(nature)) || "stream"}. The gnomes printed it on the front page.`,
-      `${cap(pick(longish)) || "Long ago"} — the gnomes loved that word. They ${lc(pick(verbs)) || "marched"} through the ${lc(pick(places)) || "valley"}, carrying a basket of ${lc(pick(food)) || "bread"} for the ${lc(pick(animals)) || "wolves"}.`,
-      `One morning, a ${lc(pick(animals)) || "raven"} ${lc(pick(verbs)) || "stole"} the gnomes' ${lc(pick(food)) || "soup"}. They chased it through every ${lc(pick(nature)) || "thicket"} until the sun set on the ${lc(pick(places)) || "marsh"}.`,
-      `The press whispered: "${(pick(longish) || pick(any) || "WORDS").toUpperCase()}." The gnomes ${lc(pick(verbs)) || "wept"} with joy and ${lc(pick(verbs)) || "danced"} in the ${lc(pick(nature)) || "rain"}.`,
-      `Beneath the ${lc(pick(colors)) || "amber"} sky, the smithy hammered the letters into ${cap(pick(longish)) || "a tale"}. A ${lc(pick(animals)) || "deer"} came to listen.`,
-      `The gnomes traded ${lc(pick(food)) || "honey"} for stories. Today they got "${cap(pick(longish)) || cap(pick(any)) || "WORDS"}" — and a ${lc(pick(animals)) || "cat"} as a witness.`,
+    if (any.length < 3) {
+      return isEs ? {
+        headline: "LA IMPRENTA QUEDA EN SILENCIO",
+        dateline: "Distrito del Taller",
+        body: "Los gnomos esperan junto a sus tinteros. El yunque del herrero se enfrió antes de forjar una sola oración. Mañana, esperan.",
+      } : {
+        headline: "PRESS FALLS SILENT",
+        dateline: "Workshop District",
+        body: "The gnomes wait by their inkwells. The smithy's anvil cooled before a single sentence could be forged. Tomorrow, they hope.",
+      };
+    }
+    const headlines = isEs ? [
+      `${up(pick(animals)) || "BESTIA"} AVISTADO EN ${up(pick(places)) || "EL PUEBLO"}`,
+      `GNOMOS LOCALES EXIGEN MÁS ${up(pick(food)) || "PAN"}`,
+      `${up(pick(longish)) || "RAREZAS"} REPORTADAS CERCA DE ${up(pick(nature)) || "EL RÍO"}`,
+      `CIELOS ${up(pick(colors)) || "ÁMBAR"} SOBRE ${up(pick(places)) || "EL VALLE"}`,
+      `EL HERRERO ${up(pick(verbs)) || "FORJA"} A PESAR DEL CLIMA`,
+      `"${up(pick(longish) || pick(any))}" — ¿ES UNA PALABRA?`,
+      `${up(pick(animals)) || "BÚHOS"} SE NIEGAN A ${up(pick(verbs)) || "PARTIR"}`,
+      `LOS GNOMOS ${up(pick(verbs)) || "VOTAN"} PROHIBIR ${up(pick(food)) || "NABOS"}`,
+      `LA VERDAD SOBRE ${up(pick(any)) || "TODO"}`,
+      `ÚLTIMA HORA: ${up(pick(longish) || pick(any))} CONFIRMADO`,
+    ] : [
+      `${up(pick(animals)) || "BEAST"} SPOTTED IN ${up(pick(places)) || "TOWN"}`,
+      `LOCAL GNOMES DEMAND MORE ${up(pick(food)) || "BREAD"}`,
+      `${up(pick(longish)) || "STRANGENESS"} REPORTED NEAR ${up(pick(nature)) || "RIVER"}`,
+      `${up(pick(colors)) || "AMBER"} SKIES OVER ${up(pick(places)) || "VALLEY"}`,
+      `SMITHY ${up(pick(verbs)) || "FORGES"} ON DESPITE WEATHER`,
+      `"${up(pick(longish) || pick(any))}" — IS IT A WORD?`,
+      `${up(pick(animals)) || "OWLS"} REFUSE TO ${up(pick(verbs)) || "LEAVE"}`,
+      `GNOMES ${up(pick(verbs)) || "VOTE"} TO BAN ${up(pick(food)) || "TURNIPS"}`,
+      `THE TRUTH ABOUT ${up(pick(any)) || "EVERYTHING"}`,
+      `BREAKING: ${up(pick(longish) || pick(any))} CONFIRMED`,
     ];
-    return pick(templates);
+    const bodies = isEs ? [
+      `En ${lc(pick(places)) || "el bosque profundo"}, un ${lc(pick(animals)) || "zorro"} ${lc(pick(verbs)) || "corrió"} junto a un ${lc(pick(nature)) || "arroyo"} ${lc(pick(colors)) || "plateado"}. Los gnomos pequeños lo tomaron como un presagio. Los grandes, como un bocadillo.`,
+      `${cap(pick(longish)) || "Hace tiempo"} — los gnomos aún discuten esa palabra. Anoche ${lc(pick(verbs)) || "marcharon"} por ${lc(pick(places)) || "el valle"} con una canasta de ${lc(pick(food)) || "pan"} y solo seis regresaron. Nadie hace preguntas.`,
+      `Una mañana, un ${lc(pick(animals)) || "cuervo"} ${lc(pick(verbs)) || "robó"} la ${lc(pick(food)) || "sopa"} de los gnomos. Lo persiguieron por cada ${lc(pick(nature)) || "matorral"} hasta que el sol se puso sobre ${lc(pick(places)) || "el pantano"}. La sopa nunca apareció. El cuervo solicitó ciudadanía.`,
+      `La imprenta susurró, luego gritó: "${(pick(longish) || pick(any) || "PALABRAS").toUpperCase()}." Los gnomos ${lc(pick(verbs)) || "lloraron"} de alegría y ${lc(pick(verbs)) || "bailaron"} bajo ${lc(pick(nature)) || "la lluvia"} hasta que el editor les recordó la fecha de cierre.`,
+      `Bajo el cielo ${lc(pick(colors)) || "ámbar"}, el herrero martilló las letras hasta formar ${cap(pick(longish)) || "una historia"}. Un ${lc(pick(animals)) || "ciervo"} vino a escuchar, odió el final y dejó una reseña de una estrella.`,
+      `Los gnomos cambiaron ${lc(pick(food)) || "miel"} por historias. Hoy consiguieron "${cap(pick(longish)) || cap(pick(any)) || "PALABRAS"}" — y un ${lc(pick(animals)) || "gato"} como testigo. El gato se negó a comentar.`,
+      `Ciudadanos de ${cap(pick(places)) || "Hammerton"} reportan ver una ${lc(pick(animals)) || "polilla"} ${lc(pick(colors)) || "violeta"} ${lc(pick(verbs)) || "rodear"} la chimenea tres veces antes de desaparecer en ${lc(pick(nature)) || "la niebla"}. Las autoridades sospechan un presagio o una mascota perdida.`,
+      `Rumores desde ${lc(pick(places)) || "la taberna"}: un extraño alto pidió ${lc(pick(food)) || "guiso"}, pagó con monedas ${lc(pick(colors)) || "plateadas"}, y luego ${lc(pick(verbs)) || "desapareció"} antes de que la cocinera pudiera darle las gracias. Dejó atrás una pequeña ${lc(pick(animals)) || "rana"}.`,
+      `Nota del editor: por ${lc(pick(nature)) || "una tormenta"} esta semana, las entregas de los gnomos a ${cap(pick(places)) || "Riverbend"} están demoradas. Mientras tanto, ${lc(pick(verbs)) || "considere"} una taza de cortesía de ${lc(pick(food)) || "caldo"}.`,
+      `Desde el juzgado: un ${lc(pick(animals)) || "tejón"} acusado de ${lc(pick(verbs)) || "robar"} ${lc(pick(food)) || "pasteles"} repetidamente de ${lc(pick(places)) || "la panadería"} fue sentenciado a una semana de ${lc(pick(verbs)) || "desyerbar"} ${lc(pick(nature)) || "el jardín"}. Sentencia reducida por buena conducta.`,
+    ] : [
+      `In the ${lc(pick(places)) || "deep wood"}, a ${lc(pick(animals)) || "fox"} ${lc(pick(verbs)) || "ran"} past a ${lc(pick(colors)) || "silver"} ${lc(pick(nature)) || "stream"}. The smaller gnomes took it as an omen. The bigger gnomes took it as a snack.`,
+      `${cap(pick(longish)) || "Long ago"} — the gnomes still argue about that word. Last night they ${lc(pick(verbs)) || "marched"} through the ${lc(pick(places)) || "valley"} with a basket of ${lc(pick(food)) || "bread"} and only six of them came back. Nobody is asking questions.`,
+      `One morning, a ${lc(pick(animals)) || "raven"} ${lc(pick(verbs)) || "stole"} the gnomes' ${lc(pick(food)) || "soup"}. They chased it through every ${lc(pick(nature)) || "thicket"} until the sun set on the ${lc(pick(places)) || "marsh"}. The soup was never recovered. The raven has filed for citizenship.`,
+      `The press whispered, then it shouted: "${(pick(longish) || pick(any) || "WORDS").toUpperCase()}." The gnomes ${lc(pick(verbs)) || "wept"} with joy and ${lc(pick(verbs)) || "danced"} in the ${lc(pick(nature)) || "rain"} until the editor reminded them about deadlines.`,
+      `Beneath the ${lc(pick(colors)) || "amber"} sky, the smithy hammered the letters into ${cap(pick(longish)) || "a tale"}. A ${lc(pick(animals)) || "deer"} came to listen, hated the ending, and left a one-star review.`,
+      `The gnomes traded ${lc(pick(food)) || "honey"} for stories. Today they got "${cap(pick(longish)) || cap(pick(any)) || "WORDS"}" — and a ${lc(pick(animals)) || "cat"} as a witness. The cat refused to comment.`,
+      `Citizens of ${cap(pick(places)) || "Hammerton"} report seeing a ${lc(pick(colors)) || "violet"} ${lc(pick(animals)) || "moth"} ${lc(pick(verbs)) || "circle"} the chimney three times before disappearing into the ${lc(pick(nature)) || "fog"}. Authorities suspect either an omen or someone's lost pet.`,
+      `Rumours from the ${lc(pick(places)) || "tavern"}: a tall stranger ordered ${lc(pick(food)) || "stew"}, paid in ${lc(pick(colors)) || "silver"} coins, then ${lc(pick(verbs)) || "vanished"} before the cook could thank them. They left behind a small ${lc(pick(animals)) || "frog"}.`,
+      `Editor's note: due to a ${lc(pick(nature)) || "storm"} this week, all gnome deliveries to ${cap(pick(places)) || "Riverbend"} are delayed. In the meantime, please ${lc(pick(verbs)) || "consider"} a complimentary cup of ${lc(pick(food)) || "broth"}.`,
+      `From the courthouse: a ${lc(pick(animals)) || "badger"} accused of repeatedly ${lc(pick(verbs)) || "stealing"} ${lc(pick(food)) || "pies"} from the ${lc(pick(places)) || "bakery"} was sentenced to one full week of ${lc(pick(verbs)) || "weeding"} the ${lc(pick(nature)) || "garden"}. Sentence reduced for good behaviour.`,
+    ];
+    const dateline = isEs ? pick([
+      cap(pick(places)) || "Distrito Hammerton",
+      "El Taller",
+      cap(pick(places)) || "Callejón del Tintero",
+      "Escritorio del Editor",
+      "Detrás de la Fragua",
+    ]) : pick([
+      cap(pick(places)) || "Hammerton District",
+      "The Workshop",
+      cap(pick(places)) || "Inkwell Lane",
+      "Editor's Desk",
+      "Behind The Forge",
+    ]);
+    return { headline: pick(headlines), body: pick(bodies), dateline };
   }, [foundWords.length, runDurationMs]);
+
+  // Read latest lifetime stats for the "new words discovered" stat that App
+  // wrote when it transitioned to game-over.
+  const lifetimeStats = React.useMemo(() => {
+    try { return window.WordsmithSave.loadStats(); }
+    catch (e) { return null; }
+  }, [foundWords.length]);
 
   return (
     <div className="overlay">
       <div className="overlay-card game-over-card">
         <div className="overlay-eyebrow" style={{ color: cleared ? "#6ee7a5" : "#ff4d6d" }}>
-          {cleared ? "RUN COMPLETE" : hasLivesLeft ? "YOU DIED" : "GAME OVER"}
+          {cleared ? T("RUN COMPLETE", "PARTIDA COMPLETA") : hasLivesLeft ? T("YOU DIED", "HAS MUERTO") : T("GAME OVER", "FIN DEL JUEGO")}
         </div>
 
         {/* Trophy panel — bronze / silver / gold based on best level reached.
@@ -8786,22 +9306,25 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
           <div className="trophy-panel">
             <img src={"./ASSETS/" + trophy.img} alt={trophy.tier} className="trophy-img" />
             <div className="trophy-tier" style={{ color: trophy.color }}>{trophy.tier}</div>
-            <div className="trophy-sub">reached level {bestLevel}</div>
+            <div className="trophy-sub">{T("reached level", "nivel alcanzado")} {bestLevel}</div>
           </div>
         ) : (
           <div className="trophy-panel no-trophy">
-            <div className="trophy-sub">reached level {Math.max(1, bestLevel)}</div>
+            <div className="trophy-sub">{T("reached level", "nivel alcanzado")} {Math.max(1, bestLevel)}</div>
           </div>
         )}
 
         <h1 className="overlay-title large">{score.toLocaleString()}</h1>
-        <div className="overlay-units">POINTS</div>
+        <div className="overlay-units">{T("POINTS", "PUNTOS")}</div>
 
         {!cleared && (
           <div className="lives-row">
             {"❤️".repeat(Math.max(0, lives))}{"🖤".repeat(Math.max(0, 3 - Math.min(3, lives)))}
             <div className="lives-row-caption">
-              {hasLivesLeft ? `${lives} life${lives === 1 ? "" : "s"} left — retry this level?` : "Out of lives. Run is over."}
+              {hasLivesLeft
+                ? T(`${lives} life${lives === 1 ? "" : "s"} left — retry this level?`,
+                    `${lives} ${lives === 1 ? "vida" : "vidas"} restante${lives === 1 ? "" : "s"} — ¿reintentar este nivel?`)
+                : T("Out of lives. Run is over.", "Sin vidas. La partida terminó.")}
             </div>
           </div>
         )}
@@ -8810,32 +9333,54 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
         {uniqueWords.length > 0 && (
           <div className="run-stats">
             <div className="run-stat-row">
-              <div className="run-stat"><span className="run-stat-num">{stats.total}</span><span className="run-stat-lbl">words</span></div>
-              <div className="run-stat"><span className="run-stat-num">{stats.longest.length}</span><span className="run-stat-lbl">longest</span></div>
-              <div className="run-stat"><span className="run-stat-num">{Math.round(stats.wpm)}</span><span className="run-stat-lbl">wpm</span></div>
-              <div className="run-stat"><span className="run-stat-num">{stats.coverage.toFixed(2)}%</span><span className="run-stat-lbl">of dict</span></div>
+              <div className="run-stat"><span className="run-stat-num">{stats.total}</span><span className="run-stat-lbl">{T("words", "palabras")}</span></div>
+              <div className="run-stat"><span className="run-stat-num">{stats.longest.length}</span><span className="run-stat-lbl">{T("longest", "más larga")}</span></div>
+              <div className="run-stat"><span className="run-stat-num">{Math.round(stats.wpm)}</span><span className="run-stat-lbl">{T("wpm", "ppm")}</span></div>
+              {lifetimeStats && lifetimeStats.lastRunNewWords > 0 ? (
+                <div className="run-stat new-words"><span className="run-stat-num">+{lifetimeStats.lastRunNewWords}</span><span className="run-stat-lbl">{T("new words", "nuevas")}</span></div>
+              ) : (
+                <div className="run-stat"><span className="run-stat-num">{stats.coverage.toFixed(2)}%</span><span className="run-stat-lbl">{T("of dict", "del dicc.")}</span></div>
+              )}
             </div>
             {stats.longest && (
-              <div className="run-stat-longest">longest word: <strong>{stats.longest}</strong></div>
+              <div className="run-stat-longest">{T("longest word:", "palabra más larga:")} <strong>{stats.longest}</strong></div>
             )}
             <div className="run-stat-cats">
-              {stats.groups.verbs   > 0 && <span className="run-stat-cat verbs">⚒ {stats.groups.verbs} verbs</span>}
-              {stats.groups.places  > 0 && <span className="run-stat-cat places">🏛 {stats.groups.places} places</span>}
-              {stats.groups.nature  > 0 && <span className="run-stat-cat nature">🌿 {stats.groups.nature} nature</span>}
-              {stats.groups.animals > 0 && <span className="run-stat-cat animals">🦊 {stats.groups.animals} animals</span>}
-              {stats.groups.food    > 0 && <span className="run-stat-cat food">🍞 {stats.groups.food} food</span>}
-              {stats.groups.colors  > 0 && <span className="run-stat-cat colors">🎨 {stats.groups.colors} colors</span>}
+              {stats.groups.verbs   > 0 && <span className="run-stat-cat verbs">⚒ {stats.groups.verbs} {T("verbs", "verbos")}</span>}
+              {stats.groups.places  > 0 && <span className="run-stat-cat places">🏛 {stats.groups.places} {T("places", "lugares")}</span>}
+              {stats.groups.nature  > 0 && <span className="run-stat-cat nature">🌿 {stats.groups.nature} {T("nature", "naturaleza")}</span>}
+              {stats.groups.animals > 0 && <span className="run-stat-cat animals">🦊 {stats.groups.animals} {T("animals", "animales")}</span>}
+              {stats.groups.food    > 0 && <span className="run-stat-cat food">🍞 {stats.groups.food} {T("food", "comida")}</span>}
+              {stats.groups.colors  > 0 && <span className="run-stat-cat colors">🎨 {stats.groups.colors} {T("colors", "colores")}</span>}
             </div>
           </div>
         )}
 
-        {/* The Gnomes' Gazette story block is temporarily removed — an
-            AI-powered version is coming. Keeps the screen compact in the
-            meantime so trophy + stats + words all fit without scrolling. */}
+        {/* ─── THE GNOMES' GAZETTE ───
+            Procedural newspaper of the run. Grayscale Smithy mascot up top,
+            a randomized headline, a dateline, and a body paragraph stitched
+            from the player's actual words. AI version coming — this is the
+            placeholder treatment so the layout's ready when it lands. */}
+        {uniqueWords.length >= 3 && (
+          <div className="gazette">
+            <div className="gazette-masthead">
+              <div className="gazette-issue">{T("VOL.", "TOMO")} {(levelIdx || 0) + 1} · {T("ED.", "EDIC.")} {Math.min(99, 12 + ((runDurationMs / 1000) | 0) % 88)}</div>
+              <div className="gazette-title">{T("The Gnomes' Gazette", "La Gaceta de los Gnomos")}</div>
+              <div className="gazette-issue">{T("PRESS RUN", "TIRADA")} · {uniqueWords.length} {T("WORDS", "PALABRAS")}</div>
+            </div>
+            <div className="gazette-image">
+              <img src="./ASSETS/Smithy.png" alt="" className="gazette-img" />
+            </div>
+            <h2 className="gazette-headline">{gazette.headline}</h2>
+            <div className="gazette-dateline">{gazette.dateline} — {T("Special to the Gazette", "Especial para la Gaceta")}</div>
+            <p className="gazette-body">{gazette.body}</p>
+            <div className="gazette-footer">{T("— more on page 2 —", "— continúa en página 2 —")}</div>
+          </div>
+        )}
 
         {uniqueWords.length > 0 && (
           <>
-            <div className="words-section-label">{uniqueWords.length} word{uniqueWords.length === 1 ? "" : "s"} forged this run</div>
+            <div className="words-section-label">{uniqueWords.length} {T(uniqueWords.length === 1 ? "word forged this run" : "words forged this run", uniqueWords.length === 1 ? "palabra forjada esta partida" : "palabras forjadas esta partida")}</div>
             <div className="go-words-list scrollable game-over-words">
               {uniqueWords.map((w, i) => (
                 <div key={i} className="go-word-chip" data-len={w.length}>{w}</div>
@@ -8845,9 +9390,9 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
         )}
 
         {hasLivesLeft && !cleared
-          ? <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onRetryLevel(); }}>Retry this level</button>
-          : <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onRestart(); }}>New run</button>}
-        <button className="overlay-btn secondary" onClick={() => { window.Sound && Sound.tap(); onHome(); }}>Back to title</button>
+          ? <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onRetryLevel(); }}>{T("Retry this level", "Reintentar nivel")}</button>
+          : <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onRestart(); }}>{T("New run", "Nueva partida")}</button>}
+        <button className="overlay-btn secondary" onClick={() => { window.Sound && Sound.tap(); onHome(); }}>{T("Back to title", "Volver al menú")}</button>
       </div>
     </div>
   );
