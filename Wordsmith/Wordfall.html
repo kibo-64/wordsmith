@@ -4,7 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wordsmith">
+<meta name="theme-color" content="#1a0f2e">
+<meta name="description" content="A word-puzzle smithy. Drop letters, forge words, beat bosses.">
+<!-- PWA manifest + Apple touch icon so iOS "Add to Home Screen" and Android "Install app" both produce a fullscreen experience with our branding. -->
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./ASSETS/Smithy.png">
+<link rel="icon" type="image/png" href="./ASSETS/Smithy.png">
 <title>Wordsmith</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2266,6 +2274,67 @@ html, body {
 
 .overlay-btn + .overlay-btn {
   margin-top: 8px;
+}
+
+/* Install button — secondary style with a subtle accent stripe + download glyph
+   so it reads as an opt-in upgrade rather than competing with "Begin Forging". */
+.overlay-btn.install-btn {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 185, 88, 0.16), rgba(255, 122, 89, 0.10));
+  border: 1px solid rgba(255, 185, 88, 0.40);
+  color: var(--accent-amber);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.install-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 185, 88, 0.25);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* iOS install instructions overlay */
+.overlay.ios-install-overlay { z-index: 200; }
+.overlay-card.ios-install-card {
+  position: relative;
+  max-width: 340px;
+  padding: 28px 22px 20px;
+  background: linear-gradient(180deg, rgba(28, 14, 38, 0.97), rgba(14, 6, 24, 0.97));
+  border: 1px solid rgba(255, 245, 220, 0.12);
+  border-radius: 18px;
+}
+.ios-install-steps {
+  text-align: left;
+  margin: 14px 0 18px;
+  padding-left: 22px;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.ios-install-steps li { margin-bottom: 10px; }
+.ios-install-steps strong { color: var(--text-bright); font-weight: 700; }
+.ios-share-glyph {
+  display: inline-block;
+  background: rgba(110, 180, 255, 0.18);
+  border: 1px solid rgba(110, 180, 255, 0.45);
+  color: #8ccaff;
+  padding: 1px 7px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: middle;
+  margin: 0 2px;
 }
 
 /* ─── Forging preview row ───────────────────────────────────────────────
@@ -7288,6 +7357,39 @@ function ControlPanel({ powerups, armedPower, onUsePower, nextQueue, level, scor
 function StartScreen({ onStart }) {
   // Per-letter hue uses the same letterHue() function as in-game tiles so the
   // title block colors match the gameplay palette.
+  // ─── PWA INSTALL ────────────────────────────────────────────
+  // Chrome/Android fire `beforeinstallprompt` when the site is installable;
+  // we stash the event and trigger it from the Install button. iOS Safari
+  // has no programmatic install — we detect iOS and show a "tap share → Add
+  // to Home Screen" instructions overlay instead. Button hides entirely if
+  // the app is already running in standalone mode.
+  const [deferredPrompt, setDeferredPrompt] = React.useState(null);
+  const [showIOSInstall, setShowIOSInstall] = React.useState(false);
+  const isIOS = React.useMemo(() =>
+    typeof navigator !== "undefined" &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream, []);
+  const isStandalone = React.useMemo(() =>
+    (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+    !!window.navigator.standalone, []);
+  React.useEffect(() => {
+    const onPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+  }, []);
+  const handleInstall = async () => {
+    window.Sound && Sound.tap();
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch (e) {}
+      setDeferredPrompt(null);
+    } else if (isIOS) {
+      setShowIOSInstall(true);
+    }
+  };
+  const showInstallButton = !isStandalone && (deferredPrompt || isIOS);
   return (
     <div className="overlay" style={{ animation: "none" }}>
       <div className="overlay-card start-card">
@@ -7341,10 +7443,33 @@ function StartScreen({ onStart }) {
 
         <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onStart(); }}>Begin Forging</button>
 
+        {showInstallButton && (
+          <button className="overlay-btn secondary install-btn" onClick={handleInstall}>
+            <span className="install-icon">⤓</span> Install · Play fullscreen
+          </button>
+        )}
+
         {/* Smithy hero — moved to the BOTTOM (signature element under the button)
             and resized smaller so it doesn't dominate the screen. */}
         <img src="./ASSETS/Smithy.png" alt="" className="start-hero start-hero-bottom" />
       </div>
+
+      {/* iOS install instructions — Safari can't prompt programmatically. */}
+      {showIOSInstall && (
+        <div className="overlay ios-install-overlay" onClick={() => setShowIOSInstall(false)}>
+          <div className="overlay-card ios-install-card" onClick={e => e.stopPropagation()}>
+            <button className="pause-close" type="button" onClick={() => setShowIOSInstall(false)} aria-label="Close">×</button>
+            <div className="overlay-eyebrow">INSTALL ON iOS</div>
+            <h1 className="overlay-title">Add to Home Screen</h1>
+            <ol className="ios-install-steps">
+              <li>Tap the <strong>Share</strong> button <span className="ios-share-glyph">⬆</span> in Safari's bottom bar.</li>
+              <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
+              <li>Tap <strong>Add</strong>. Wordsmith opens fullscreen from your home screen.</li>
+            </ol>
+            <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); setShowIOSInstall(false); }}>Got it</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
