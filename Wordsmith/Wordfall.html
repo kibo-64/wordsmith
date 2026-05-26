@@ -2273,6 +2273,99 @@ html, body {
   margin-top: 8px;
 }
 
+/* Resume button — leads the start screen when there's a saved run. */
+.overlay-btn.resume-btn {
+  background: linear-gradient(180deg, var(--accent-amber), var(--accent-coral));
+  color: #2a1830;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 14px rgba(255, 185, 88, 0.45);
+}
+/* Records button on the start screen — subtle secondary. */
+.overlay-btn.records-btn { font-size: 12px; padding: 10px 14px; }
+
+/* Records / Hall of the Smith overlay */
+.overlay.records-overlay { z-index: 180; }
+.overlay-card.records-card {
+  position: relative;
+  max-width: 360px;
+  padding: 26px 22px 18px;
+  background: linear-gradient(180deg, rgba(28, 14, 38, 0.97), rgba(14, 6, 24, 0.97));
+  border: 1px solid rgba(255, 245, 220, 0.12);
+  border-radius: 18px;
+}
+.records-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+.records-cell {
+  background: rgba(255, 245, 220, 0.05);
+  border: 1px solid rgba(255, 245, 220, 0.08);
+  border-radius: 10px;
+  padding: 12px 10px 10px;
+  text-align: center;
+}
+.records-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent-amber);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.records-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-top: 6px;
+}
+.records-sub {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-top: 3px;
+  letter-spacing: 0.04em;
+}
+.records-cats {
+  margin: 0 0 16px;
+  padding: 10px;
+  background: rgba(255, 245, 220, 0.04);
+  border-radius: 10px;
+}
+.records-cats-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.records-cats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+.records-reset {
+  font-size: 11px;
+  opacity: 0.75;
+  color: var(--accent-rose);
+  margin-top: 6px;
+}
+.records-confirm {
+  font-size: 12px;
+  color: var(--accent-rose);
+  text-align: center;
+  margin: 12px 0;
+}
+.records-confirm-btn { background: linear-gradient(180deg, #ff5588, #ff4d6d); color: #fff; }
+
 /* Install button — secondary style with a subtle accent stripe + download glyph
    so it reads as an opt-in upgrade rather than competing with "Begin Forging". */
 .overlay-btn.install-btn {
@@ -3542,6 +3635,25 @@ html, body {
       if (ctx.state === "suspended") ctx.resume();
       return ctx;
     }
+    // RESUME ON VISIBILITY CHANGE — iOS especially suspends the AudioContext
+    // when the tab is backgrounded or a phone call interrupts. Without this,
+    // sounds vanish on return until a hard reload. We kick the context back
+    // on visibilitychange + on focus + on the next user touch.
+    if (typeof document !== "undefined") {
+      const wakeAudio = () => {
+        if (ctx && ctx.state === "suspended") {
+          try { ctx.resume(); } catch (e) {}
+        }
+      };
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) wakeAudio();
+      });
+      window.addEventListener("focus", wakeAudio);
+      window.addEventListener("pageshow", wakeAudio);
+      // Belt + suspenders: any touch/click also tries to resume.
+      window.addEventListener("touchstart", wakeAudio, { passive: true });
+      window.addEventListener("pointerdown", wakeAudio, { passive: true });
+    }
     function blip(freq, dur, type, vol, attack, sweepTo) {
       if (muted) return;
       const c = ensure(); if (!c) return;
@@ -3652,7 +3764,7 @@ const NATURE = "bay,bee,bog,cow,dam,dew,dog,doe,elk,elm,fig,fir,fox,gem,hen,ice,
 // Supplemental words — common entries missing from the curated lists that
 // playtesters have hit (LOOTER, EMOTE, etc.). Mostly 5-8 letter words and
 // agent/-er/-ing/-ed/-s derivations of common verbs and nouns.
-const SUPPLEMENTAL_WORDS = "looter,looters,emote,emoted,emotes,emoting,booter,scooter,scooters,shooter,shooters,hooter,rooter,tooter,locker,lockers,roper,ropes,ropers,roped,roping,cloner,clones,cloned,cloning,riser,risers,rising,baker,bakers,baking,baked,maker,makers,making,player,players,playing,played,gamer,gamers,gaming,timer,timers,timed,timing,framer,framers,framed,framing,framer,winner,winners,winning,sinner,sinners,runner,runners,running,planner,planners,planned,banner,banners,banned,banning,scanner,scanners,scanning,canner,canned,canning,reader,readers,reading,leader,leaders,leading,header,headers,heading,beader,wonder,wondered,wondering,thunder,thunders,thundered,asunder,plunder,plunders,plundered,founder,founders,founded,founding,bound,bounds,bounded,bounding,found,grounds,grounded,grounding,sounds,sounded,sounding,rounds,rounded,rounding,wounds,wounded,wounding,pounds,pounded,pounding,hounds,hounded,hounding,mounds,molder,molders,smolder,golder,bolder,older,colder,folders,folder,folded,folding,holder,holders,holding,molder,solder,welder,welders,welded,welding,gilder,gilders,gilded,gilding,builder,builders,building,filler,fillers,filled,filling,killer,killers,killed,killing,miller,millers,milled,milling,roller,rollers,rolled,rolling,seller,sellers,selling,teller,tellers,telling,driller,drillers,drilled,drilling,thriller,thrillers,thrilled,thrilling,boiler,boilers,boiled,boiling,broiler,broilers,broiled,broiling,blower,blowers,blown,blowing,flower,flowers,flowering,flowered,glower,glowers,grower,growers,growing,known,knower,knowing,shower,showers,showered,showering,tower,towers,towered,towering,lower,lowers,lowered,lowering,power,powers,powered,powering,plower,plowers,plowed,plowing,prowler,prowlers,prowling,prowled,bowler,bowlers,bowled,bowling,fowler,fowlers,worker,workers,working,worked,marker,markers,marked,marking,parker,parkers,parked,parking,barker,barkers,barked,barking,darker,larker,larkers,sparker,sparkers,sparking,sparked,server,servers,served,serving,observer,observers,observed,observing,deserver,reserver,nerver,curver,carver,carvers,carved,carving,starver,starvers,starved,starving,corner,corners,cornered,cornering,banner,banners,banned,manner,manners,scanner,thinner,thinners,thinned,thinning,zinner,sinner,sinned,winner,winners,winning,owner,owners,owning,owned,downer,downers,drowner,drowners,drowned,drowning,frowner,frowners,frowned,frowning,renter,renters,renting,rented,enter,enters,entering,entered,winter,winters,wintered,wintering,minter,printer,printers,printed,printing,splinter,splinters,splintered,sprinter,sprinters,sprinting,sprinted,hunter,hunters,hunted,hunting,punter,punters,punting,canter,canters,cantered,banter,bantered,counter,counters,countered,countering,daunter,daunters,daunted,daunting,saunter,sauntered,sauntering,jaunter,plotter,plotters,plotted,plotting,knotter,knotters,knotted,knotting,clotter,clotters,clotted,clotting,potter,potters,potted,potting,rotter,rotters,setter,setters,setting,settee,letter,letters,lettering,better,betters,bettered,bettering,getter,getters,wetter,wetters,fetter,fetters,fettered,fettering,otter,otters,butter,buttered,buttering,gutter,gutters,guttered,guttering,utter,utters,uttered,uttering,cutter,cutters,cutting,litter,litters,littered,littering,jitter,jitters,jittered,jittering,bitter,bitters,bittered,fitter,fitters,fitted,fitting,hitter,hitters,hitting,sitter,sitters,sitting,glitter,glitters,glittered,glittering,critter,critters,knitter,knitters,knitting,knitted,clutter,clutters,cluttered,cluttering,sputter,sputters,sputtered,sputtering,stutter,stutters,stuttered,stuttering,scuttle,scuttled,scuttles,scuttling,shuttle,shuttles,shuttled,shuttling,suttle,subtle,kettle,kettles,settle,settles,settled,settling,nettle,nettles,nettled,nettling,fettle,whittle,whittles,whittled,whittling,brittle,blade,blades,bladed,blading,glade,glades,grade,grades,graded,grading,trade,trades,traded,trading,shade,shades,shaded,shading,wade,wader,waders,waded,wading,roader,roaders,reader,readers,leaden,leaders,sadden,saddens,saddened,saddening,roaster,roasters,roasted,roasting,toaster,toasters,toasted,toasting,coaster,coasters,coasted,coasting,booster,boosters,boosted,boosting,rooster,roosters,monster,monsters,faster,fasters,fasted,fasting,master,masters,mastered,mastering,plaster,plasters,plastered,plastering,disaster,disasters,easter,baster,basters,basted,basting,oyster,oysters,broker,brokers,brokered,brokering,smoker,smokers,smoked,smoking,stoker,stokers,stoked,stoking,joker,jokers,joked,joking,poker,pokers,poked,poking,evoker,evokers,evoked,evoking,croaker,croakers,croaked,croaking,soaker,soakers,soaked,soaking,bricker,brickers,bricked,sticker,stickers,stuck,kicker,kickers,kicked,kicking,licker,lickers,licked,licking,picker,pickers,picked,picking,sicker,ticker,tickers,ticked,ticking,clicker,clickers,clicked,clicking,flicker,flickers,flickered,flickering,sticker,trickster,tricksters,trickier,prickle,prickly,prickles,prickled,trickle,trickles,trickled,trickling,sickle,sickles,fickle,pickle,pickles,pickled,pickling,nickel,nickels,tackle,tackles,tackled,tackling,jackal,jackals,bushel,bushels,parcel,parcels,parceled,parceling,morsel,morsels,vessel,vessels,channel,channels,channeled,channeling,enamel,enamels,counsel,counsels,counseled,counseling,kennel,kennels,paneled,paneling,tunnel,tunnels,tunneled,tunneling,jaunted,jaunts,launched,launching,launches,bench,benches,benched,benching,wrench,wrenches,wrenched,wrenching,branch,branches,branched,branching,brunch,brunches,clinch,clinches,clinched,clinching,inch,inches,inched,inching,witch,witches,bitch,bitches,ditch,ditches,ditched,ditching,fetch,fetches,fetched,fetching,sketch,sketches,sketched,sketching,stretch,stretches,stretched,stretching,wretch,wretches,wretched,butch,clutch,clutches,clutched,clutching,crutch,crutches,thrush,thrushes,brush,brushes,brushed,brushing,crush,crushes,crushed,crushing,plush,blush,blushes,blushed,blushing,gush,gushes,gushed,gushing,hush,hushes,hushed,hushing,mush,push,pushes,pushed,pushing,rush,rushes,rushed,rushing,slush,thrash,thrashes,thrashed,thrashing,dasher,dashers,dashing,casher,cashed,cashing,gasher,gashed,gashing,hasher,hashed,hashing,lasher,lashed,lashing,masher,mashed,mashing,washer,washers,washed,washing,quasher,quashed,quashing,smasher,smashed,smashing,splasher,splashed,splashing,thrasher,thrashed,thrashing,trasher,clobber,clobbered,clobbering,jabber,jabbered,jabbering,grabber,grabbers,grabbed,grabbing,stabber,stabbed,stabbing,blubber,robber,robbers,robbed,robbing,sober,sobers,sobered,sobering,silver,silvers,silvered,silvering,olive,olives,salivate,relive,active,actives,passive,passives,massive,massives,positive,positives,negative,negatives,creative,creatives,relative,relatives,allure,allured,allures,alluring,attire,attires,attired,attiring,desire,desires,desired,desiring,perspire,perspired,perspires,perspiring,inspire,inspires,inspired,inspiring,acquire,acquires,acquired,acquiring,inquire,inquires,inquired,inquiring,require,requires,required,requiring,retire,retires,retired,retiring,umpire,umpires,empire,empires,vampire,vampires,sapphire,sapphires,satire,satires,quagmire,quagmires,mister,misters,sister,sisters,bister,sniper,snipers,snipped,sniping,piper,pipers,piped,piping,wiper,wipers,wiped,wiping,niper,riper,viper,vipers,gripper,grippers,gripped,gripping,clipper,clippers,clipped,clipping,flipper,flippers,flipped,flipping,nipper,nippers,nipped,nipping,ripper,rippers,rip,ripped,ripping,shipper,shippers,shipped,shipping,skipper,skippers,skipped,skipping,slipper,slippers,slipped,slipping,stripper,strippers,stripped,stripping,whipper,whippers,whipped,whipping,zipper,zippers,zipped,zipping,divisor,divisors,advisor,advisors,monitor,monitors,senior,seniors,junior,juniors,terror,terrors,error,errors,horror,horrors,tractor,tractors,doctor,doctors,doctored,doctoring,factor,factors,factored,factoring,actor,actors,visitor,visitors,janitor,janitors,sweater,sweaters,heater,heaters,beater,beaters,beat,beats,beaten,beating,greater,theater,theaters,seater,seaters,seated,seating,heater,heaters,heated,heating,water,waters,watered,watering,bouncer,bouncers,bounced,bouncing,fencer,fencers,fenced,fencing,lancer,lancers,lanced,lancing,dancer,dancers,danced,dancing,prancer,prancers,prancing,glancer,glancers,glanced,glancing,balancer,balanced,balances,balancing,romance,romances,romanced,romancing,finance,finances,financed,financing,advance,advances,advanced,advancing,enhance,enhances,enhanced,enhancing,entrance,entrances,entranced,entrancing,wonderful,beautiful,thankful,careful,fearful,playful,joyful,cheerful,helpful,powerful,hopeful,painful,useful,colorful,doubtful,faithful,plentiful,respectful,success,successful,fortunate,unfortunate,opera,operas,opal,opals,operating,operation,operations,operator,operators,nation,nations,national,fiction,fictions,fictional,friction,frictions,friction,traction,attraction,attractive,actions,acted,acting,active,reaction,reactions,reactor,reactors,faction,factions,sanction,sanctions,sanctioned,vacation,vacations,vocation,vocations,migration,migrations,addition,additions,additional,edition,editions,editor,editors,editorial,creator,creators,creature,creatures,creation,creations,creative,reactor,reactors,senator,senators,inventor,inventors,investor,investors,curator,curators,initiator,initiators,communicator,communicators,validator,validators,kayak,kayaks,canoe,canoes,canoeing,canoed,saber,sabers,super,supers,duper,super,viper,vipers,nemesis,nemeses,oasis,oases,thesis,theses,crisis,crises,axis,axes,basis,bases,analysis,analyses,synthesis,syntheses,paralysis,paralyses,emphasis,emphases,hypothesis,hypotheses,parenthesis,parentheses,diagnosis,diagnoses,prognosis,prognoses,genesis,exodus,opus,bonus,bonuses,focus,focuses,radius,radii,cactus,cacti,fungus,fungi,nucleus,nuclei,octopus,virus,viruses,status,statuses,campus,campuses,census,censuses,minus,minuses,plus,pluses,chorus,choruses,virus,bias,biases,canvas,canvases,gas,gases,mass,masses,glass,glasses,grass,grasses,brass,brasses,class,classes,classes,kiss,kisses,miss,misses,pass,passes,bliss,clamp,clamps,clamped,clamping,cramp,cramps,cramped,cramping,stamp,stamps,stamped,stamping,scout,scouts,scouted,scouting,spout,spouts,spouted,spouting,shroud,shrouds,shrouded,proud,prouder,proudest,plover,plovers,clover,clovers,rover,rovers,cover,covers,covered,covering,hover,hovers,hovered,hovering,lover,lovers,driver,drivers,driven,driving,liver,livers,giver,givers,given,giving,river,rivers,sliver,slivers,quiver,quivers,quivered,quivering,fever,fevers,lever,levers,sever,severs,severed,severing,whatever,whoever,however,clever,cleverer,brave,braves,bravery,salty,sweet,sweeter,bitter,bitterer,sour,sourer,spicy,spicier,tangy,zesty,smoky,smokier,leafy,leafier,bushy,bushier,dusty,dustier,rusty,rustier,musty,mustier,gusty,gustier,foggy,foggier,soggy,soggier,cloudy,cloudier,stormy,stormier,windy,windier,snowy,snowier,sunny,sunnier,rainy,rainier,frosty,frostier,chilly,chillier,steamy,steamier,creamy,creamier,dreamy,dreamier,gleamy,beamy,roomy,roomier,gloomy,gloomier,doomy,bloom,blooms,bloomed,blooming,broom,brooms,gloom,room,rooms,zoom,zooms,zoomed,zooming,boom,booms,boomed,booming,doom,dooms,doomed,dooming,loom,looms,loomed,looming".split(",");
+const SUPPLEMENTAL_WORDS = "looter,looters,emote,emoted,emotes,emoting,booter,scooter,scooters,shooter,shooters,hooter,rooter,tooter,locker,lockers,roper,ropes,ropers,roped,roping,cloner,clones,cloned,cloning,riser,risers,rising,baker,bakers,baking,baked,maker,makers,making,player,players,playing,played,gamer,gamers,gaming,timer,timers,timed,timing,framer,framers,framed,framing,framer,winner,winners,winning,sinner,sinners,runner,runners,running,planner,planners,planned,banner,banners,banned,banning,scanner,scanners,scanning,canner,canned,canning,reader,readers,reading,leader,leaders,leading,header,headers,heading,beader,wonder,wondered,wondering,thunder,thunders,thundered,asunder,plunder,plunders,plundered,founder,founders,founded,founding,bound,bounds,bounded,bounding,found,grounds,grounded,grounding,sounds,sounded,sounding,rounds,rounded,rounding,wounds,wounded,wounding,pounds,pounded,pounding,hounds,hounded,hounding,mounds,molder,molders,smolder,golder,bolder,older,colder,folders,folder,folded,folding,holder,holders,holding,molder,solder,welder,welders,welded,welding,gilder,gilders,gilded,gilding,builder,builders,building,filler,fillers,filled,filling,killer,killers,killed,killing,miller,millers,milled,milling,roller,rollers,rolled,rolling,seller,sellers,selling,teller,tellers,telling,driller,drillers,drilled,drilling,thriller,thrillers,thrilled,thrilling,boiler,boilers,boiled,boiling,broiler,broilers,broiled,broiling,blower,blowers,blown,blowing,flower,flowers,flowering,flowered,glower,glowers,grower,growers,growing,known,knower,knowing,shower,showers,showered,showering,tower,towers,towered,towering,lower,lowers,lowered,lowering,power,powers,powered,powering,plower,plowers,plowed,plowing,prowler,prowlers,prowling,prowled,bowler,bowlers,bowled,bowling,fowler,fowlers,worker,workers,working,worked,marker,markers,marked,marking,parker,parkers,parked,parking,barker,barkers,barked,barking,darker,larker,larkers,sparker,sparkers,sparking,sparked,server,servers,served,serving,observer,observers,observed,observing,deserver,reserver,nerver,curver,carver,carvers,carved,carving,starver,starvers,starved,starving,corner,corners,cornered,cornering,banner,banners,banned,manner,manners,scanner,thinner,thinners,thinned,thinning,zinner,sinner,sinned,winner,winners,winning,owner,owners,owning,owned,downer,downers,drowner,drowners,drowned,drowning,frowner,frowners,frowned,frowning,renter,renters,renting,rented,enter,enters,entering,entered,winter,winters,wintered,wintering,minter,printer,printers,printed,printing,splinter,splinters,splintered,sprinter,sprinters,sprinting,sprinted,hunter,hunters,hunted,hunting,punter,punters,punting,canter,canters,cantered,banter,bantered,counter,counters,countered,countering,daunter,daunters,daunted,daunting,saunter,sauntered,sauntering,jaunter,plotter,plotters,plotted,plotting,knotter,knotters,knotted,knotting,clotter,clotters,clotted,clotting,potter,potters,potted,potting,rotter,rotters,setter,setters,setting,settee,letter,letters,lettering,better,betters,bettered,bettering,getter,getters,wetter,wetters,fetter,fetters,fettered,fettering,otter,otters,butter,buttered,buttering,gutter,gutters,guttered,guttering,utter,utters,uttered,uttering,cutter,cutters,cutting,litter,litters,littered,littering,jitter,jitters,jittered,jittering,bitter,bitters,bittered,fitter,fitters,fitted,fitting,hitter,hitters,hitting,sitter,sitters,sitting,glitter,glitters,glittered,glittering,critter,critters,knitter,knitters,knitting,knitted,clutter,clutters,cluttered,cluttering,sputter,sputters,sputtered,sputtering,stutter,stutters,stuttered,stuttering,scuttle,scuttled,scuttles,scuttling,shuttle,shuttles,shuttled,shuttling,suttle,subtle,kettle,kettles,settle,settles,settled,settling,nettle,nettles,nettled,nettling,fettle,whittle,whittles,whittled,whittling,brittle,blade,blades,bladed,blading,glade,glades,grade,grades,graded,grading,trade,trades,traded,trading,shade,shades,shaded,shading,wade,wader,waders,waded,wading,roader,roaders,reader,readers,leaden,leaders,sadden,saddens,saddened,saddening,roaster,roasters,roasted,roasting,toaster,toasters,toasted,toasting,coaster,coasters,coasted,coasting,booster,boosters,boosted,boosting,rooster,roosters,monster,monsters,faster,fasters,fasted,fasting,master,masters,mastered,mastering,plaster,plasters,plastered,plastering,disaster,disasters,easter,baster,basters,basted,basting,oyster,oysters,broker,brokers,brokered,brokering,smoker,smokers,smoked,smoking,stoker,stokers,stoked,stoking,joker,jokers,joked,joking,poker,pokers,poked,poking,evoker,evokers,evoked,evoking,croaker,croakers,croaked,croaking,soaker,soakers,soaked,soaking,bricker,brickers,bricked,sticker,stickers,stuck,kicker,kickers,kicked,kicking,licker,lickers,licked,licking,picker,pickers,picked,picking,sicker,ticker,tickers,ticked,ticking,clicker,clickers,clicked,clicking,flicker,flickers,flickered,flickering,sticker,trickster,tricksters,trickier,prickle,prickly,prickles,prickled,trickle,trickles,trickled,trickling,sickle,sickles,fickle,pickle,pickles,pickled,pickling,nickel,nickels,tackle,tackles,tackled,tackling,jackal,jackals,bushel,bushels,parcel,parcels,parceled,parceling,morsel,morsels,vessel,vessels,channel,channels,channeled,channeling,enamel,enamels,counsel,counsels,counseled,counseling,kennel,kennels,paneled,paneling,tunnel,tunnels,tunneled,tunneling,jaunted,jaunts,launched,launching,launches,bench,benches,benched,benching,wrench,wrenches,wrenched,wrenching,branch,branches,branched,branching,brunch,brunches,clinch,clinches,clinched,clinching,inch,inches,inched,inching,witch,witches,bitch,bitches,ditch,ditches,ditched,ditching,fetch,fetches,fetched,fetching,sketch,sketches,sketched,sketching,stretch,stretches,stretched,stretching,wretch,wretches,wretched,butch,clutch,clutches,clutched,clutching,crutch,crutches,thrush,thrushes,brush,brushes,brushed,brushing,crush,crushes,crushed,crushing,plush,blush,blushes,blushed,blushing,gush,gushes,gushed,gushing,hush,hushes,hushed,hushing,mush,push,pushes,pushed,pushing,rush,rushes,rushed,rushing,slush,thrash,thrashes,thrashed,thrashing,dasher,dashers,dashing,casher,cashed,cashing,gasher,gashed,gashing,hasher,hashed,hashing,lasher,lashed,lashing,masher,mashed,mashing,washer,washers,washed,washing,quasher,quashed,quashing,smasher,smashed,smashing,splasher,splashed,splashing,thrasher,thrashed,thrashing,trasher,clobber,clobbered,clobbering,jabber,jabbered,jabbering,grabber,grabbers,grabbed,grabbing,stabber,stabbed,stabbing,blubber,robber,robbers,robbed,robbing,sober,sobers,sobered,sobering,silver,silvers,silvered,silvering,olive,olives,salivate,relive,active,actives,passive,passives,massive,massives,positive,positives,negative,negatives,creative,creatives,relative,relatives,allure,allured,allures,alluring,attire,attires,attired,attiring,desire,desires,desired,desiring,perspire,perspired,perspires,perspiring,inspire,inspires,inspired,inspiring,acquire,acquires,acquired,acquiring,inquire,inquires,inquired,inquiring,require,requires,required,requiring,retire,retires,retired,retiring,umpire,umpires,empire,empires,vampire,vampires,sapphire,sapphires,satire,satires,quagmire,quagmires,mister,misters,sister,sisters,bister,sniper,snipers,snipped,sniping,piper,pipers,piped,piping,wiper,wipers,wiped,wiping,niper,riper,viper,vipers,gripper,grippers,gripped,gripping,clipper,clippers,clipped,clipping,flipper,flippers,flipped,flipping,nipper,nippers,nipped,nipping,ripper,rippers,rip,ripped,ripping,shipper,shippers,shipped,shipping,skipper,skippers,skipped,skipping,slipper,slippers,slipped,slipping,stripper,strippers,stripped,stripping,whipper,whippers,whipped,whipping,zipper,zippers,zipped,zipping,divisor,divisors,advisor,advisors,monitor,monitors,senior,seniors,junior,juniors,terror,terrors,error,errors,horror,horrors,tractor,tractors,doctor,doctors,doctored,doctoring,factor,factors,factored,factoring,actor,actors,visitor,visitors,janitor,janitors,sweater,sweaters,heater,heaters,beater,beaters,beat,beats,beaten,beating,greater,theater,theaters,seater,seaters,seated,seating,heater,heaters,heated,heating,water,waters,watered,watering,bouncer,bouncers,bounced,bouncing,fencer,fencers,fenced,fencing,lancer,lancers,lanced,lancing,dancer,dancers,danced,dancing,prancer,prancers,prancing,glancer,glancers,glanced,glancing,balancer,balanced,balances,balancing,romance,romances,romanced,romancing,finance,finances,financed,financing,advance,advances,advanced,advancing,enhance,enhances,enhanced,enhancing,entrance,entrances,entranced,entrancing,wonderful,beautiful,thankful,careful,fearful,playful,joyful,cheerful,helpful,powerful,hopeful,painful,useful,colorful,doubtful,faithful,plentiful,respectful,success,successful,fortunate,unfortunate,opera,operas,opal,opals,operating,operation,operations,operator,operators,nation,nations,national,fiction,fictions,fictional,friction,frictions,friction,traction,attraction,attractive,actions,acted,acting,active,reaction,reactions,reactor,reactors,faction,factions,sanction,sanctions,sanctioned,vacation,vacations,vocation,vocations,migration,migrations,addition,additions,additional,edition,editions,editor,editors,editorial,creator,creators,creature,creatures,creation,creations,creative,reactor,reactors,senator,senators,inventor,inventors,investor,investors,curator,curators,initiator,initiators,communicator,communicators,validator,validators,kayak,kayaks,canoe,canoes,canoeing,canoed,saber,sabers,super,supers,duper,super,viper,vipers,nemesis,nemeses,pellet,pellets,pellets,bullet,bullets,packet,packets,racket,rackets,docket,dockets,jacket,jackets,locket,lockets,pocket,pockets,rocket,rockets,socket,sockets,thicket,thickets,wicket,wickets,bucket,buckets,sprocket,sprockets,oasis,oases,thesis,theses,crisis,crises,axis,axes,basis,bases,analysis,analyses,synthesis,syntheses,paralysis,paralyses,emphasis,emphases,hypothesis,hypotheses,parenthesis,parentheses,diagnosis,diagnoses,prognosis,prognoses,genesis,exodus,opus,bonus,bonuses,focus,focuses,radius,radii,cactus,cacti,fungus,fungi,nucleus,nuclei,octopus,virus,viruses,status,statuses,campus,campuses,census,censuses,minus,minuses,plus,pluses,chorus,choruses,virus,bias,biases,canvas,canvases,gas,gases,mass,masses,glass,glasses,grass,grasses,brass,brasses,class,classes,classes,kiss,kisses,miss,misses,pass,passes,bliss,clamp,clamps,clamped,clamping,cramp,cramps,cramped,cramping,stamp,stamps,stamped,stamping,scout,scouts,scouted,scouting,spout,spouts,spouted,spouting,shroud,shrouds,shrouded,proud,prouder,proudest,plover,plovers,clover,clovers,rover,rovers,cover,covers,covered,covering,hover,hovers,hovered,hovering,lover,lovers,driver,drivers,driven,driving,liver,livers,giver,givers,given,giving,river,rivers,sliver,slivers,quiver,quivers,quivered,quivering,fever,fevers,lever,levers,sever,severs,severed,severing,whatever,whoever,however,clever,cleverer,brave,braves,bravery,salty,sweet,sweeter,bitter,bitterer,sour,sourer,spicy,spicier,tangy,zesty,smoky,smokier,leafy,leafier,bushy,bushier,dusty,dustier,rusty,rustier,musty,mustier,gusty,gustier,foggy,foggier,soggy,soggier,cloudy,cloudier,stormy,stormier,windy,windier,snowy,snowier,sunny,sunnier,rainy,rainier,frosty,frostier,chilly,chillier,steamy,steamier,creamy,creamier,dreamy,dreamier,gleamy,beamy,roomy,roomier,gloomy,gloomier,doomy,bloom,blooms,bloomed,blooming,broom,brooms,gloom,room,rooms,zoom,zooms,zoomed,zooming,boom,booms,boomed,booming,doom,dooms,doomed,dooming,loom,looms,loomed,looming".split(",");
 
 // ─── Conjugation generator ────────────────────────────────────
 // Given a base verb, returns common inflected forms: -s, -es, -ed, -ied, -ing,
@@ -3734,7 +3846,12 @@ window.NAMES = NAMES;
 const WORDS = new Set([
   ...WORD_LIST_3, ...WORD_LIST_4, ...WORD_LIST_5, ...WORD_LIST_6,
   ...VERBS, ...NATURE, ...SUPPLEMENTAL_WORDS,
-  ..._verbConjugations, ...NAMES, ...IRREGULAR_PLURALS_LIST,
+  ..._verbConjugations,
+  // Filter NAMES to 4+ letters — 3-letter names (MAE, IDA, JO, etc.) feel
+  // arbitrary and trigger "does that even exist?" reactions in play. Real
+  // 3-letter words are already covered by WORD_LIST_3.
+  ...NAMES.filter(n => n.length >= 4),
+  ...IRREGULAR_PLURALS_LIST,
 ].map(w => w.toUpperCase().trim()).filter(w => w.length >= 3));
 const VERB_SET = new Set(VERBS.map(w => w.toUpperCase().trim()).filter(w => w.length >= 3));
 const NATURE_SET = new Set(NATURE.map(w => w.toUpperCase().trim()).filter(w => w.length >= 3));
@@ -3805,6 +3922,11 @@ const BOSS_CHALLENGES = [
   // No-repeats — words you've already scored this RUN no longer score. Forces
   // variety. Tracked at processWordsAt time using foundWordsRef.
   { id: "noRepeat",   label: "No repeats",        desc: "Words already found this run don't score again.",     modifier: null, flags: { noRepeats: true } },
+  // Stonebreaker — board starts seeded with stones; player wins by destroying
+  // every stone. No new stones spawn during this boss. Player gets free
+  // Hammers + Dynamite so it's actually clearable.
+  { id: "stones",     label: "Stonebreaker",      desc: "Destroy every stone on the board. No new stones will spawn — finish what's there.",
+    modifier: null, flags: { stoneCrusher: true } },
 ];
 
 function pickBossChallenge() {
@@ -4247,7 +4369,10 @@ window.STONE = STONE;
 // (was 5) at 5% and climb to ~30% by level 100 so stones actually show up.
 function pickExtraLetter(levelIdx) {
   const lvl = (typeof levelIdx === "number") ? levelIdx : 0;
-  const stoneProb = lvl < 2 ? 0 : Math.min(0.30, 0.05 + (lvl - 2) * 0.005);
+  // Stonebreaker boss disables ALL new stone spawns this level.
+  const stoneProb = (window.__noStones || lvl < 2)
+    ? 0
+    : Math.min(0.30, 0.05 + (lvl - 2) * 0.005);
   if (Math.random() < stoneProb) return STONE;
   // Letter bias (set by the Plurals boss to "S") — 40% chance to short-circuit
   // and return the biased letter so plurals are actually formable.
@@ -4370,6 +4495,67 @@ window.GameLogic = {
   LEVELS, getLevel, wordPassesModifier,
   generateSparkles, pickExtraLetter, pickStuckChance, pickDecayChance, pickGlueChance,
 };
+
+// ─── Save / Resume + Stats persistence (localStorage) ────────────────────
+// We snapshot the in-progress run after every meaningful state change so the
+// player can close the tab / get a phone call / re-open the PWA and pick up
+// exactly where they were. Stats are tracked separately (cumulative).
+window.WordsmithSave = (function () {
+  const SAVE_KEY = "wordsmith_save_v1";
+  const STATS_KEY = "wordsmith_stats_v1";
+  // Bump if save shape changes incompatibly so old saves are discarded.
+  const SAVE_VERSION = 1;
+  function safeLoad(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      const parsed = JSON.parse(raw);
+      return parsed || fallback;
+    } catch (e) { return fallback; }
+  }
+  function safeStore(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); }
+    catch (e) { /* quota or private-mode */ }
+  }
+  function clear(key) {
+    try { localStorage.removeItem(key); } catch (e) {}
+  }
+  // ─── Run snapshot ─────────────────────────────────────────
+  function saveRun(snapshot) {
+    if (!snapshot) return;
+    safeStore(SAVE_KEY, Object.assign({ _v: SAVE_VERSION, _t: Date.now() }, snapshot));
+  }
+  function loadRun() {
+    const s = safeLoad(SAVE_KEY, null);
+    if (!s || s._v !== SAVE_VERSION) return null;
+    return s;
+  }
+  function clearRun() { clear(SAVE_KEY); }
+  // ─── Lifetime stats ───────────────────────────────────────
+  function defaultStats() {
+    return {
+      runs: 0,
+      bestScore: 0,
+      bestLevel: 1,
+      totalWords: 0,
+      longestWord: "",
+      totalPlayMs: 0,
+      bossesBeaten: 0,
+      totalCoinsEarned: 0,
+      perCategory: { verbs: 0, nature: 0, places: 0, colors: 0, food: 0, animals: 0 },
+    };
+  }
+  function loadStats() {
+    const s = safeLoad(STATS_KEY, null);
+    if (!s) return defaultStats();
+    return Object.assign(defaultStats(), s, {
+      perCategory: Object.assign(defaultStats().perCategory, s.perCategory || {}),
+    });
+  }
+  function saveStats(s) { safeStore(STATS_KEY, s); }
+  function resetStats() { clear(STATS_KEY); }
+  return { saveRun, loadRun, clearRun, loadStats, saveStats, resetStats, defaultStats };
+})();
 
 </script>
 <script type="text/babel">
@@ -4740,8 +4926,124 @@ function App() {
         livesRef.current = remaining;
         setLives(remaining);
       }
+      // ─── Update lifetime stats + clear the saved-run snapshot ──
+      try {
+        const Save = window.WordsmithSave;
+        if (Save) {
+          const cur = Save.loadStats();
+          const wordsThisRun = foundWordsArrRef.current || [];
+          const longestThisRun = wordsThisRun.reduce(
+            (acc, w) => (w && w.length > acc.length ? w : acc),
+            cur.longestWord || ""
+          );
+          const cats = cur.perCategory || {};
+          const W = window;
+          const inSet = (set, w) => set && set.has(w);
+          const u = [...new Set(wordsThisRun)];
+          let v = 0, p = 0, n = 0, a = 0, f = 0, c = 0;
+          u.forEach(w => {
+            if (inSet(W.VERB_SET, w))    v += 1;
+            if (inSet(W.PLACES_SET, w))  p += 1;
+            if (inSet(W.NATURE_SET, w))  n += 1;
+            if (inSet(W.ANIMALS_SET, w)) a += 1;
+            if (inSet(W.FOOD_SET, w))    f += 1;
+            if (inSet(W.COLORS_SET, w))  c += 1;
+          });
+          Save.saveStats({
+            ...cur,
+            runs: cur.runs + 1,
+            bestScore: Math.max(cur.bestScore, scoreRef.current),
+            bestLevel: Math.max(cur.bestLevel, levelRef.current + 1),
+            totalWords: cur.totalWords + wordsThisRun.length,
+            longestWord: longestThisRun,
+            totalPlayMs: cur.totalPlayMs + Math.max(0, Date.now() - runStartTimeRef.current),
+            perCategory: {
+              verbs:   (cats.verbs   || 0) + v,
+              places:  (cats.places  || 0) + p,
+              nature:  (cats.nature  || 0) + n,
+              animals: (cats.animals || 0) + a,
+              food:    (cats.food    || 0) + f,
+              colors:  (cats.colors  || 0) + c,
+            },
+          });
+          Save.clearRun();
+        }
+      } catch (e) { /* localStorage may be disabled */ }
+    } else if (phase === "start") {
+      // Returning to title also wipes any pending save snapshot so it doesn't
+      // try to resume into an abandoned run.
+      try { window.WordsmithSave && window.WordsmithSave.clearRun(); } catch (e) {}
     }
     // eslint-disable-next-line
+  }, [phase]);
+
+  // ─── STONEBREAKER WIN CONDITION ──────────────────────────────
+  // When the active boss is the stoneCrusher one, the level clears the
+  // moment every stone (cell value "#") on the board is gone — regardless
+  // of score / time / blocks. Triggers a brief delay so the last shatter
+  // animation can finish before the overlay slams in.
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const boss = bossChallengeRef.current;
+    if (!boss || !boss.flags || !boss.flags.stoneCrusher) return;
+    let stoneCount = 0;
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) if (board[r][c] === "#") stoneCount += 1;
+    }
+    if (stoneCount === 0) {
+      // Stones are gone — but only declare victory if at least one stone existed
+      // earlier (avoid firing on level-start before scatter runs). Guarded by
+      // a small delay to let the shatter animation finish first.
+      const t = setTimeout(() => {
+        if (phaseRef.current === "playing") setPhase("level-clear");
+      }, 350);
+      return () => clearTimeout(t);
+    }
+  }, [board, phase]);
+
+  // ─── AUTO-SAVE RUN ───────────────────────────────────────────
+  // Snapshot the entire in-progress state every 1.5s while playing, plus on
+  // visibility loss (tab hidden, phone call) so a sudden background never
+  // costs the player their run. The snapshot lives in localStorage and the
+  // start screen offers a "Resume run" button when one exists.
+  useEffect(() => {
+    if (phase !== "playing" && phase !== "shop" && phase !== "boss-intro" && phase !== "level-clear") return;
+    const snapshot = () => {
+      try {
+        const Save = window.WordsmithSave;
+        if (!Save) return;
+        Save.saveRun({
+          phase: phaseRef.current,
+          board: boardRef.current,
+          tileIds: tileIdsRef.current,
+          active: activeRef.current,
+          nextQueue: nextQueueRef.current,
+          extras: extrasRef.current,
+          score: scoreRef.current,
+          blocksLeft: blocksLeftRef.current,
+          timeLeft: timeLeftRef.current,
+          foundWords: foundWordsArrRef.current,
+          levelWords: levelWordsRef.current,
+          levelStartScore: levelStartScoreRef.current,
+          levelIdx: levelRef.current,
+          coins: coinsRef.current,
+          lives: livesRef.current,
+          powerups: powerupsRef.current,
+          bossChallenge: bossChallengeRef.current,
+          mustMakeMet: mustMakeMetRef.current,
+          pendingExtra: pendingExtraRef.current,
+          runStartedAt: runStartTimeRef.current,
+        });
+      } catch (e) {}
+    };
+    const id = setInterval(snapshot, 1500);
+    const onHide = () => { if (document.hidden) snapshot(); };
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onHide);
+      snapshot();   // one last save on unmount
+    };
   }, [phase]);
   useEffect(() => { boardRef.current = board; }, [board]);
   useEffect(() => { activeRef.current = active; }, [active]);
@@ -4760,6 +5062,11 @@ function App() {
   // Used by the "No repeats" boss challenge.
   const foundWordsRef = useRef(new Set());
   useEffect(() => { foundWordsRef.current = new Set(foundWords); }, [foundWords]);
+  // Mirror foundWords (array) + levelWords for the run-save snapshot.
+  const foundWordsArrRef = useRef([]);
+  useEffect(() => { foundWordsArrRef.current = foundWords; }, [foundWords]);
+  const levelWordsRef = useRef([]);
+  useEffect(() => { levelWordsRef.current = levelWords; }, [levelWords]);
   useEffect(() => { levelRef.current = levelIdx; }, [levelIdx]);
   useEffect(() => { blocksLeftRef.current = blocksLeft; }, [blocksLeft]);
   useEffect(() => { nextQueueRef.current = nextQueue; }, [nextQueue]);
@@ -4848,6 +5155,60 @@ function App() {
       movesLeftRef.current = Infinity;
       setMovesLeft(Infinity);
     }
+    // STONEBREAKER BOSS — scatter ~10 stones across the lower 2/3 of the board
+    // and gift the player Hammers + Dynamite + Wild so they can actually clear
+    // them. New stones won't spawn this level (handled in pickExtraLetter via
+    // window.__noStones).
+    if (bossN && bossN.flags && bossN.flags.stoneCrusher) {
+      const STONE_COUNT = 10;
+      const scattered = newBoard.map(row => [...row]);
+      const ids = newTileIds.map(row => [...row]);
+      const colCount = {};
+      let placed = 0, tries = 0;
+      while (placed < STONE_COUNT && tries < 200) {
+        tries += 1;
+        const r = 6 + Math.floor(Math.random() * (ROWS - 6)); // rows 6..ROWS-1
+        const c = Math.floor(Math.random() * COLS);
+        // Skip occupied cells; cap 3 stones per column.
+        if (scattered[r][c] !== null) continue;
+        if ((colCount[c] || 0) >= 3) continue;
+        scattered[r][c] = "#";
+        ids[r][c] = `stone-seed-${r}-${c}-${Date.now()}`;
+        colCount[c] = (colCount[c] || 0) + 1;
+        placed += 1;
+      }
+      // Settle stones to the bottom via gravity so they form a clean pile,
+      // not floating mid-air.
+      const settled = G.applyGravity(scattered);
+      // Tile-ids need to be regravitied in lockstep with the board values.
+      const newIds = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+      for (let cc = 0; cc < COLS; cc++) {
+        const valStack = [];
+        const idStack = [];
+        for (let rr = 0; rr < ROWS; rr++) {
+          if (scattered[rr][cc] !== null) {
+            valStack.push(scattered[rr][cc]);
+            idStack.push(ids[rr][cc]);
+          }
+        }
+        for (let i = 0; i < valStack.length; i++) {
+          newIds[ROWS - 1 - i][cc] = idStack[idStack.length - 1 - i];
+        }
+      }
+      setBoard(settled);
+      boardRef.current = settled;
+      setTileIds(newIds);
+      // Gift powerups: 5 Hammers + 2 Dynamite + 1 Wild = comfortably clearable.
+      setPowerups(p => ({
+        ...p,
+        hammer:   (p.hammer   || 0) + 5,
+        dynamite: (p.dynamite || 0) + 2,
+        wild:     (p.wild     || 0) + 1,
+      }));
+      window.__noStones = true;
+    } else {
+      window.__noStones = false;
+    }
     // Delay first extra spawn so the player isn't ambushed at level start.
     lastExtraSpawnRef.current = Date.now() + 2500;
     setPhase("playing");
@@ -4886,6 +5247,74 @@ function App() {
       startLevel(0);
     }
   }, [startLevel]);
+
+  // Resume a previously-saved run. Restores every piece of mutable state
+  // from the saved snapshot; phase is set last so the playing loop kicks
+  // off with the right context. If the save is malformed, fall back to a
+  // fresh new game.
+  const resumeGame = useCallback((saved) => {
+    if (!saved) { startGame(); return; }
+    try {
+      if (window.Sound) Sound.start();
+      // Run-timer continuity: if runStartedAt was saved, preserve it so the
+      // total-play-time stat reflects real-life duration including the
+      // away-from-screen pause. (We don't try to credit time-while-paused —
+      // the in-level countdown timeLeft was snapshotted as-is.)
+      runStartTimeRef.current = saved.runStartedAt || Date.now();
+      // Apply all serialized state. Order: refs first (so they're current
+      // when any synchronous effect reads them), then setters for re-render.
+      const board = saved.board || G.makeEmptyBoard();
+      const tileIds = saved.tileIds || Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+      boardRef.current = board;
+      tileIdsRef.current = tileIds;
+      activeRef.current = saved.active || null;
+      nextQueueRef.current = saved.nextQueue || [];
+      extrasRef.current = saved.extras || [];
+      scoreRef.current = saved.score || 0;
+      blocksLeftRef.current = typeof saved.blocksLeft === "number" ? saved.blocksLeft : 0;
+      timeLeftRef.current = typeof saved.timeLeft === "number" ? saved.timeLeft : 0;
+      levelRef.current = saved.levelIdx || 0;
+      coinsRef.current = saved.coins || 0;
+      livesRef.current = typeof saved.lives === "number" ? saved.lives : 3;
+      powerupsRef.current = saved.powerups || { hammer: 0, scramble: 0, dynamite: 0, stasis: 0, wild: 0, gold: 0 };
+      bossChallengeRef.current = saved.bossChallenge || null;
+      mustMakeMetRef.current = !!saved.mustMakeMet;
+      pendingExtraRef.current = saved.pendingExtra || null;
+      levelStartScoreRef.current = saved.levelStartScore || 0;
+      foundWordsRef.current = new Set(saved.foundWords || []);
+      foundWordsArrRef.current = saved.foundWords || [];
+      levelWordsRef.current = saved.levelWords || [];
+      setBoard(board);
+      setTileIds(tileIds);
+      setActive(saved.active || null);
+      setNextQueue(saved.nextQueue || []);
+      setExtras(saved.extras || []);
+      setScore(saved.score || 0);
+      setBlocksLeft(saved.blocksLeft || 0);
+      setTimeLeft(saved.timeLeft || 0);
+      setLevelIdx(saved.levelIdx || 0);
+      setCoins(saved.coins || 0);
+      setLives(typeof saved.lives === "number" ? saved.lives : 3);
+      setPowerups(saved.powerups || { hammer: 0, scramble: 0, dynamite: 0, stasis: 0, wild: 0, gold: 0 });
+      setBossChallenge(saved.bossChallenge || null);
+      setMustMakeMet(!!saved.mustMakeMet);
+      setPendingExtra(saved.pendingExtra || null);
+      setLevelStartScore(saved.levelStartScore || 0);
+      setFoundWords(saved.foundWords || []);
+      setLevelWords(saved.levelWords || []);
+      // Phase last — kicks off the play loop with everything else already set.
+      // Default to "playing" if the saved phase is one of the gameplay phases;
+      // otherwise drop to start.
+      const resumePhase = saved.phase === "playing" || saved.phase === "shop"
+        || saved.phase === "boss-intro" || saved.phase === "level-clear"
+        ? saved.phase : "playing";
+      setPhase(resumePhase);
+    } catch (e) {
+      // Corrupt save → fresh start.
+      try { window.WordsmithSave && window.WordsmithSave.clearRun(); } catch (er) {}
+      startGame();
+    }
+  }, [startGame]);
 
   const nextLevel = useCallback(() => {
     // Coins were already awarded in the level-clear phase effect; this just advances UI.
@@ -6743,7 +7172,7 @@ function App() {
         </>
       )}
 
-      {phase === "start" && <StartScreen onStart={startGame} />}
+      {phase === "start" && <StartScreen onStart={startGame} onResume={resumeGame} />}
 
       {phase === "boss-intro" && (
         <BossIntroOverlay level={level} bossChallenge={bossChallenge} onBegin={() => startLevel(levelIdx)} />
@@ -7351,9 +7780,18 @@ function ControlPanel({ powerups, armedPower, onUsePower, nextQueue, level, scor
 
 // ─── Overlays ──────────────────────────────────────────────
 
-function StartScreen({ onStart }) {
+function StartScreen({ onStart, onResume }) {
   // Per-letter hue uses the same letterHue() function as in-game tiles so the
   // title block colors match the gameplay palette.
+  // ─── SAVED RUN + RECORDS ────────────────────────────────────
+  const [savedRun, setSavedRun] = React.useState(null);
+  const [showRecords, setShowRecords] = React.useState(false);
+  React.useEffect(() => {
+    try {
+      const Save = window.WordsmithSave;
+      if (Save) setSavedRun(Save.loadRun());
+    } catch (e) {}
+  }, []);
   // ─── PWA INSTALL ────────────────────────────────────────────
   // Chrome/Android fire `beforeinstallprompt` when the site is installable;
   // we stash the event and trigger it from the Install button. iOS Safari
@@ -7438,12 +7876,33 @@ function StartScreen({ onStart }) {
           </div>
         </div>
 
-        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onStart(); }}>Begin Forging</button>
+        {savedRun && onResume && (
+          <button
+            className="overlay-btn resume-btn"
+            onClick={() => { window.Sound && Sound.tap(); onResume(savedRun); }}
+          >
+            ▶ Resume run · Lvl {(savedRun.levelIdx || 0) + 1} · {(savedRun.score || 0).toLocaleString()} pts
+          </button>
+        )}
+        <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onStart(); }}>
+          {savedRun ? "Start a new run" : "Begin Forging"}
+        </button>
+
+        <button
+          className="overlay-btn secondary records-btn"
+          onClick={() => { window.Sound && Sound.tap(); setShowRecords(true); }}
+        >
+          🏆 Records
+        </button>
 
         {showInstallButton && (
           <button className="overlay-btn secondary install-btn" onClick={handleInstall}>
             <span className="install-icon">⤓</span> Install · Play fullscreen
           </button>
+        )}
+
+        {showRecords && (
+          <RecordsScreen onClose={() => setShowRecords(false)} />
         )}
 
         {/* Smithy hero — moved to the BOTTOM (signature element under the button)
@@ -7467,6 +7926,96 @@ function StartScreen({ onStart }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Records / Stats screen ─────────────────────────────────────
+// Shows lifetime stats from localStorage. Player can reset with confirmation.
+function RecordsScreen({ onClose }) {
+  const [stats, setStats] = React.useState(() => {
+    try { return window.WordsmithSave.loadStats(); }
+    catch (e) { return window.WordsmithSave.defaultStats(); }
+  });
+  const [confirmReset, setConfirmReset] = React.useState(false);
+  const doReset = () => {
+    try {
+      window.WordsmithSave.resetStats();
+      setStats(window.WordsmithSave.defaultStats());
+    } catch (e) {}
+    setConfirmReset(false);
+  };
+  const fmtTime = (ms) => {
+    const totalSec = Math.floor((ms || 0) / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
+  };
+  return (
+    <div className="overlay records-overlay" onClick={onClose}>
+      <div className="overlay-card records-card" onClick={e => e.stopPropagation()}>
+        <button className="pause-close" type="button" onClick={onClose} aria-label="Close">×</button>
+        <div className="overlay-eyebrow">RECORDS</div>
+        <h1 className="overlay-title">Hall of the Smith</h1>
+        <div className="records-grid">
+          <div className="records-cell">
+            <div className="records-num">{(stats.bestScore || 0).toLocaleString()}</div>
+            <div className="records-lbl">Best score</div>
+          </div>
+          <div className="records-cell">
+            <div className="records-num">{stats.bestLevel || 1}</div>
+            <div className="records-lbl">Highest level</div>
+          </div>
+          <div className="records-cell">
+            <div className="records-num">{(stats.totalWords || 0).toLocaleString()}</div>
+            <div className="records-lbl">Words forged</div>
+          </div>
+          <div className="records-cell">
+            <div className="records-num">{(stats.longestWord || "—").length || "—"}</div>
+            <div className="records-lbl">Longest word</div>
+            {stats.longestWord && <div className="records-sub">{stats.longestWord}</div>}
+          </div>
+          <div className="records-cell">
+            <div className="records-num">{stats.runs || 0}</div>
+            <div className="records-lbl">Runs played</div>
+          </div>
+          <div className="records-cell">
+            <div className="records-num">{fmtTime(stats.totalPlayMs)}</div>
+            <div className="records-lbl">Time at the forge</div>
+          </div>
+        </div>
+        {(stats.perCategory && (
+          stats.perCategory.verbs + stats.perCategory.places + stats.perCategory.nature +
+          stats.perCategory.animals + stats.perCategory.food + stats.perCategory.colors > 0
+        )) && (
+          <div className="records-cats">
+            <div className="records-cats-label">Lifetime by theme</div>
+            <div className="records-cats-row">
+              {stats.perCategory.verbs   > 0 && <span className="run-stat-cat verbs">⚒ {stats.perCategory.verbs} verbs</span>}
+              {stats.perCategory.places  > 0 && <span className="run-stat-cat places">🏛 {stats.perCategory.places} places</span>}
+              {stats.perCategory.nature  > 0 && <span className="run-stat-cat nature">🌿 {stats.perCategory.nature} nature</span>}
+              {stats.perCategory.animals > 0 && <span className="run-stat-cat animals">🦊 {stats.perCategory.animals} animals</span>}
+              {stats.perCategory.food    > 0 && <span className="run-stat-cat food">🍞 {stats.perCategory.food} food</span>}
+              {stats.perCategory.colors  > 0 && <span className="run-stat-cat colors">🎨 {stats.perCategory.colors} colors</span>}
+            </div>
+          </div>
+        )}
+        {!confirmReset ? (
+          <>
+            <button className="overlay-btn" onClick={onClose}>Back</button>
+            <button className="overlay-btn secondary records-reset" onClick={() => setConfirmReset(true)}>
+              Reset all records
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="records-confirm">This wipes every record. There's no undo.</p>
+            <button className="overlay-btn records-confirm-btn" onClick={doReset}>Yes, reset everything</button>
+            <button className="overlay-btn secondary" onClick={() => setConfirmReset(false)}>Cancel</button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
