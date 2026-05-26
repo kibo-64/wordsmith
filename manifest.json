@@ -1,0 +1,26 @@
+{
+  "name": "Wordsmith",
+  "short_name": "Wordsmith",
+  "description": "A word-puzzle smithy. Drop letters, forge words, beat bosses.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a0f2e",
+  "theme_color": "#1a0f2e",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    {
+      "src": "./Wordsmith%20LOGO.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./Wordsmith%20LOGO.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
