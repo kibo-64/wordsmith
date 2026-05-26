@@ -8146,18 +8146,22 @@ function ShopOverlay({ points, coins, lives, powerups, lastCoinAward, onBuy, onC
     { name: "gold",     img: "Drop.png",       label: "Gold mark", desc: "Tap a tile — next word through it scores 2×",  price: 14, currency: "coins", color: "linear-gradient(135deg, #fff4b8, #f7c948, #c08820)" },
     { name: "life",     emoji: "❤️", label: "Extra Life", desc: "Cheating death isn't cheap",                       price: 40, currency: "coins", reward: "life",      color: "linear-gradient(135deg, #ff5588, #ff7a59)" },
   ];
-  // The trade button is rendered separately as a full-width strip beneath the grid.
-  // TRADE — PRICE SCALES WITH NEXT-LEVEL TARGET. The flat 30 pts version got
-  // trivialized at high levels (30/7500 = 0.4% of target). Now: each coin
-  // costs 5% of the NEXT level's target, so at level 1 it's ~25 pts and at
-  // level 100 it's ~375 pts. Always meaningful relative to current scoring.
-  const tradePrice = Math.max(20, Math.round((target || 500) * 0.05));
-  const tradeItem  = { name: "trade", emoji: "💱", label: `Trade ${tradePrice} pts → 1 🪙`, desc: "One-way exchange. Cost scales with next-level target.", price: tradePrice, currency: "points", reward: { coin: 1 }, color: "linear-gradient(135deg, #6ee7a5, #2eb98a)" };
   // Visualize the player's points relative to what they'll need to clear the next level.
   // The bar fills with the current points; a target marker sits at (points + nextTarget),
   // so as the player buys items the fill shrinks LEFT, growing the gap to the marker —
   // a literal picture of "how far away the next-level goal is getting."
+  // DEFINED FIRST so tradePrice (below) can read the real target — earlier
+  // ordering bug meant `target` was undefined when tradePrice computed,
+  // so the trade was always 25 pts regardless of level. Moved up to fix.
   const target = typeof nextTarget === "number" ? nextTarget : 0;
+  // The trade button is rendered separately as a full-width strip beneath the grid.
+  // TRADE — PRICE SCALES WITH NEXT-LEVEL TARGET. Each coin costs ~7% of the
+  // next level's target with a 40-pt floor. So at level 1 (target ~500) →
+  // ~40 pts/coin; level 10 (~2000) → ~140; level 50 (~5000) → ~350; level
+  // 100 (~7500) → ~525. Felt-right curve: trivial early, real cost mid-game,
+  // a meaningful trade-off late without being punishing.
+  const tradePrice = Math.max(40, Math.round((target || 500) * 0.07));
+  const tradeItem  = { name: "trade", emoji: "💱", label: `Trade ${tradePrice} pts → 1 🪙`, desc: "One-way exchange. Cost scales with next-level target.", price: tradePrice, currency: "points", reward: { coin: 1 }, color: "linear-gradient(135deg, #6ee7a5, #2eb98a)" };
   const max = Math.max(points + target, 1);
   const fillPct = Math.max(0, Math.min(100, (points / max) * 100));
   const markerPct = 100;  // marker sits at points+target which is `max` → 100%
@@ -8202,7 +8206,12 @@ function ShopOverlay({ points, coins, lives, powerups, lastCoinAward, onBuy, onC
               </div>
             </div>
             <div className="shop-progress-caption">
-              Need <strong>{target}</strong> more pts to clear next level
+              {/* Show CURRENT points + the absolute next-level threshold, so
+                  both numbers move as the player buys things. Mathematically
+                  the *gap* (target) is fixed regardless of spending — but the
+                  static "Need X more" caption misled players into thinking the
+                  display was broken. This version reacts. */}
+              <strong>{points.toLocaleString()}</strong> pts → need <strong>{(points + target).toLocaleString()}</strong> to clear next level
             </div>
           </div>
         )}
