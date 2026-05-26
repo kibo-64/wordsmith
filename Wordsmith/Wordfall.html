@@ -1053,6 +1053,66 @@ html, body {
   border-top: 1px dotted rgba(0, 0, 0, 0.4);
   padding-top: 6px;
 }
+/* AI bits — gentle highlight when the AI gazette swaps in, and a "Forge an
+   engraving" button that triggers gpt-image-2 image generation. */
+.gazette-ai .gazette-headline { color: #2a1a0a; }
+.gazette-img-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 235, 215, 0.85);
+  color: #1a1208;
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 11px;
+  pointer-events: none;
+}
+.gazette-image { position: relative; }
+.gazette-img-ai {
+  filter: grayscale(1) contrast(1.05);   /* keep the engraving aesthetic */
+}
+.gazette-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0 6px;
+  font-family: 'Georgia', serif;
+  font-size: 11px;
+}
+.gazette-busy {
+  color: rgba(0, 0, 0, 0.55);
+  font-style: italic;
+}
+.gazette-forge-btn {
+  background: rgba(26, 18, 8, 0.92);
+  color: #f5ebd0;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+.gazette-forge-btn:hover:not(:disabled) {
+  background: #1a1208;
+  transform: translateY(-1px);
+}
+.gazette-forge-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.gazette-err {
+  color: #8a1a1a;
+  font-size: 10px;
+  font-style: italic;
+}
 
 .run-stat.new-words .run-stat-num { color: #6ee7a5; }
 
@@ -9292,6 +9352,68 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
     catch (e) { return null; }
   }, [foundWords.length]);
 
+  // ─── AI Gazette ──────────────────────────────────────────────
+  // Fires /api/gazette on mount and replaces the procedural article with the
+  // Claude-generated version when it lands. The procedural gazette renders
+  // first as a placeholder so there's never a blank space — AI is additive.
+  // /api/gazette-image is button-triggered (gpt-image-2 is too pricey to fire
+  // automatically). Both endpoints are best-effort: any failure silently
+  // falls back to the procedural article + the static Smithy.png mascot.
+  const [aiGazette, setAiGazette] = React.useState(null);     // { headline, dateline, body } | null
+  const [aiBusy,    setAiBusy]    = React.useState(true);     // text still in flight on first paint
+  const [aiImage,   setAiImage]   = React.useState(null);     // data: URL when generated
+  const [imgBusy,   setImgBusy]   = React.useState(false);
+  const [imgError,  setImgError]  = React.useState("");
+  React.useEffect(() => {
+    if (uniqueWords.length < 3) { setAiBusy(false); return; }
+    let cancelled = false;
+    const lang = (window.Lang && window.Lang.get()) || "en";
+    fetch("/api/gazette", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        words: uniqueWords.slice(0, 60),
+        lang,
+        level: (levelIdx || 0) + 1,
+        score,
+        longest: stats.longest || "",
+      }),
+    })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error("gazette HTTP " + r.status)))
+      .then(j => { if (!cancelled && j && j.headline && j.body) setAiGazette(j); })
+      .catch(() => { /* silent — procedural fallback is already rendered */ })
+      .finally(() => { if (!cancelled) setAiBusy(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // Effective gazette: AI version if loaded, otherwise procedural.
+  const effectiveGazette = aiGazette || gazette;
+  // Image-generation handler — fires only on user tap so we never burn $0.01+
+  // automatically. Disabled while in flight or if already generated.
+  const handleForgeImage = React.useCallback(() => {
+    if (imgBusy || aiImage) return;
+    setImgBusy(true);
+    setImgError("");
+    const lang = (window.Lang && window.Lang.get()) || "en";
+    fetch("/api/gazette-image", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        words:    uniqueWords.slice(0, 20),
+        headline: effectiveGazette.headline,
+        lang,
+        quality:  "low",   // grayscale newspaper engraving — low is plenty
+      }),
+    })
+      .then(r => r.json().then(j => ({ ok: r.ok, j })))
+      .then(({ ok, j }) => {
+        if (ok && j && j.image) setAiImage(j.image);
+        else setImgError(j?.error || "Image generation failed");
+      })
+      .catch(e => setImgError(e?.message || "Network error"))
+      .finally(() => setImgBusy(false));
+  }, [imgBusy, aiImage, effectiveGazette.headline, uniqueWords]);
+
   return (
     <div className="overlay">
       <div className="overlay-card game-over-card">
@@ -9357,23 +9479,41 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
         )}
 
         {/* ─── THE GNOMES' GAZETTE ───
-            Procedural newspaper of the run. Grayscale Smithy mascot up top,
-            a randomized headline, a dateline, and a body paragraph stitched
-            from the player's actual words. AI version coming — this is the
-            placeholder treatment so the layout's ready when it lands. */}
+            Two-phase rendering: procedural article paints first (instant),
+            then the AI version from /api/gazette swaps in when it lands.
+            The mascot image is the static Smithy.png by default; the player
+            can tap "Forge an image" to commission a one-off gpt-image-2
+            engraving for this specific run (~$0.01 per call). */}
         {uniqueWords.length >= 3 && (
-          <div className="gazette">
+          <div className={`gazette ${aiGazette ? "gazette-ai" : ""}`}>
             <div className="gazette-masthead">
               <div className="gazette-issue">{T("VOL.", "TOMO")} {(levelIdx || 0) + 1} · {T("ED.", "EDIC.")} {Math.min(99, 12 + ((runDurationMs / 1000) | 0) % 88)}</div>
               <div className="gazette-title">{T("The Gnomes' Gazette", "La Gaceta de los Gnomos")}</div>
               <div className="gazette-issue">{T("PRESS RUN", "TIRADA")} · {uniqueWords.length} {T("WORDS", "PALABRAS")}</div>
             </div>
             <div className="gazette-image">
-              <img src="./ASSETS/Smithy.png" alt="" className="gazette-img" />
+              {aiImage
+                ? <img src={aiImage} alt="" className="gazette-img gazette-img-ai" />
+                : <img src="./ASSETS/Smithy.png" alt="" className="gazette-img" />}
+              {imgBusy && <div className="gazette-img-overlay">{T("Forging engraving…", "Forjando grabado…")}</div>}
             </div>
-            <h2 className="gazette-headline">{gazette.headline}</h2>
-            <div className="gazette-dateline">{gazette.dateline} — {T("Special to the Gazette", "Especial para la Gaceta")}</div>
-            <p className="gazette-body">{gazette.body}</p>
+            <h2 className="gazette-headline">{effectiveGazette.headline}</h2>
+            <div className="gazette-dateline">{effectiveGazette.dateline} — {T("Special to the Gazette", "Especial para la Gaceta")}</div>
+            <p className="gazette-body">{effectiveGazette.body}</p>
+            <div className="gazette-actions">
+              {aiBusy && <span className="gazette-busy">{T("✒ The gnomes are typing…", "✒ Los gnomos están escribiendo…")}</span>}
+              {!aiImage && (
+                <button
+                  className="gazette-forge-btn"
+                  onClick={() => { window.Sound && Sound.tap(); handleForgeImage(); }}
+                  disabled={imgBusy}>
+                  {imgBusy
+                    ? T("Forging engraving…", "Forjando grabado…")
+                    : T("⚒ Forge an engraving", "⚒ Forjar un grabado")}
+                </button>
+              )}
+              {imgError && <span className="gazette-err">{imgError}</span>}
+            </div>
             <div className="gazette-footer">{T("— more on page 2 —", "— continúa en página 2 —")}</div>
           </div>
         )}
