@@ -439,7 +439,17 @@ html, body {
 }
 
 .tile.dissolving .tile-inner {
-  animation: tile-dissolve 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  /* !important so it overrides the decay-pulse / boon-aura-pulse animations
+     that share the same selector specificity. Without this, dissolving decay
+     and boon tiles would keep their pulse and never fade out. */
+  animation: tile-dissolve 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+/* Suppress the per-tile fill / aura layers during dissolve so they don't
+   visually fight the scale-and-fade. */
+.tile.dissolving.decay .tile-inner::after,
+.tile.dissolving .tile-boon-badge {
+  animation: none !important;
+  opacity: 0 !important;
 }
 
 @keyframes tile-dissolve {
@@ -594,7 +604,9 @@ html, body {
      45% : squash to 45% with subtle tilt — letter has changed by now
      100%: bounce back to full size */
 .dice-cube.swap-pop {
-  animation: dice-swap-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Snappier swap — bumped from 320ms to 180ms so tap-to-swap feels responsive
+     rather than mid-tempo. */
+  animation: dice-swap-pop 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes dice-swap-pop {
   0%   { transform: scale(1) rotate(0deg); }
@@ -604,7 +616,7 @@ html, body {
 
 /* Upcoming-letter pill pulses when tapped so the source of the swap is also visible. */
 .next-bar-block.just-swapped {
-  animation: next-pill-swap 0.32s ease-out;
+  animation: next-pill-swap 0.18s ease-out;
 }
 @keyframes next-pill-swap {
   0%   { transform: scale(1); background: rgba(255, 209, 102, 0.55); }
@@ -1504,6 +1516,51 @@ html, body {
   pointer-events: none;
 }
 
+/* ─── Boon tile (embedded powerup) ─── */
+/* Each variant gets a colored aura tied to its powerup family. The small badge
+   in the top-right shows which powerup is embedded. Firing the boon (via word
+   or hammer) triggers the effect automatically. */
+.tile.boon .tile-inner {
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.10),
+    0 3px 6px rgba(0, 0, 0, 0.42),
+    0 1px 0 rgba(0, 0, 0, 0.5),
+    0 0 0 2px var(--boon-aura, rgba(255, 255, 255, 0.5)),
+    0 0 14px var(--boon-glow, rgba(255, 255, 255, 0.35));
+  animation: boon-aura-pulse 2s ease-in-out infinite;
+}
+.tile.boon-stasis    { --boon-aura: rgba(140, 200, 255, 0.78); --boon-glow: rgba(140, 200, 255, 0.55); }
+.tile.boon-dynamite  { --boon-aura: rgba(255, 140, 80, 0.80);  --boon-glow: rgba(255, 140, 80, 0.55); }
+.tile.boon-scramble  { --boon-aura: rgba(190, 130, 255, 0.78); --boon-glow: rgba(190, 130, 255, 0.50); }
+.tile.boon-wild      { --boon-aura: rgba(255, 130, 220, 0.78); --boon-glow: rgba(200, 130, 255, 0.50); }
+.tile.boon-life      { --boon-aura: rgba(255, 110, 140, 0.85); --boon-glow: rgba(255, 90, 140, 0.55); }
+.tile.boon-superarea { --boon-aura: rgba(255, 220, 80, 0.85);  --boon-glow: rgba(255, 200, 60, 0.55); }
+
+@keyframes boon-aura-pulse {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.12); }
+}
+
+.tile-boon-badge {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65));
+  z-index: 3;
+}
+.boon-badge-wild  { color: #ffeaff; }
+.boon-badge-life  { color: #ffd7e0; }
+.boon-badge-stasis,
+.boon-badge-dynamite,
+.boon-badge-scramble,
+.boon-badge-superarea { color: #fff; }
+
 /* ─── Decay tile ─── */
 /* A normal-looking letter with an orange/red pulsing ring + ⏳ badge. After
    ~25s on the board the petrification effect converts the cell into a stone. */
@@ -1529,11 +1586,43 @@ html, body {
   font-size: 11px;
   pointer-events: none;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+  z-index: 2;
 }
 @keyframes decay-pulse {
   0%, 100% { filter: brightness(1.0); }
   50%      { filter: brightness(1.18); }
 }
+/* Petrification fill — a dark stone-colored layer that rises from the bottom
+   of the tile over 25s (matching DECAY_TIMEOUT_MS). Negative animation-delay
+   is set inline so the bar appears already-X-seconds-in for tiles that have
+   been on the board a while. When the fill hits the top, the converter
+   effect petrifies the cell into a stone (handled separately). */
+.tile.decay .tile-inner {
+  position: relative;
+  overflow: hidden;
+}
+.tile.decay .tile-inner::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0%;
+  background: linear-gradient(0deg,
+    rgba(48, 28, 14, 0.78) 0%,
+    rgba(78, 50, 26, 0.62) 60%,
+    rgba(118, 78, 42, 0.30) 100%);
+  border-top: 1px solid rgba(255, 220, 180, 0.35);
+  pointer-events: none;
+  animation: decay-fill 25s linear forwards;
+  animation-delay: var(--decay-delay, 0s);
+  z-index: 1;
+}
+@keyframes decay-fill {
+  from { height: 0%; }
+  to   { height: 100%; }
+}
+.tile.decay .tile-letter { position: relative; z-index: 2; }
 
 /* ─── Glue tile ─── */
 /* Two letters spawned linked. Tinted teal + 🔗 badge. CAN form words; CAN'T be
@@ -2656,6 +2745,14 @@ html, body {
   background: linear-gradient(135deg, #ff9eb5, #b8a4ff, #8ee3ff, #ffd166);
   color: #fff;
   font-size: 20px;
+}
+.demo-tile.demo-boon {
+  background: linear-gradient(180deg, #f0d9a7, #b58a5a);
+  color: #2a1830;
+  box-shadow:
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    0 0 0 2px rgba(140, 200, 255, 0.78),
+    0 0 12px rgba(140, 200, 255, 0.55);
 }
 .demo-tile.demo-stuck {
   background: linear-gradient(180deg, #3a2a48, #1c1126);
@@ -4400,12 +4497,39 @@ function pickDecayChance(levelIdx) {
   return lvl < 7 ? 0 : Math.min(0.18, (lvl - 7) * 0.003);
 }
 
-// Probability the next extra spawn comes as a GLUED PAIR — two adjacent tiles
-// that fall together and refuse drag until one is consumed by a word (which
-// frees the other). Levels < 10 = 0%; ramps to ~14% at level 100.
-function pickGlueChance(levelIdx) {
+// Glue (linked) pairs were retired per playtest — they were confusing and
+// the visual didn't communicate the constraint well. Kept as a permanent 0
+// so any code that still calls this just sees "never spawn glue."
+function pickGlueChance(levelIdx) { return 0; }
+
+// Probability a fresh extra is a GOLD tile — when locked, any word that
+// passes through it doubles in points. Rare so it stays a happy surprise.
+// Levels < 2 = 0%; ramps to ~8% at level 50+.
+function pickGoldChance(levelIdx) {
   const lvl = (typeof levelIdx === "number") ? levelIdx : 0;
-  return lvl < 9 ? 0 : Math.min(0.14, (lvl - 9) * 0.0025);
+  return lvl < 1 ? 0 : Math.min(0.08, 0.025 + (lvl - 1) * 0.0012);
+}
+
+// Probability a fresh extra carries an EMBEDDED POWERUP (a "boon"). Forming a
+// word that includes the boon tile — or hammering it — fires that powerup's
+// effect immediately. Capped at ~5% total across all boon kinds combined.
+function pickBoonChance(levelIdx) {
+  const lvl = (typeof levelIdx === "number") ? levelIdx : 0;
+  return lvl < 1 ? 0 : Math.min(0.05, 0.015 + (lvl - 1) * 0.0008);
+}
+
+// Distribution across boon kinds — common (stasis/dynamite/scramble), uncommon
+// (wild/superarea), rare (life). Weights are relative; pickBoonKind picks one.
+const BOON_WEIGHTS = { stasis: 24, dynamite: 22, scramble: 20, wild: 16, superarea: 12, life: 6 };
+function pickBoonKind() {
+  let total = 0;
+  for (const k in BOON_WEIGHTS) total += BOON_WEIGHTS[k];
+  let r = Math.random() * total;
+  for (const k in BOON_WEIGHTS) {
+    r -= BOON_WEIGHTS[k];
+    if (r <= 0) return k;
+  }
+  return "stasis";
 }
 
 function getLevel(idx) {
@@ -4493,7 +4617,8 @@ window.GameLogic = {
   makeEmptyBoard, findDropRow, applyGravity,
   findWordsThrough, scoreForWord,
   LEVELS, getLevel, wordPassesModifier,
-  generateSparkles, pickExtraLetter, pickStuckChance, pickDecayChance, pickGlueChance,
+  generateSparkles, pickExtraLetter, pickStuckChance, pickDecayChance, pickGlueChance, pickGoldChance,
+  pickBoonChance, pickBoonKind,
 };
 
 // ─── Save / Resume + Stats persistence (localStorage) ────────────────────
@@ -4732,6 +4857,14 @@ function App() {
   // petrification effect scans this every second and converts expired decay
   // tiles into stones.
   const decayTimersRef = useRef({});
+  // Expose the live decay-timer map globally so the Tile renderer can compute
+  // the petrification-fill animation's negative animation-delay per tile,
+  // without us having to thread it through props (which would defeat the
+  // React.memo on Tile).
+  useEffect(() => {
+    window.__wfDecayTimers = decayTimersRef.current;
+    return () => { delete window.__wfDecayTimers; };
+  }, []);
   // How long a decay tile can sit on the board before petrifying (ms).
   const DECAY_TIMEOUT_MS = 25000;
   // COMBO: timestamp of the last word found + current streak length. If the
@@ -5520,15 +5653,19 @@ function App() {
       setTileIds(prev => {
         const nt = prev.map(row => [...row]);
         // tileId prefixes encode the per-tile modifier:
-        //   stone-...   → rock obstacle, immovable, only Hammer/Dynamite clears
-        //   stuck-...   → frozen letter, refuses drag
-        //   decay-...   → ticking down, will petrify if not used
-        //   glue-PAIR-… → linked with another glue-PAIR-… tile
+        //   stone-...        → rock obstacle, immovable
+        //   stuck-...        → frozen letter, refuses drag
+        //   decay-...        → ticking down, will petrify if not used
+        //   gold-...         → next word through this tile scores 2×
+        //   boon-{kind}-...  → embedded powerup; firing word OR hammer hit
+        //                      triggers the powerup. kind = stasis/dynamite/
+        //                      wild/scramble/life/superarea.
         let prefix = "extra-";
-        if (ext.letter === "#") prefix = "stone-";    // locked rock
+        if (ext.letter === "#") prefix = "stone-";
         else if (ext.stuck)     prefix = "stuck-";
         else if (ext.decay)     prefix = "decay-";
-        else if (ext.glue)      prefix = `glue-${ext.glue}-`;
+        else if (ext.gold)      prefix = "gold-";
+        else if (ext.boon)      prefix = `boon-${ext.boon}-`;
         nt[settleRow][ext.col] = `${prefix}${ext.id}`;
         return nt;
       });
@@ -5623,15 +5760,20 @@ function App() {
           // Roll for the various spawn-time modifiers. Only one can win per spawn
           // and they don't apply to stones.
           const isReal = rolled !== "#";
-          let isStuck = false, isDecay = false, isGlue = false;
+          let isStuck = false, isDecay = false, isGold = false, boonKind = null;
           if (isReal) {
             const r = Math.random();
-            const glueP  = G.pickGlueChance(levelRef.current);
+            // Each branch consumes the next probability band of r in [0, 1).
+            // Boon (embedded powerup) is its own band; if it wins, pick which
+            // powerup with weighted distribution.
+            const goldP  = G.pickGoldChance(levelRef.current);
+            const boonP  = G.pickBoonChance(levelRef.current);
             const decayP = G.pickDecayChance(levelRef.current);
             const stuckP = G.pickStuckChance(levelRef.current);
-            if (r < glueP)                              isGlue = true;
-            else if (r < glueP + decayP)                isDecay = true;
-            else if (r < glueP + decayP + stuckP)       isStuck = true;
+            if (r < goldP)                                       isGold = true;
+            else if (r < goldP + boonP)                          boonKind = G.pickBoonKind();
+            else if (r < goldP + boonP + decayP)                 isDecay = true;
+            else if (r < goldP + boonP + decayP + stuckP)        isStuck = true;
           }
           const baseId = `${now}-${Math.random().toString(36).slice(2, 6)}`;
           const newExtra = {
@@ -5643,25 +5785,10 @@ function App() {
             lastFall: now,
             stuck: isStuck,
             decay: isDecay,
-            glue: isGlue ? `pair-${baseId}` : null,
+            gold:  isGold,
+            boon:  boonKind,   // null or one of: stasis/dynamite/wild/scramble/life/superarea
           };
           let nextExtras = [...extrasRef.current, newExtra];
-          if (isGlue) {
-            // Spawn the partner one row above with a matching glue id so they
-            // fall in lockstep and link via the same pair-id.
-            const partner = {
-              id: `${baseId}-p`,
-              letter: G.pickExtraLetter(0), // partner is always a plain letter
-              nextLetter: G.pickExtraLetter(),
-              col,
-              row: -1,
-              lastFall: now,
-              stuck: false,
-              decay: false,
-              glue: newExtra.glue,
-            };
-            nextExtras = [...nextExtras, partner];
-          }
           extrasRef.current = nextExtras;
           setExtras(nextExtras);
           lastExtraSpawnRef.current = now;
@@ -5876,6 +6003,134 @@ function App() {
     }, 50);
   }, [spawnNextBlock]);
 
+  // ─── BOON TILE EFFECTS ───────────────────────────────────────
+  // Fires the embedded-powerup effect of a boon tile at (r, c). Called from
+  // the word-scoring loop (boon tile consumed by a word) AND from the hammer
+  // handler (boon tile hammered). Each kind produces its own visual + sound.
+  const triggerBoon = useCallback((kind, r, c) => {
+    if (!kind) return;
+    const px = c * CELL + CELL / 2;
+    const py = r * CELL;
+    // Floating callout so the player sees it pop.
+    const label = ({
+      stasis:    "❄ STASIS",
+      dynamite:  "🧨 BOOM",
+      scramble:  "⚡ SCRAMBLE",
+      wild:      "✦ WILD +1",
+      life:      "❤️ LIFE +1",
+      superarea: "💥 SUPER BLAST",
+    })[kind] || "BOON";
+    const callId = Date.now() + Math.random();
+    setCallouts(prev => [...prev, { id: callId, word: label, pts: "", x: px, y: py }]);
+    setTimeout(() => setCallouts(prev => prev.filter(cc => cc.id !== callId)), 1500);
+
+    if (kind === "stasis") {
+      const until = Date.now() + 10000;
+      frozenRef.current = until;
+      setFrozenUntil(until);
+      setTimeout(() => {
+        setFrozenUntil(prev => prev === until ? 0 : prev);
+        if (frozenRef.current === until) frozenRef.current = 0;
+      }, 10000);
+    } else if (kind === "life") {
+      const LIVES_CAP = 5;
+      livesRef.current = Math.min(LIVES_CAP, livesRef.current + 1);
+      setLives(l => Math.min(LIVES_CAP, l + 1));
+    } else if (kind === "wild") {
+      // Bank a wild charge into the player's inventory — they'll use it later.
+      setPowerups(p => ({ ...p, wild: (p.wild || 0) + 1 }));
+    } else if (kind === "scramble") {
+      // Run the board-wide scramble immediately (no inventory cost).
+      const b = boardRef.current;
+      const occupied = [];
+      const letters = [];
+      for (let rr = 0; rr < ROWS; rr++) {
+        for (let cc = 0; cc < COLS; cc++) {
+          if (b[rr][cc]) { occupied.push([rr, cc]); letters.push(b[rr][cc]); }
+        }
+      }
+      if (occupied.length >= 2) {
+        if (window.Sound) Sound.scramble();
+        setScrambleWobble(true);
+        setTimeout(() => {
+          const shuffled = G.shuffle(letters);
+          const newBoard = b.map(row => [...row]);
+          occupied.forEach(([rr, cc], i) => { newBoard[rr][cc] = shuffled[i]; });
+          boardRef.current = newBoard;
+          setBoard(newBoard);
+          setTileIds(() => {
+            const ids = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+            const t = Date.now();
+            occupied.forEach(([rr, cc], i) => { ids[rr][cc] = `scram-${t}-${i}`; });
+            return ids;
+          });
+        }, 260);
+        setTimeout(() => setScrambleWobble(false), 540);
+      }
+    } else if (kind === "dynamite" || kind === "superarea") {
+      // Dynamite = row + column through this cell.
+      // Super area = 3×3 area around this cell.
+      if (window.Sound) Sound.boom();
+      setBoardShake(true);
+      setTimeout(() => setBoardShake(false), 380);
+      setExplosionFlash({ row: r, col: c, key: Date.now() });
+      setTimeout(() => setExplosionFlash(null), 380);
+      const newBoard = boardRef.current.map(row => [...row]);
+      if (kind === "dynamite") {
+        for (let cc = 0; cc < COLS; cc++) newBoard[r][cc] = null;
+        for (let rr = 0; rr < ROWS; rr++) newBoard[rr][c] = null;
+      } else {
+        for (let rr = r - 1; rr <= r + 1; rr++) {
+          for (let cc = c - 1; cc <= c + 1; cc++) {
+            if (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS) newBoard[rr][cc] = null;
+          }
+        }
+      }
+      const settled = G.applyGravity(newBoard);
+      boardRef.current = settled;
+      setBoard(settled);
+      setTileIds(prev => {
+        const ids = prev.map(row => [...row]);
+        if (kind === "dynamite") {
+          for (let cc = 0; cc < COLS; cc++) ids[r][cc] = null;
+          for (let rr = 0; rr < ROWS; rr++) ids[rr][c] = null;
+        } else {
+          for (let rr = r - 1; rr <= r + 1; rr++) {
+            for (let cc = c - 1; cc <= c + 1; cc++) {
+              if (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS) ids[rr][cc] = null;
+            }
+          }
+        }
+        // Gravity-settle tileIds in lockstep.
+        const newIds = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+        for (let cc = 0; cc < COLS; cc++) {
+          const stack = [];
+          for (let rr = 0; rr < ROWS; rr++) if (ids[rr][cc] !== null) stack.push(ids[rr][cc]);
+          for (let i = 0; i < stack.length; i++) newIds[ROWS - 1 - i][cc] = stack[stack.length - 1 - i];
+        }
+        return newIds;
+      });
+    }
+  }, []);
+
+  // Helper used by both the word-scoring pass and the hammer handler — scans
+  // a list of (r, c) cells for boon tiles BEFORE they're cleared and queues
+  // their effects to fire. Returns the list of {kind, r, c} to be fired.
+  const collectBoonsInCells = useCallback((cells) => {
+    const out = [];
+    const ids = tileIdsRef.current;
+    if (!ids) return out;
+    cells.forEach(([r, c]) => {
+      const tid = ids[r] && ids[r][c];
+      if (typeof tid === "string" && tid.startsWith("boon-")) {
+        const parts = tid.split("-");   // boon-{kind}-{...id...}
+        const kind = parts[1];
+        if (kind) out.push({ kind, r, c });
+      }
+    });
+    return out;
+  }, []);
+
   // Process word formation, scoring, gravity. Recurses if gravity creates new words.
   const processWordsAt = useCallback((r, c, currentBoard) => {
     const modifier = effectiveModifier();
@@ -5928,6 +6183,18 @@ function App() {
     const cellsToHighlight = new Set();
     validWords.forEach(w => w.cells.forEach(([rr, cc]) => cellsToHighlight.add(`${rr}-${cc}`)));
     setHighlightCells(cellsToHighlight);
+
+    // BOON TILES: if any cell in a scored word holds a boon, queue its
+    // powerup to fire. Detected BEFORE the dissolve clears tile IDs.
+    const cellsArr = Array.from(cellsToHighlight).map(k => k.split("-").map(Number));
+    const boons = collectBoonsInCells(cellsArr);
+    if (boons.length > 0) {
+      // Slight stagger so multiple boons land as a satisfying chain instead
+      // of one stacked frame.
+      boons.forEach((b, i) => {
+        setTimeout(() => triggerBoon(b.kind, b.r, b.c), 220 + i * 180);
+      });
+    }
     // Mark these cells as in-flight RIGHT NOW so any concurrent processWordsAt
     // call (e.g. from an extra locking 50ms after the dice) sees them and skips
     // any word that touches them. They get unmarked at the very end of the
@@ -6254,7 +6521,7 @@ function App() {
 
     // Mark the upcoming pill for its pulse animation (will get the displaced letter).
     setJustSwappedNextId(target.id);
-    setTimeout(() => setJustSwappedNextId(prev => prev === target.id ? null : prev), 340);
+    setTimeout(() => setJustSwappedNextId(prev => prev === target.id ? null : prev), 200);
 
     // Update the active dice: new letters + transient `swapping` flag to fire the
     // CSS swap-pop animation. We snap-position too so the dice doesn't slide between
@@ -6272,10 +6539,10 @@ function App() {
         setActive(prev => prev ? { ...prev, snapping: false } : prev);
       });
     });
-    // Clear the swap-pop flag after the animation finishes (320ms).
+    // Clear the swap-pop flag after the (sped-up) 180ms animation.
     setTimeout(() => {
       setActive(prev => prev ? { ...prev, swapping: false } : prev);
-    }, 340);
+    }, 200);
 
     setNextQueue(prev => prev.map((b, i) => i === idx
       ? { ...b, letters: [...a.letters] }
@@ -6307,10 +6574,11 @@ function App() {
     }, 900);
   }, []);
 
-  // Lightweight helper to spawn a new "extra" falling block at an arbitrary cell with a
-  // chosen letter. Used by drag-placed-into-air and the swap-falling-onto-placed paths.
-  // lastFall is set to 0 so the very next extras tick advances it (no startup delay);
-  // fastFall: true makes it commit at 90ms/row instead of the natural cadence.
+  // Lightweight helper to spawn a new "extra" falling block at an arbitrary cell
+  // with a chosen letter. Used by drag-placed-into-air and the swap-falling-onto-
+  // placed paths. fastFall used to speed these up but it felt inconsistent —
+  // some letters dropped fast, others naturally. Removed per playtest: every
+  // letter now falls at the level's natural cadence, regardless of source.
   const spawnExtraAt = useCallback((col, row, letter) => {
     const newExtra = {
       id: `spawn-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -6319,7 +6587,6 @@ function App() {
       col: Math.max(0, Math.min(COLS - 1, col)),
       row: Math.max(0, Math.min(ROWS - 1, row)),
       lastFall: 0,
-      fastFall: true,
     };
     const next = [...extrasRef.current, newExtra];
     extrasRef.current = next;
@@ -6343,19 +6610,18 @@ function App() {
       ids[r2][c2] = idA;
       return ids;
     });
-    // DECAY TIMER RESET: if either tile is a decay tile, move its timer entry
-    // to its new (r,c) AND reset to now — moving a decay tile resets the
-    // petrification countdown so the player can buy themselves more time.
+    // DECAY: move the timer entry to the new cell but PRESERVE the original
+    // start timestamp — the countdown keeps ticking from when it first
+    // landed, not from when it was last moved. (User feedback: free
+    // unlimited reset-by-shuffle made decay tiles too easy to defuse.)
     const k1 = `${r1}-${c1}`, k2 = `${r2}-${c2}`;
-    const had1 = decayTimersRef.current[k1] !== undefined;
-    const had2 = decayTimersRef.current[k2] !== undefined;
-    if (had1 || had2) {
-      const now = Date.now();
-      // Delete both first, then set, so the swap-both case doesn't clobber.
-      if (had1) delete decayTimersRef.current[k1];
-      if (had2) delete decayTimersRef.current[k2];
-      if (had1) decayTimersRef.current[k2] = now;
-      if (had2) decayTimersRef.current[k1] = now;
+    const t1 = decayTimersRef.current[k1];
+    const t2 = decayTimersRef.current[k2];
+    if (t1 !== undefined || t2 !== undefined) {
+      if (t1 !== undefined) delete decayTimersRef.current[k1];
+      if (t2 !== undefined) delete decayTimersRef.current[k2];
+      if (t1 !== undefined) decayTimersRef.current[k2] = t1;
+      if (t2 !== undefined) decayTimersRef.current[k1] = t2;
     }
     // After swap, scan for newly formed words at both positions
     setTimeout(() => {
@@ -6665,14 +6931,15 @@ function App() {
           return;
         }
 
-        // Normal release — snap to (newCol, newRow), set fastFall to commit quickly.
+        // Normal release — snap to (newCol, newRow). Used to set fastFall:true
+        // to commit quickly, but per playtest every letter falls at natural
+        // speed now regardless of how it was placed.
         setActive(prev => prev ? {
           ...prev,
           col: newCol,
           row: newRow,
           pixelX: newCol * CELL,
           pixelY: newRow * CELL,
-          fastFall: true,
         } : prev);
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
@@ -6759,7 +7026,7 @@ function App() {
           // Empty cell — push up if another extra already there.
           while (newRow > 0 && extrasRef.current.some(o => o.id !== ext.id && o.col === newCol && o.row === newRow)) newRow--;
           const next = extrasRef.current.map(x => x.id === ext.id
-            ? { ...x, col: newCol, row: newRow, pixelX: undefined, pixelY: undefined, lastFall: 0, fastFall: true }
+            ? { ...x, col: newCol, row: newRow, pixelX: undefined, pixelY: undefined, lastFall: 0 }
             : x);
           extrasRef.current = next;
           setExtras(next);
@@ -7044,11 +7311,14 @@ function App() {
 
     if (armedPower === "hammer") {
       if (board[r][c] === null) return;
-      // Smash FX: shard particles + smash sound. clearCells nulls the cell
-      // and applies gravity; the particles + sound just add punch.
+      // BOON FIRE: hammering a boon tile also activates its embedded powerup
+      // (in addition to destroying the tile). Detected before clearCells
+      // wipes the tileId.
+      const hammeredBoons = collectBoonsInCells([[r, c]]);
       if (window.Sound) Sound.smash();
       spawnShatterParticles(r, c, 10, "#fff");
       clearCells([[r, c]]);
+      hammeredBoons.forEach(b => triggerBoon(b.kind, b.r, b.c));
       setPowerups(p => ({ ...p, hammer: (p.hammer || 0) - 1 }));
       setArmedPower(null);
     } else if (armedPower === "dynamite") {
@@ -7444,6 +7714,16 @@ function Hud({ level, score, timeLeft, blocksLeft, scorePops, coins, lives, paus
 
 // Memoized cell — skips re-render when the props for THIS cell are unchanged. Since most
 // state updates only touch a few cells, the bulk of the 84-cell board now stays put.
+// Map of boon kinds → display icon. Kept top-level so Tile re-renders are cheap.
+const BOON_ICONS = {
+  stasis:    "❄",
+  dynamite:  "🧨",
+  scramble:  "⚡",
+  wild:      "✦",
+  life:      "❤",
+  superarea: "💥",
+};
+
 const Tile = React.memo(function Tile({ letter, id, r, c, inWord, dissolving, armed, isSparkle, isWild, isStuck, isDecay, isGlue, isGold, isBeingDragged, dragX, dragY, isReleased, onCellClick }) {
   // Position via transform: translate3d so 2D motion (especially diagonal swaps)
   // animates as a single smooth interpolation. While dragged we kill the transition
@@ -7458,12 +7738,30 @@ const Tile = React.memo(function Tile({ letter, id, r, c, inWord, dissolving, ar
   // can break it. The letter value is "#" — kept on the board so the cell is
   // "occupied" and blocks word formation, but visually we show a stone glyph.
   const isStone = letter === "#";
+  // Boon tile detection — the prefix encodes the embedded powerup kind.
+  // e.g. "boon-stasis-1234" → boonKind = "stasis".
+  const boonKind = (typeof id === "string" && id.startsWith("boon-"))
+    ? id.split("-")[1] : null;
+  // For decay tiles, compute the elapsed time since landing so the CSS fill
+  // animation starts already-X-seconds-in. We use a negative animation-delay
+  // — e.g. delay = -10s on a 25s animation makes the fill render at 40%.
+  // Reads the live decay timer map exposed by App via window.__wfDecayTimers.
+  let decayStyle = null;
+  if (isDecay) {
+    const timers = (typeof window !== "undefined") ? window.__wfDecayTimers : null;
+    const start = timers ? timers[`${r}-${c}`] : null;
+    if (start) {
+      const elapsedMs = Math.max(0, Date.now() - start);
+      decayStyle = { "--decay-delay": `-${elapsedMs}ms` };
+    }
+  }
   return (
     <div
-      className={`tile ${inWord ? "in-word" : ""} ${dissolving ? "dissolving" : ""} ${armed ? "targeting" : ""} ${isSparkle ? "sparkle" : ""} ${isWild ? "wild" : ""} ${isStone ? "stone" : ""} ${isStuck ? "stuck" : ""} ${isDecay ? "decay" : ""} ${isGlue ? "glue" : ""} ${isGold ? "gold" : ""} ${isBeingDragged ? "dragging" : ""}`}
+      className={`tile ${inWord ? "in-word" : ""} ${dissolving ? "dissolving" : ""} ${armed ? "targeting" : ""} ${isSparkle ? "sparkle" : ""} ${isWild ? "wild" : ""} ${isStone ? "stone" : ""} ${isStuck ? "stuck" : ""} ${isDecay ? "decay" : ""} ${isGlue ? "glue" : ""} ${isGold ? "gold" : ""} ${boonKind ? `boon boon-${boonKind}` : ""} ${isBeingDragged ? "dragging" : ""}`}
       style={{
         transform: `translate3d(${tx}px, ${ty}px, 0)`,
         "--letter-hue": letterHue(letter),
+        ...(decayStyle || {}),
         // Only kill the transition while ACTIVELY dragging — once released we want
         // the default transition back so swap animates.
         transition: isBeingDragged ? "none" : undefined,
@@ -7477,6 +7775,11 @@ const Tile = React.memo(function Tile({ letter, id, r, c, inWord, dissolving, ar
           : <span className="tile-letter">{letter}</span>}
       </div>
       {isSparkle && <div className="sparkle-glow" />}
+      {boonKind && (
+        <span className={`tile-boon-badge boon-badge-${boonKind}`} aria-label={`embedded ${boonKind}`}>
+          {BOON_ICONS[boonKind]}
+        </span>
+      )}
     </div>
   );
 });
@@ -8050,6 +8353,12 @@ function PauseOverlay({ onResume, onHome, onRestart }) {
       desc: "An unstamped slug. Tap it on the board to brand it with whatever letter you need.",
     },
     {
+      cls: "demo-tile demo-boon",
+      glyph: "❄",
+      name: "Boon ingots",
+      desc: "Carry a tiny powerup baked in (stasis, dynamite, scramble, wild, life, super-blast). Look for the little icon in the top-right corner — using the tile in a word OR smashing it with a Hammer fires the powerup.",
+    },
+    {
       cls: "demo-tile demo-stuck",
       glyph: "K",
       name: "Welded stock",
@@ -8059,13 +8368,7 @@ function PauseOverlay({ onResume, onHome, onRestart }) {
       cls: "demo-tile demo-decay",
       glyph: "D",
       name: "Wrong-alloy castings",
-      desc: "Apprentice mixed the wrong alloy again. Move them or use them quick — sit still too long and they turn to stone.",
-    },
-    {
-      cls: "demo-tile demo-glue",
-      glyph: "L",
-      name: "Glue-pair tongs",
-      desc: "Two ingots fused at the hip. They travel as a unit and won't be separated, so plan around the pair.",
+      desc: "Apprentice mixed the wrong alloy again. Use them in a word before the inner fill rises — sit still too long and they petrify.",
     },
     {
       cls: "demo-tile demo-stone",
