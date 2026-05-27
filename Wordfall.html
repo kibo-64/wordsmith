@@ -1875,20 +1875,14 @@ html, body {
 /* Each variant gets a colored aura tied to its powerup family. The small badge
    in the top-right shows which powerup is embedded. Firing the boon (via word
    or hammer) triggers the effect automatically. */
-.tile.boon .tile-inner {
-  position: relative;
-  /* Inset the colored aura INSIDE the tile-inner (via inset box-shadow) so
-     the tile silhouette stays a clean square — the aura no longer adds a
-     2px outer ring that made the tile look like a different shape. */
-  box-shadow:
-    inset 0 0 0 2px var(--boon-aura, rgba(255, 255, 255, 0.5)),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.22),
-    inset 0 0 0 3px rgba(0, 0, 0, 0.10),
-    0 3px 6px rgba(0, 0, 0, 0.42),
-    0 1px 0 rgba(0, 0, 0, 0.5),
-    0 0 12px var(--boon-glow, rgba(255, 255, 255, 0.35));
-  animation: boon-aura-pulse 2s ease-in-out infinite;
+/* Boon tiles look EXACTLY like normal tiles, just with the corner badge.
+   No custom box-shadow override — that's what was making them read as a
+   different shape. The only added flair is a very gentle outer glow on
+   the .tile itself (not .tile-inner) so the tile still feels special
+   without changing its silhouette. */
+.tile.boon {
+  filter: drop-shadow(0 0 4px var(--boon-glow, rgba(255, 255, 255, 0.35)));
+  animation: boon-aura-pulse 2.4s ease-in-out infinite;
 }
 .tile.boon-stasis    { --boon-aura: rgba(140, 200, 255, 0.78); --boon-glow: rgba(140, 200, 255, 0.55); }
 .tile.boon-dynamite  { --boon-aura: rgba(255, 140, 80, 0.80);  --boon-glow: rgba(255, 140, 80, 0.55); }
@@ -1900,15 +1894,11 @@ html, body {
 /* Same boon styling applied to airborne extras (falling cubes) so a tile that
    spawned with an embedded powerup keeps its aura the whole way down. The
    visible faces are inside .dice-cube; we paint the aura on the .cube-face. */
-.extra-tile.boon .cube-face {
-  box-shadow:
-    inset 0 0 0 2px var(--boon-aura, rgba(255, 255, 255, 0.5)),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.22),
-    inset 0 0 0 3px rgba(0, 0, 0, 0.10),
-    0 3px 6px rgba(0, 0, 0, 0.42),
-    0 0 12px var(--boon-glow, rgba(255, 255, 255, 0.35));
-  animation: boon-aura-pulse 2s ease-in-out infinite;
+/* Airborne boons match the placed-tile treatment — gentle outer glow only,
+   no inset borders that would change the cube's silhouette. */
+.extra-tile.boon {
+  filter: drop-shadow(0 0 4px var(--boon-glow, rgba(255, 255, 255, 0.35)));
+  animation: boon-aura-pulse 2.4s ease-in-out infinite;
 }
 .extra-tile.boon-stasis    { --boon-aura: rgba(140, 200, 255, 0.78); --boon-glow: rgba(140, 200, 255, 0.55); }
 .extra-tile.boon-dynamite  { --boon-aura: rgba(255, 140, 80, 0.80);  --boon-glow: rgba(255, 140, 80, 0.55); }
@@ -1918,8 +1908,9 @@ html, body {
 .extra-tile.boon-superarea { --boon-aura: rgba(255, 220, 80, 0.85);  --boon-glow: rgba(255, 200, 60, 0.55); }
 
 @keyframes boon-aura-pulse {
-  0%, 100% { filter: brightness(1); }
-  50%      { filter: brightness(1.12); }
+  /* Drives the drop-shadow opacity via filter — gentle breath, not a flash. */
+  0%, 100% { filter: drop-shadow(0 0 3px var(--boon-glow, rgba(255, 255, 255, 0.30))); }
+  50%      { filter: drop-shadow(0 0 7px var(--boon-glow, rgba(255, 255, 255, 0.55))); }
 }
 
 .tile-boon-badge {
@@ -5648,6 +5639,15 @@ function App() {
   // crowded board doesn't keep getting faster — it lets the player breathe.
   // Floor of 180ms so even late-level rampage stays barely playable.
   const computeLiveFallMs = useCallback((baseMs) => {
+    // ENDLESS MODE: difficulty curves on elapsed time, not on the (frozen)
+    // level. Fall speed ramps from 100% of baseMs at 0 minutes down to 30%
+    // at 8 minutes. After that it stays brutal.
+    if (modeRef.current === "endless") {
+      const minutes = endlessElapsedRef.current / 60000;
+      const p = Math.max(0, Math.min(1, minutes / 8));
+      const rampMs = Math.max(180, Math.round(baseMs * (1 - 0.70 * p)));
+      return Math.round(rampMs * computeFullnessSlowdown());
+    }
     const lvl = G.getLevel(levelRef.current);
     if (!lvl || !lvl.time || !lvl.blocks) return baseMs;
     const timeProgress = 1 - (timeLeftRef.current / lvl.time);
@@ -5656,6 +5656,28 @@ function App() {
     const rampMs = Math.max(180, Math.round(baseMs * (1 - 0.30 * p)));
     return Math.round(rampMs * computeFullnessSlowdown());
   }, [computeFullnessSlowdown]);
+
+  // Returns the level config we should USE for the spawn pipeline. In story
+  // mode this is just the current level. In endless mode we synthesize a
+  // "virtual level" that ramps every 30 seconds of elapsed time, so the
+  // game gets harder the longer you survive — more simultaneous extras,
+  // faster spawn rate, faster fall, more hazards. Caps at level 100's
+  // intensity at ~50 minutes elapsed.
+  const getEffectiveLevel = useCallback(() => {
+    if (modeRef.current !== "endless") return G.getLevel(levelRef.current);
+    const elapsedSec = Math.floor(endlessElapsedRef.current / 1000);
+    // 1 synthetic level every 30s, capped at level 100 (= ~50 minutes).
+    const synth = Math.min(99, Math.floor(elapsedSec / 30));
+    const base = G.getLevel(synth);
+    // Boost the extras count further in endless — there's no shop break, so
+    // we want more chaos per minute than story mode at the same difficulty.
+    return {
+      ...base,
+      extrasMax:      Math.min(10, (base.extrasMax || 1) + 1),
+      extrasSpawnMs:  Math.max(500, Math.round((base.extrasSpawnMs || 3500) * 0.75)),
+      fallMs:         base.fallMs || 850,
+    };
+  }, []);
   useEffect(() => { extrasRef.current = extras; }, [extras]);
 
   // ─── Pause / resume ───────────────────────────────────────
@@ -6479,7 +6501,10 @@ function App() {
     const tick = () => {
       if (stopped) return;
       if (frozenRef.current && Date.now() < frozenRef.current) return;
-      const lvl = G.getLevel(levelRef.current);
+      // Use the effective level — story mode returns the current level config,
+      // endless mode synthesises one based on elapsed time so the difficulty
+      // actually ramps as the player survives.
+      const lvl = getEffectiveLevel();
       const maxExtras = lvl.extrasMax || 0;
       // Extras fall at the SAME speed as the main dice — single fall cadence across
       // all falling letters. Routed through computeLiveFallMs so they pick up the
@@ -6544,9 +6569,16 @@ function App() {
         if (candidates.length > 0 || peUsable) {
           const col = peUsable ? pe.col
             : candidates[Math.floor(Math.random() * candidates.length)];
+          // In endless mode, drive hazard probabilities by the synthetic
+          // elapsed-time level instead of the (stuck-at-0) story level. This
+          // makes stones/decay/stuck tiles ramp in the same way they would
+          // across story levels — without it, endless never gets harder.
+          const hazardLvlIdx = modeRef.current === "endless"
+            ? Math.min(99, Math.floor(endlessElapsedRef.current / 30000))
+            : levelRef.current;
           // Use the pre-picked letter when honoring the pending extra so the
           // preview ghost's letter matches what actually drops.
-          const rolled = peUsable ? pe.letter : G.pickExtraLetter(levelRef.current);
+          const rolled = peUsable ? pe.letter : G.pickExtraLetter(hazardLvlIdx);
           // Roll for the various spawn-time modifiers. Only one can win per spawn
           // and they don't apply to stones.
           const isReal = rolled !== "#";
@@ -6556,10 +6588,10 @@ function App() {
             // Each branch consumes the next probability band of r in [0, 1).
             // Boon (embedded powerup) is its own band; if it wins, pick which
             // powerup with weighted distribution.
-            const goldP  = G.pickGoldChance(levelRef.current);
-            const boonP  = G.pickBoonChance(levelRef.current);
-            const decayP = G.pickDecayChance(levelRef.current);
-            const stuckP = G.pickStuckChance(levelRef.current);
+            const goldP  = G.pickGoldChance(hazardLvlIdx);
+            const boonP  = G.pickBoonChance(hazardLvlIdx);
+            const decayP = G.pickDecayChance(hazardLvlIdx);
+            const stuckP = G.pickStuckChance(hazardLvlIdx);
             if (r < goldP)                                       isGold = true;
             else if (r < goldP + boonP)                          boonKind = G.pickBoonKind();
             else if (r < goldP + boonP + decayP)                 isDecay = true;
@@ -9945,8 +9977,11 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
   // Gazette is now a second page behind a button — keeps the Retry / New Run
   // / Back to Title buttons reachable without scrolling past the newspaper.
   const [showGazette, setShowGazette] = React.useState(false);
+  // Gazette disabled for now — keeping the code intact for a future revisit.
+  // Flip this back to `true` to re-enable the AI-generated newspaper.
+  const GAZETTE_ENABLED = false;
   React.useEffect(() => {
-    if (uniqueWords.length < 3) { setAiBusy(false); setImgBusy(false); return; }
+    if (!GAZETTE_ENABLED || uniqueWords.length < 3) { setAiBusy(false); setImgBusy(false); return; }
     let cancelled = false;
     const lang = (window.Lang && window.Lang.get()) || "en";
     // ─── Text first ───────────────────────────────────────────
@@ -10166,9 +10201,10 @@ function GameOverOverlay({ score, foundWords, level, levelIdx, levelStartScore, 
           ? <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onRetryLevel(); }}>{T("Retry this level", "Reintentar nivel")}</button>
           : <button className="overlay-btn" onClick={() => { window.Sound && Sound.tap(); onRestart(); }}>{T("New run", "Nueva partida")}</button>}
         <button className="overlay-btn secondary" onClick={() => { window.Sound && Sound.tap(); onHome(); }}>{T("Back to title", "Volver al menú")}</button>
-        {/* Gazette is now opt-in — keeps the buttons above reachable without
-            scrolling past the long newspaper article. */}
-        {uniqueWords.length >= 3 && (
+        {/* Gazette opt-in entry — currently disabled (GAZETTE_ENABLED=false at
+            the top of this component). Reachable code stays intact so we can
+            flip it back on without re-wiring. */}
+        {GAZETTE_ENABLED && uniqueWords.length >= 3 && (
           <button
             className="overlay-btn secondary gazette-open-btn"
             onClick={() => { window.Sound && Sound.tap(); setShowGazette(true); }}>
